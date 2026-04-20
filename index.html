@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="description" content="Descobre onde beber e comprar Café Delta em Portugal e no Mundo. Contribui com novas localizações e ganha prémios!">
+<meta name="theme-color" content="#1a0a00">
+<meta property="og:title" content="Delta Café Map">
+<meta property="og:description" content="O mapa colaborativo do Café Delta">
+<meta property="og:image" content="assets/og-image.png">
+<title>Delta Café Map ☕</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══ TOPBAR ══ -->
+  <header id="topbar">
+    <div class="logo" onclick="App.closeAllOverlays()">
+      <div class="logo-icon">☕</div>
+      <div class="logo-text">
+        <span class="logo-delta">Delta</span>
+        <span class="logo-map">Map</span>
+      </div>
+    </div>
+    <div class="topbar-center" id="topbar-search-wrap">
+      <div class="search-bar" id="topbar-search">
+        <span class="search-icon">🔍</span>
+        <input id="global-search" placeholder="Pesquisar cidade, país ou local..." oninput="Map.search(this.value)">
+      </div>
+    </div>
+    <nav class="topbar-right" id="tb-right"></nav>
+  </header>
+
+  <!-- ══ ADD BANNER ══ -->
+  <div id="add-banner">
+    <span>📍 Modo adição ativo — clica no mapa para marcar o local</span>
+    <button onclick="Map.cancelAdd()">✖ Cancelar</button>
+  </div>
+
+  <!-- ══ MAIN LAYOUT ══ -->
+  <main id="main">
+
+    <!-- Sidebar -->
+    <aside id="sidebar">
+      <div class="sidebar-section" id="filter-box">
+        <div class="sidebar-label">Tipo de Local</div>
+        <div id="type-filters"></div>
+        <div class="sidebar-label" style="margin-top:12px;">País</div>
+        <select id="country-sel" onchange="Map.renderMarkers()">
+          <option value="all">🌍 Todos os países</option>
+        </select>
+      </div>
+
+      <div class="sidebar-section sidebar-dark" id="stats-box">
+        <div class="sidebar-label-light">Comunidade</div>
+        <div class="stats-grid" id="stats-grid"></div>
+      </div>
+
+      <div class="sidebar-section" id="top-contributors-box">
+        <div class="sidebar-label">🏆 Top Exploradores</div>
+        <div id="top-list"></div>
+      </div>
+    </aside>
+
+    <!-- Map -->
+    <div id="map-container">
+      <div id="map"></div>
+
+      <!-- Floating spot panel -->
+      <div id="spot-panel" class="spot-panel hidden">
+        <div class="spot-panel-header">
+          <div class="spot-panel-icon" id="sp-icon"></div>
+          <div class="spot-panel-info">
+            <div class="spot-panel-name" id="sp-name"></div>
+            <div class="spot-panel-sub" id="sp-sub"></div>
+            <div class="spot-panel-addr" id="sp-addr"></div>
+          </div>
+          <button class="spot-close" onclick="Map.closePanel()">✕</button>
+        </div>
+        <div class="spot-tags" id="sp-tags"></div>
+        <div class="spot-prods" id="sp-prods"></div>
+        <div class="spot-footer">
+          <div class="spot-added-by" id="sp-by"></div>
+          <div class="spot-actions">
+            <button class="upvote-btn" onclick="Map.upvote()">
+              <span>👍</span><span id="sp-upv">0</span>
+            </button>
+            <button class="report-btn" onclick="Map.report()" title="Reportar local">⚠️</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Map controls -->
+      <div class="map-controls">
+        <button class="map-ctrl-btn" onclick="Map.locateMe()" title="A minha localização">📍</button>
+        <button class="map-ctrl-btn" onclick="Map.fitAll()" title="Ver todos">🌍</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ══ MOBILE BOTTOM NAV ══ -->
+  <nav id="bottom-nav">
+    <button class="bnav-btn active" data-view="map" onclick="UI.showTab('map')">🗺️<span>Mapa</span></button>
+    <button class="bnav-btn" data-view="add" onclick="Auth.requireLogin(Map.startAdd)">➕<span>Adicionar</span></button>
+    <button class="bnav-btn" data-view="ranking" onclick="UI.showTab('ranking')">🏆<span>Ranking</span></button>
+    <button class="bnav-btn" data-view="profile" onclick="UI.showTab('profile')">👤<span>Perfil</span></button>
+  </nav>
+
+</div><!-- /app -->
+
+<!-- ══════════════════════════════════════════
+     OVERLAYS / MODALS
+══════════════════════════════════════════ -->
+
+<!-- AUTH MODAL -->
+<div class="modal-bg" id="auth-modal">
+  <div class="modal modal-auth">
+    <button class="modal-close" onclick="UI.closeModal('auth-modal')">✕</button>
+    <div class="modal-logo">☕</div>
+    <h2 id="auth-title">Iniciar Sessão</h2>
+    <p class="modal-sub" id="auth-sub">Entra para explorar e contribuir</p>
+
+    <div class="demo-hint" id="demo-hint">
+      🧪 <strong>Conta demo:</strong> admin@delta.pt / admin1234
+    </div>
+
+    <div class="err-box" id="auth-err"></div>
+
+    <div id="auth-name-row" class="hidden">
+      <label class="flabel">Nome completo</label>
+      <input class="finput" id="a-name" placeholder="O teu nome" autocomplete="name">
+    </div>
+    <label class="flabel">Email</label>
+    <input class="finput" id="a-email" type="email" placeholder="email@exemplo.com" autocomplete="email">
+    <label class="flabel">Palavra-passe</label>
+    <div class="pass-wrap">
+      <input class="finput" id="a-pass" type="password" placeholder="••••••••"
+             onkeydown="if(event.key==='Enter')Auth.submit()">
+      <button class="pass-toggle" onclick="UI.togglePass('a-pass',this)">👁</button>
+    </div>
+    <div id="auth-conf-row" class="hidden">
+      <label class="flabel">Confirmar palavra-passe</label>
+      <input class="finput" id="a-conf" type="password" placeholder="••••••••">
+    </div>
+    <button class="mbtn mbtn-red" onclick="Auth.submit()" id="auth-btn">Entrar</button>
+    <p class="auth-switch">
+      <span id="auth-sw-txt">Não tens conta? </span>
+      <a onclick="Auth.toggleMode()" id="auth-sw-lnk">Registar</a>
+    </p>
+  </div>
+</div>
+
+<!-- ADD SPOT MODAL -->
+<div class="modal-bg" id="add-modal">
+  <div class="modal modal-add">
+    <button class="modal-close" onclick="Map.cancelAdd()">✕</button>
+    <h2>📍 Novo Local Delta</h2>
+    <p class="modal-sub" id="add-coords-lbl">Clica no mapa para definir a posição</p>
+    <div class="err-box" id="add-err"></div>
+
+    <div class="form-grid">
+      <div class="form-col-full">
+        <label class="flabel">Nome do local *</label>
+        <input class="finput" id="add-name" placeholder="Ex: Café A Brasileira">
+      </div>
+      <div>
+        <label class="flabel">Tipo *</label>
+        <select class="finput" id="add-type"></select>
+      </div>
+      <div>
+        <label class="flabel">País *</label>
+        <input class="finput" id="add-country" value="Portugal" list="countries-list">
+        <datalist id="countries-list"></datalist>
+      </div>
+      <div>
+        <label class="flabel">Cidade *</label>
+        <input class="finput" id="add-city" placeholder="Lisboa">
+      </div>
+      <div class="form-col-full">
+        <label class="flabel">Morada</label>
+        <input class="finput" id="add-addr" placeholder="Rua e número">
+      </div>
+      <div class="form-col-full">
+        <label class="flabel">Horário</label>
+        <input class="finput" id="add-hours" placeholder="Ex: Seg-Sex 08h-20h, Sáb 09h-18h">
+      </div>
+      <div class="form-col-full">
+        <label class="flabel">Produtos disponíveis</label>
+        <div class="ptags-wrap" id="prod-tags"></div>
+      </div>
+      <div class="form-col-full">
+        <label class="flabel">Nota adicional</label>
+        <textarea class="finput" id="add-note" rows="2" placeholder="Informação útil para outros exploradores..."></textarea>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="mbtn mbtn-ghost" onclick="Map.cancelAdd()">Cancelar</button>
+      <button class="mbtn mbtn-red" onclick="Map.submitSpot()">Submeter Local ☕</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE OVERLAY -->
+<div id="profile-overlay" class="overlay hidden">
+  <div class="overlay-header">
+    <button class="back-btn" onclick="UI.closeOverlay('profile-overlay')">← Voltar</button>
+    <h2>O Meu Perfil</h2>
+    <div></div>
+  </div>
+  <div id="profile-body" class="overlay-body"></div>
+</div>
+
+<!-- RANKING OVERLAY -->
+<div id="ranking-overlay" class="overlay hidden">
+  <div class="overlay-header">
+    <button class="back-btn" onclick="UI.closeOverlay('ranking-overlay')">← Voltar</button>
+    <h2>🏆 Ranking Global</h2>
+    <div></div>
+  </div>
+  <div id="ranking-body" class="overlay-body"></div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ══ SCRIPTS ══ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/gamification.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/map.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
