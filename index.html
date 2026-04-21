@@ -27,7 +27,7 @@
     </div>
     <div class="topbar-center" id="topbar-search-wrap">
       <div class="search-bar" id="topbar-search">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon">⌕</span>
         <input id="global-search" placeholder="Pesquisar cidade, país ou local..." oninput="Map.search(this.value)">
       </div>
     </div>
@@ -36,8 +36,8 @@
 
   <!-- ══ ADD BANNER ══ -->
   <div id="add-banner">
-    <span>📍 Modo adição ativo — clica no mapa para marcar o local</span>
-    <button onclick="Map.cancelAdd()">✖ Cancelar</button>
+    <span>Modo de adição ativo — clica no mapa para marcar o local</span>
+    <button onclick="Map.cancelAdd()">Cancelar</button>
   </div>
 
   <!-- ══ MAIN LAYOUT ══ -->
@@ -60,7 +60,7 @@
       </div>
 
       <div class="sidebar-section" id="top-contributors-box">
-        <div class="sidebar-label">🏆 Top Exploradores</div>
+        <div class="sidebar-label">Top Exploradores</div>
         <div id="top-list"></div>
       </div>
     </aside>
@@ -68,6 +68,14 @@
     <!-- Map -->
     <div id="map-container">
       <div id="map"></div>
+
+    <!-- Layer switcher -->
+    <div class="layer-switcher">
+      <button class="layer-btn active" data-layer="streets"   onclick="Map.setLayer('streets')">Mapa</button>
+      <button class="layer-btn"        data-layer="satellite" onclick="Map.setLayer('satellite')">Satélite</button>
+      <button class="layer-btn"        data-layer="terrain"   onclick="Map.setLayer('terrain')">Relevo</button>
+    </div>
+
 
       <!-- Floating spot panel -->
       <div id="spot-panel" class="spot-panel hidden">
@@ -78,7 +86,7 @@
             <div class="spot-panel-sub" id="sp-sub"></div>
             <div class="spot-panel-addr" id="sp-addr"></div>
           </div>
-          <button class="spot-close" onclick="Map.closePanel()">✕</button>
+          <button class="spot-close" onclick="Map.closePanel()">&#215;</button>
         </div>
         <div class="spot-tags" id="sp-tags"></div>
         <div class="spot-prods" id="sp-prods"></div>
@@ -86,27 +94,27 @@
           <div class="spot-added-by" id="sp-by"></div>
           <div class="spot-actions">
             <button class="upvote-btn" onclick="Map.upvote()">
-              <span>👍</span><span id="sp-upv">0</span>
+              <span class="upvote-label">Útil</span><span id="sp-upv">0</span>
             </button>
-            <button class="report-btn" onclick="Map.report()" title="Reportar local">⚠️</button>
+            <button class="report-btn" onclick="Map.report()" title="Reportar local" class="report-btn-txt">Reportar</button>
           </div>
         </div>
       </div>
 
       <!-- Map controls -->
       <div class="map-controls">
-        <button class="map-ctrl-btn" onclick="Map.locateMe()" title="A minha localização">📍</button>
-        <button class="map-ctrl-btn" onclick="Map.fitAll()" title="Ver todos">🌍</button>
+        <button class="map-ctrl-btn" onclick="Map.locateMe()" title="A minha localização">◎</button>
+        <button class="map-ctrl-btn" onclick="Map.fitAll()" title="Ver todos">▣</button>
       </div>
     </div>
   </main>
 
   <!-- ══ MOBILE BOTTOM NAV ══ -->
   <nav id="bottom-nav">
-    <button class="bnav-btn active" data-view="map" onclick="UI.showTab('map')">🗺️<span>Mapa</span></button>
-    <button class="bnav-btn" data-view="add" onclick="Auth.requireLogin(Map.startAdd)">➕<span>Adicionar</span></button>
-    <button class="bnav-btn" data-view="ranking" onclick="UI.showTab('ranking')">🏆<span>Ranking</span></button>
-    <button class="bnav-btn" data-view="profile" onclick="UI.showTab('profile')">👤<span>Perfil</span></button>
+    <button class="bnav-btn active" data-view="map" onclick="UI.showTab('map')"><span>Mapa</span></button>
+    <button class="bnav-btn" data-view="add" onclick="Auth.requireLogin(Map.startAdd)"><span>Adicionar</span></button>
+    <button class="bnav-btn" data-view="ranking" onclick="UI.showTab('ranking')"><span>Ranking</span></button>
+    <button class="bnav-btn" data-view="profile" onclick="UI.showTab('profile')"><span>Perfil</span></button>
   </nav>
 
 </div><!-- /app -->
@@ -118,13 +126,13 @@
 <!-- AUTH MODAL -->
 <div class="modal-bg" id="auth-modal">
   <div class="modal modal-auth">
-    <button class="modal-close" onclick="UI.closeModal('auth-modal')">✕</button>
+    <button class="modal-close" onclick="UI.closeModal('auth-modal')">&#215;</button>
     <div class="modal-logo">☕</div>
     <h2 id="auth-title">Iniciar Sessão</h2>
     <p class="modal-sub" id="auth-sub">Entra para explorar e contribuir</p>
 
     <div class="demo-hint" id="demo-hint">
-      🧪 <strong>Conta demo:</strong> admin@delta.pt / admin1234
+      <strong>Conta demo:</strong> admin@delta.pt / admin1234
     </div>
 
     <div class="err-box" id="auth-err"></div>
@@ -156,7 +164,7 @@
 <!-- ADD SPOT MODAL -->
 <div class="modal-bg" id="add-modal">
   <div class="modal modal-add">
-    <button class="modal-close" onclick="Map.cancelAdd()">✕</button>
+    <button class="modal-close" onclick="Map.cancelAdd()">&#215;</button>
     <h2>📍 Novo Local Delta</h2>
     <p class="modal-sub" id="add-coords-lbl">Clica no mapa para definir a posição</p>
     <div class="err-box" id="add-err"></div>
