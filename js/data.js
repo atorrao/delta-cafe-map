@@ -3,17 +3,19 @@
    ═══════════════════════════════════════ */
 
 // Tipos visíveis no mapa — apenas estes 5
+// Delta brand palette
+// Vermelho Delta: #8B1A1A  Dourado: #C8A84B  Espresso: #2C1810  Castanho médio: #6B3A2A
 const TYPE_CONFIG = {
-  "cafe":         { label: "Delta Espresso",    color: "#c0392b" },
-  "loja-oficial": { label: "Loja Delta Oficial", color: "#1a0a00" },
-  "delta-q":      { label: "Delta Q",            color: "#6d3b8e" },
-  "restaurante":  { label: "Restaurante",         color: "#167a6a" },
-  "fabrica":      { label: "Fábrica / Museu",     color: "#b07d2e" },
+  "cafe":         { label: "Delta Espresso",     color: "#8B1A1A" },  // vermelho Delta
+  "loja-oficial": { label: "Loja Delta Oficial",  color: "#2C1810" },  // espresso escuro
+  "delta-q":      { label: "Delta Q",             color: "#6B3A2A" },  // castanho médio
+  "restaurante":  { label: "Restaurante",          color: "#C8A84B" },  // dourado Delta
+  "fabrica":      { label: "Fábrica / Museu",      color: "#4A2010" },  // castanho fundo
 };
 
-// SVG icons — chávena para café/espresso, cápsula para lojas
+// Cup = chávena fumegante | Capsule = cápsula de café
 const MARKER_ICONS = {
-  "cafe":         "cup",     // chávena fumegante
+  "cafe":         "cup",
   "loja-oficial": "capsule",
   "delta-q":      "capsule",
   "restaurante":  "cup",
@@ -21,34 +23,47 @@ const MARKER_ICONS = {
 };
 
 function getMarkerSVG(type, color) {
+  const uid = Math.random().toString(36).substr(2,5);
   if (MARKER_ICONS[type] === "cup") {
-    // Chávena fumegante
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="34" viewBox="0 0 28 34">
-      <filter id="sh"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="rgba(0,0,0,.35)"/></filter>
-      <g filter="url(#sh)">
-        <!-- pin shape -->
-        <path d="M14 2 C7 2 2 7 2 13 C2 20 14 30 14 30 C14 30 26 20 26 13 C26 7 21 2 14 2Z" fill="${color}"/>
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40">
+      <defs>
+        <filter id="ds${uid}">
+          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,.4)"/>
+        </filter>
+      </defs>
+      <g filter="url(#ds${uid})">
+        <path d="M16 2C9.4 2 4 7.4 4 14c0 8.5 12 24 12 24s12-15.5 12-24C28 7.4 22.6 2 16 2z" fill="${color}"/>
+        <circle cx="16" cy="14" r="9" fill="rgba(255,255,255,0.12)"/>
         <!-- cup body -->
-        <rect x="8" y="10" width="10" height="8" rx="1.5" fill="white" opacity="0.95"/>
-        <!-- cup handle -->
-        <path d="M18 12 Q22 12 22 15 Q22 18 18 18" fill="none" stroke="white" stroke-width="1.5" opacity="0.95"/>
-        <!-- steam lines -->
-        <path d="M10 8.5 Q10.8 7 10 5.5" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.8"/>
-        <path d="M13 8 Q13.8 6.5 13 5" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.8"/>
-        <path d="M16 8.5 Q16.8 7 16 5.5" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.8"/>
+        <rect x="10.5" y="11.5" width="9" height="7" rx="1.5" fill="white" opacity="0.95"/>
+        <!-- handle -->
+        <path d="M19.5 13 Q23 13 23 15.5 Q23 18 19.5 18" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" opacity="0.95"/>
+        <!-- saucer line -->
+        <line x1="9.5" y1="18.5" x2="20.5" y2="18.5" stroke="white" stroke-width="1" opacity="0.6"/>
+        <!-- steam -->
+        <path d="M13 10 Q13.6 8.5 13 7" fill="none" stroke="white" stroke-width="1.1" stroke-linecap="round" opacity="0.75"/>
+        <path d="M16 9.5 Q16.6 8 16 6.5" fill="none" stroke="white" stroke-width="1.1" stroke-linecap="round" opacity="0.75"/>
+        <path d="M19 10 Q19.6 8.5 19 7" fill="none" stroke="white" stroke-width="1.1" stroke-linecap="round" opacity="0.75"/>
       </g>
     </svg>`;
   } else {
-    // Cápsula de café
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="34" viewBox="0 0 28 34">
-      <filter id="sh2"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="rgba(0,0,0,.35)"/></filter>
-      <g filter="url(#sh2)">
-        <path d="M14 2 C7 2 2 7 2 13 C2 20 14 30 14 30 C14 30 26 20 26 13 C26 7 21 2 14 2Z" fill="${color}"/>
-        <!-- capsule shape -->
-        <ellipse cx="14" cy="13" rx="5.5" ry="4" fill="white" opacity="0.95"/>
-        <path d="M14 9 L17 13 L14 17 L11 13 Z" fill="${color}" opacity="0.4"/>
-        <!-- top nozzle -->
-        <rect x="12.5" y="7.5" width="3" height="2" rx="1" fill="white" opacity="0.9"/>
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40">
+      <defs>
+        <filter id="ds${uid}">
+          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,.4)"/>
+        </filter>
+      </defs>
+      <g filter="url(#ds${uid})">
+        <path d="M16 2C9.4 2 4 7.4 4 14c0 8.5 12 24 12 24s12-15.5 12-24C28 7.4 22.6 2 16 2z" fill="${color}"/>
+        <circle cx="16" cy="14" r="9" fill="rgba(255,255,255,0.12)"/>
+        <!-- capsule body -->
+        <ellipse cx="16" cy="15" rx="5" ry="7" fill="white" opacity="0.95"/>
+        <!-- capsule top nozzle -->
+        <rect x="14" y="7.5" width="4" height="2.5" rx="1.2" fill="white" opacity="0.9"/>
+        <!-- capsule shine -->
+        <ellipse cx="14" cy="13" rx="1.5" ry="2.5" fill="${color}" opacity="0.2"/>
+        <!-- capsule bottom point -->
+        <path d="M13 20 Q16 23.5 19 20" fill="white" opacity="0.6"/>
       </g>
     </svg>`;
   }

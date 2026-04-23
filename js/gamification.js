@@ -141,7 +141,10 @@ const Gamification = {
     if (!next) return 100;
     return Math.min(100, Math.round(((pts - cur.minPts) / (next.minPts - cur.minPts)) * 100));
   },
-  getAvatarSVG(pts) {
+  getAvatarSVG(pts, selectedAvatar) {
+    if (selectedAvatar !== undefined && selectedAvatar !== null) {
+      return LEVEL_AVATARS[selectedAvatar] || LEVEL_AVATARS[0];
+    }
     const lv = this.getLevel(pts);
     return LEVEL_AVATARS[lv.level - 1] || LEVEL_AVATARS[0];
   },

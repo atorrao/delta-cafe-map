@@ -8,7 +8,7 @@
 <meta property="og:title" content="Delta Café Map">
 <meta property="og:description" content="O mapa colaborativo do Café Delta">
 <meta property="og:image" content="assets/og-image.png">
-<title>Delta Café Map ☕</title>
+<title>Where's my Delta? ☕</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="css/style.css"/>
@@ -54,10 +54,7 @@
         </select>
       </div>
 
-      <div class="sidebar-section sidebar-dark" id="stats-box">
-        <div class="sidebar-label-light">Estatísticas</div>
-        <div class="stats-grid" id="stats-grid"></div>
-      </div>
+
     </aside>
 
     <!-- Map -->
@@ -89,7 +86,7 @@
           <div class="spot-added-by" id="sp-by"></div>
           <div class="spot-actions">
             <button class="upvote-btn" onclick="Map.upvote()">
-              <span class="upvote-label">Útil</span><span id="sp-upv">0</span>
+              <span id="sp-upv">0</span><span class="upvote-label">útil</span>
             </button>
             <button class="report-btn" onclick="Map.report()" title="Reportar local" class="report-btn-txt">Reportar</button>
           </div>
@@ -112,6 +109,13 @@
     <button class="bnav-btn" data-view="profile" onclick="UI.showTab('profile')"><span>Perfil</span></button>
   </nav>
 
+  <!-- FAB Add Button -->
+  <button class="fab-add" onclick="Auth.requireLogin(Map.startAdd)" title="Adicionar local">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="12" y1="5" x2="12" y2="19" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="5" y1="12" x2="19" y2="12" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+  </button>
 </div><!-- /app -->
 
 <!-- ══════════════════════════════════════════

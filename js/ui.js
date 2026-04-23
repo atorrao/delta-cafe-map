@@ -51,7 +51,7 @@ const UI = {
       el.innerHTML = `
         <button class="tbtn tbtn-add" id="add-btn" onclick="Auth.requireLogin(Map.startAdd)">+ Adicionar</button>
         <div class="avatar-btn" onclick="UI.openProfileOverlay()" title="${App.currentUser.name}">
-          <div class="avatar-svg-wrap">${Gamification.getAvatarSVG(App.currentUser.points||0)}</div>
+          <div class="avatar-svg-wrap">${Gamification.getAvatarSVG(App.currentUser.points||0, App.currentUser.selectedAvatar)}</div>
           <div class="avatar-level-badge" style="background:${lv.color};">${lv.level}</div>
         </div>`;
     } else {
@@ -93,7 +93,7 @@ const UI = {
       <div class="profile-hero">
         <div class="profile-user-row">
           <div class="profile-bigav" style="border-color:${lv.color}70;">
-            <div class="profile-avatar-svg">${Gamification.getAvatarSVG(pts)}</div>
+            <div class="profile-avatar-svg">${Gamification.getAvatarSVG(pts, u.selectedAvatar)}</div>
           </div>
           <div class="profile-user-info">
             <div class="profile-greeting">Olá, ${firstName}</div>
@@ -111,22 +111,60 @@ const UI = {
       </div>
 
       <!-- ACCOUNT SETTINGS -->
-      <div class="profile-card">
-        <div class="card-section-title">Conta</div>
-        <div class="account-field"><span class="account-label">Username</span><span class="account-value">${u.email.split('@')[0]}</span></div>
-        <div class="account-field"><span class="account-label">Nome</span><span class="account-value">${u.name}</span></div>
-        <div class="account-field"><span class="account-label">E-mail</span><span class="account-value">${u.email}</span></div>
-        <div class="account-field"><span class="account-label">Password</span><span class="account-value">••••••••</span></div>
-        <div class="account-field" style="border-bottom:none;">
-          <span class="account-label">Avatar</span>
-          <div class="avatar-level-row">
-            ${LEVEL_AVATARS.map((svg, i) => {
-              const lvNum = i + 1;
-              const unlocked = lv.level >= lvNum;
-              return `<div class="avatar-option ${unlocked ? 'unlocked' : 'locked'} ${lv.level === lvNum ? 'current' : ''}" title="Nível ${lvNum}${!unlocked?' — bloqueado':''}">
-                <div style="width:32px;height:32px;opacity:${unlocked?1:0.3};">${svg}</div>
-              </div>`;
-            }).join('')}
+      <div class="profile-card" id="account-card">
+        <div style="display:flex;align-items:center;margin-bottom:14px;">
+          <div class="card-section-title" style="margin-bottom:0;">Conta</div>
+          <button class="edit-toggle-btn" onclick="UI.toggleEditMode()">Editar</button>
+        </div>
+        <div id="account-view">
+          <div class="account-field"><span class="account-label">Username</span><span class="account-value">${u.email.split('@')[0]}</span></div>
+          <div class="account-field"><span class="account-label">Nome</span><span class="account-value">${u.name}</span></div>
+          <div class="account-field"><span class="account-label">E-mail</span><span class="account-value">${u.email}</span></div>
+          <div class="account-field"><span class="account-label">Password</span><span class="account-value">••••••••</span></div>
+          <div class="account-field" style="border-bottom:none;flex-direction:column;align-items:flex-start;gap:8px;">
+            <span class="account-label">Avatar</span>
+            <div class="avatar-level-row">
+              ${LEVEL_AVATARS.map((svg, i) => {
+                const lvNum = i + 1;
+                const unlocked = lv.level >= lvNum;
+                const isCurrent = (u.selectedAvatar !== undefined ? u.selectedAvatar : lv.level - 1) === i;
+                return \`<div class="avatar-option \${unlocked?'unlocked':'locked'} \${isCurrent?'current':''}" title="Nível \${lvNum}\${!unlocked?' — bloqueado':''}">
+                  <div style="width:32px;height:32px;opacity:\${unlocked?1:0.3};">\${svg}</div>
+                </div>\`;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+        <div id="account-edit" style="display:none;">
+          <div class="account-field-edit">
+            <label class="account-label">Nome</label>
+            <input class="account-edit-input" id="edit-name" value="${u.name}" placeholder="O teu nome">
+          </div>
+          <div class="account-field-edit">
+            <label class="account-label">E-mail</label>
+            <input class="account-edit-input" id="edit-email" type="email" value="${u.email}" placeholder="email@exemplo.com">
+          </div>
+          <div class="account-field-edit">
+            <label class="account-label">Nova Password (deixa em branco para manter)</label>
+            <input class="account-edit-input" id="edit-pass" type="password" placeholder="••••••••">
+          </div>
+          <div class="account-field-edit" style="border-bottom:none;">
+            <label class="account-label">Escolher Avatar</label>
+            <div class="avatar-picker-grid">
+              ${LEVEL_AVATARS.map((svg, i) => {
+                const lvNum = i + 1;
+                const unlocked = lv.level >= lvNum;
+                const isCurrent = (u.selectedAvatar !== undefined ? u.selectedAvatar : lv.level - 1) === i;
+                return \`<div class="avatar-pick-option \${unlocked?'':'locked'} \${isCurrent?'selected':''}"
+                  onclick="UI.selectAvatar(\${i})" title="Nível \${lvNum}">
+                  \${svg}
+                </div>\`;
+              }).join('')}
+            </div>
+          </div>
+          <div class="edit-actions">
+            <button class="btn-cancel-edit" onclick="UI.toggleEditMode()">Cancelar</button>
+            <button class="btn-save" onclick="UI.saveProfile()">Guardar</button>
           </div>
         </div>
       </div>
@@ -278,6 +316,73 @@ const UI = {
       document.getElementById(`rtab-${t}`).classList.toggle('on', t===tab);
       document.getElementById(`rank-list-${t}`).style.display = t===tab?'block':'none';
     });
+  },
+
+  _editMode: false,
+  _selectedAvatar: null,
+
+  toggleEditMode() {
+    this._editMode = !this._editMode;
+    const view = document.getElementById('account-view');
+    const edit = document.getElementById('account-edit');
+    const btn  = document.querySelector('.edit-toggle-btn');
+    if (!view || !edit) return;
+    view.style.display = this._editMode ? 'none' : 'block';
+    edit.style.display = this._editMode ? 'block' : 'none';
+    if (btn) btn.textContent = this._editMode ? 'Cancelar' : 'Editar';
+    if (this._editMode) {
+      this._selectedAvatar = App.currentUser.selectedAvatar !== undefined
+        ? App.currentUser.selectedAvatar
+        : Gamification.getLevel(App.currentUser.points||0).level - 1;
+    }
+  },
+
+  selectAvatar(index) {
+    this._selectedAvatar = index;
+    document.querySelectorAll('.avatar-pick-option').forEach((el, i) => {
+      el.classList.toggle('selected', i === index);
+    });
+  },
+
+  saveProfile() {
+    const name  = (document.getElementById('edit-name')  || {}).value?.trim();
+    const email = (document.getElementById('edit-email') || {}).value?.trim().toLowerCase();
+    const pass  = (document.getElementById('edit-pass')  || {}).value;
+
+    if (!name)  { this.toast('O nome não pode estar vazio.', 'error'); return; }
+    if (!email) { this.toast('O email não pode estar vazio.', 'error'); return; }
+
+    const users   = Store.getUsers();
+    const oldEmail = App.currentUser.email;
+
+    // If email changed, check not taken by another user
+    if (email !== oldEmail && users[email]) {
+      this.toast('Este email já está em uso.', 'error'); return;
+    }
+
+    // Update user record
+    const updated = { ...users[oldEmail], name, email };
+    if (pass && pass.length >= 6) updated.password = pass;
+    else if (pass && pass.length > 0) { this.toast('Password deve ter 6+ caracteres.', 'error'); return; }
+    if (this._selectedAvatar !== null) updated.selectedAvatar = this._selectedAvatar;
+
+    // Handle email change
+    if (email !== oldEmail) {
+      delete users[oldEmail];
+    }
+    users[email] = updated;
+    Store.saveUsers(users);
+
+    // Update session
+    const { password: _, ...safe } = updated;
+    safe.avatar = updated.name[0].toUpperCase();
+    App.currentUser = safe;
+    Store.saveSession(safe);
+
+    this._editMode = false;
+    this.renderProfile();
+    this.renderTopbar();
+    this.toast('Perfil atualizado com sucesso.');
   }
 };
 

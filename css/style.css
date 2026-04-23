@@ -3,14 +3,25 @@
    ═══════════════════════════════════════════════════ */
 
 :root {
-  --esp:        #1a0a00;
-  --roast:      #2d1200;
-  --car:        #b07d2e;
-  --car-light:  #d4a24e;
-  --cream:      #f5eed8;
-  --foam:       #f7f4ef;
-  --red:        #9b2335;
-  --red-dark:   #72192a;
+  /* Delta Cafés brand palette */
+  --delta-red:      #8B1A1A;   /* vermelho Delta principal */
+  --delta-red-dark: #5C0F0F;   /* hover/dark */
+  --delta-gold:     #C8A84B;   /* dourado Delta */
+  --delta-gold-lt:  #E0C278;   /* dourado claro */
+  --delta-espresso: #2C1810;   /* espresso escuro — topbar */
+  --delta-roast:    #4A2010;   /* castanho médio */
+  --delta-cream:    #F5EED8;   /* creme */
+  --delta-foam:     #FAF7F2;   /* fundo geral */
+
+  /* Aliases internos */
+  --esp:        var(--delta-espresso);
+  --roast:      var(--delta-roast);
+  --car:        var(--delta-gold);
+  --car-light:  var(--delta-gold-lt);
+  --cream:      var(--delta-cream);
+  --foam:       var(--delta-foam);
+  --red:        var(--delta-red);
+  --red-dark:   var(--delta-red-dark);
   --mut:        #6b7280;
   --mut-light:  #9ca3af;
   --brd:        rgba(0,0,0,.09);
@@ -57,8 +68,8 @@ input, select, textarea { font-family:'DM Sans',sans-serif; }
 }
 .logo { display:flex; align-items:center; gap:9px; cursor:pointer; flex-shrink:0; }
 .logo-icon { font-size:22px; }
-.logo-delta { font-family:'Playfair Display',serif; font-weight:900; font-size:18px; color:var(--cream); letter-spacing:-.3px; }
-.logo-map   { font-family:'Playfair Display',serif; font-weight:400; font-size:14px; color:var(--car); margin-left:2px; }
+.logo-delta { font-family:'Playfair Display',serif; font-weight:900; font-size:13px; color:var(--cream); letter-spacing:-.2px; line-height:1.1; }
+.logo-map   { font-family:'Playfair Display',serif; font-weight:700; font-size:13px; color:var(--delta-gold); margin-left:2px; }
 
 .topbar-center { flex:1; max-width:460px; }
 .search-bar {
@@ -566,8 +577,8 @@ select.finput { cursor:pointer; }
   .form-col-full { grid-column:1; }
 }
 
-/* Upvote button text variant */
-.upvote-label { font-size:12px; font-weight:600; letter-spacing:.2px; }
+/* Upvote count only */
+.upvote-label { font-size:10px; color:var(--mut); margin-left:3px; }
 /* Report button text variant */
 .report-btn-txt { background:none; border:none; font-size:11px; color:var(--mut-light); transition:color .15s; padding:0; }
 .report-btn-txt:hover { color:var(--red); }
@@ -640,3 +651,108 @@ select.finput { cursor:pointer; }
 
 /* Profile bigav no inner text — just SVG */
 .profile-bigav { background: transparent !important; border: 2.5px solid transparent; }
+
+/* ══════════════════════════════════════
+   FAB — Floating Action Button
+══════════════════════════════════════ */
+.fab-add {
+  position: fixed;
+  bottom: 28px; right: 24px;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--delta-red);
+  border: none;
+  box-shadow: 0 4px 16px rgba(139,26,26,.45), 0 2px 6px rgba(0,0,0,.2);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 900;
+  cursor: pointer;
+  transition: transform .18s, box-shadow .18s, background .15s;
+}
+.fab-add:hover {
+  background: var(--delta-red-dark);
+  transform: scale(1.07);
+  box-shadow: 0 6px 22px rgba(139,26,26,.55), 0 2px 8px rgba(0,0,0,.22);
+}
+.fab-add:active { transform: scale(0.96); }
+.fab-add svg { width: 24px; height: 24px; }
+
+/* On mobile, lift FAB above bottom nav */
+@media (max-width: 768px) {
+  .fab-add { bottom: calc(var(--bottom-nav-h) + 16px); right: 20px; }
+}
+
+/* Hide the topbar "+ Adicionar" button — FAB replaces it on desktop too */
+/* Keep it for now, FAB is additional */
+
+/* ══════════════════════════════════════
+   PROFILE EDIT MODE
+══════════════════════════════════════ */
+.account-field-edit {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 10px 0; border-bottom: 1px solid var(--brd);
+}
+.account-field-edit:last-child { border-bottom: none; }
+.account-edit-input {
+  width: 100%; padding: 8px 10px;
+  border: 1.5px solid var(--brd); border-radius: var(--r-sm);
+  font-size: 13px; color: var(--text);
+  background: var(--surface-2); outline: none;
+  font-family: 'Poppins', 'DM Sans', sans-serif;
+  transition: border-color .15s;
+}
+.account-edit-input:focus { border-color: var(--delta-gold); background: #fff; }
+.edit-actions {
+  display: flex; gap: 8px; margin-top: 14px;
+}
+.btn-save {
+  flex: 1; padding: 10px;
+  background: var(--delta-red); color: #fff;
+  border: none; border-radius: var(--r-sm);
+  font-size: 12px; font-weight: 600;
+  font-family: 'Poppins', 'DM Sans', sans-serif;
+  cursor: pointer; transition: background .15s;
+}
+.btn-save:hover { background: var(--delta-red-dark); }
+.btn-cancel-edit {
+  flex: 1; padding: 10px;
+  background: transparent; color: var(--mut);
+  border: 1.5px solid var(--brd); border-radius: var(--r-sm);
+  font-size: 12px; font-weight: 600;
+  font-family: 'Poppins', 'DM Sans', sans-serif;
+  cursor: pointer; transition: border-color .15s;
+}
+.btn-cancel-edit:hover { border-color: var(--mut); }
+.edit-toggle-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; margin-left: auto;
+  background: var(--surface-2);
+  border: 1.5px solid var(--brd); border-radius: 20px;
+  font-size: 11px; font-weight: 600; color: var(--mut);
+  font-family: 'Poppins', 'DM Sans', sans-serif;
+  cursor: pointer; transition: all .15s;
+}
+.edit-toggle-btn:hover { border-color: var(--delta-gold); color: var(--delta-roast); }
+
+/* Avatar picker in edit mode */
+.avatar-picker-grid {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  margin-top: 10px; padding: 12px;
+  background: var(--surface-2); border-radius: var(--r-sm);
+}
+.avatar-pick-option {
+  width: 44px; height: 44px;
+  border-radius: 50%; cursor: pointer;
+  border: 2.5px solid transparent;
+  transition: border-color .15s, transform .15s;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.avatar-pick-option:hover { transform: scale(1.1); }
+.avatar-pick-option.selected { border-color: var(--delta-gold); }
+.avatar-pick-option.locked { opacity: .3; cursor: not-allowed; pointer-events: none; }
+.avatar-pick-option svg { width: 40px; height: 40px; }
+
+/* Logo layout for two-line name */
+.logo-text { flex-direction: column; gap: 0; align-items: flex-start; }
+.logo-delta { line-height: 1.15 !important; }
+.logo-map   { line-height: 1.15 !important; margin-left: 0 !important; }
