@@ -68,9 +68,9 @@ const Auth = {
 
     try {
       if (this.mode === 'login') {
-        const u = await DB.getUser(email);
+        let u = await DB.getUser(email);
         btn.textContent = orig; btn.disabled = false;
-        if (!u)              { UI.showErr('auth-err', 'Não existe nenhuma conta com este email.'); return; }
+        if (!u) { UI.showErr('auth-err', 'Não existe nenhuma conta com este email. As tabelas do Supabase podem ainda não ter sido criadas — consulta o administrador.'); return; }
         if (u.password !== pass) { UI.showErr('auth-err', 'Palavra-passe incorreta.'); return; }
         if (u.status === 'pending')  { UI.showErr('auth-err', 'A tua conta aguarda aprovação pelo administrador.'); return; }
         if (u.status === 'inactive') { UI.showErr('auth-err', 'A tua conta foi desativada. Contacta o administrador.'); return; }
@@ -102,7 +102,7 @@ const Auth = {
       }
     } catch(e) {
       btn.textContent = orig; btn.disabled = false;
-      UI.showErr('auth-err', 'Erro de ligação. Tenta novamente.');
+      UI.showErr('auth-err', 'Erro de ligação ao servidor. Verifica a ligação à internet e tenta novamente.');
       console.error(e);
     }
   },
