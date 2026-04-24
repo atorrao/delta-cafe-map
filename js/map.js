@@ -162,7 +162,7 @@ var Map = (function() {
       if (_activeType !== 'all' && l.type !== _activeType) return false;
       if (q && !_matchSearch(l, q)) return false;
       // Hide user-submitted pending locations from public map
-      if (!l.verified && l.status === 'pending' && l.ownerEmail) return false;
+      if (l.ownerEmail && !l.verified && (l.status === 'pending' || !l.status)) return false;
       return true;
     });
 

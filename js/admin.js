@@ -27,7 +27,7 @@ var Admin = {
       return u.email !== 'admin@delta.pt' && u.email !== 'admin';
     });
     var pendingUsers = allUsers.filter(function(u){ return (u.status||'pending') === 'pending'; }).length;
-    var pendingLocs  = App.locations.filter(function(l){ return !l.verified && l.status === 'pending' && l.ownerEmail; }).length;
+    var pendingLocs  = App.locations.filter(function(l){ return l.ownerEmail && !l.verified && (l.status === 'pending' || !l.status); }).length;
 
     return '<div class="admin-tabs">' +
       '<button class="admin-tab ' + (Admin._tab==='users'     ? 'active' : '') + '" onclick="Admin._switchTab(\'users\')">' +
@@ -165,7 +165,7 @@ var Admin = {
   /* ── LOCATIONS TAB ───────────────────────────────────────── */
   _renderLocations: function() {
     var pendingLocs = App.locations.filter(function(l){
-      return !l.verified && l.status === 'pending' && l.ownerEmail;
+      return l.ownerEmail && !l.verified && (l.status === 'pending' || !l.status);
     });
     var approvedLocs = App.locations.filter(function(l){
       return l.ownerEmail && (l.verified || l.status === 'approved');

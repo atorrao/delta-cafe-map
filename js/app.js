@@ -11,7 +11,14 @@ const App = {
     this.locations = [...SEED_LOCATIONS];
     const userLocs = Store.getLocs();
     const seedIds = new Set(SEED_LOCATIONS.map(s => s.id));
-    userLocs.forEach(l => { if (!seedIds.has(l.id)) this.locations.push(l); });
+    userLocs.forEach(l => {
+      if (!seedIds.has(l.id)) {
+        // Normalise older submissions that may lack status field
+        if (!l.status && l.ownerEmail) l.status = 'pending';
+        if (!l.status && !l.ownerEmail) l.status = 'approved';
+        this.locations.push(l);
+      }
+    });
 
     // Init auth (restores session, ensures admin exists)
     this.currentUser = Auth.init();
