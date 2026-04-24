@@ -1,177 +1,262 @@
 /* ═══════════════════════════════════════════════════
-   MAP — Lógica do mapa Leaflet
+   MAP — Lógica do mapa Leaflet  v5
    ═══════════════════════════════════════════════════ */
 
-const Map = (() => {
-  let _map, _markers = [], _addMode = false;
-  let _pendingCoords = null, _selId = null, _activeType = 'all';
+var Map = (function() {
+  var _map, _markers = [], _addMode = false;
+  var _pendingCoords = null, _selId = null, _activeType = 'all';
+  var _tiles = {};
 
   function init() {
     _map = L.map('map', { zoomControl: true, attributionControl: false }).setView([39.5, -8.0], 6);
 
-    // Tile layers
-    const tiles = {
-      streets:   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19, subdomains: 'abcd' }),
-      satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }),
-      sat_labels:L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, opacity: 0.85 }),
-      terrain:   L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, subdomains: 'abc' }),
-    };
-    window._mapTiles = tiles;
-    tiles.streets.addTo(_map);
+    _tiles.streets   = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19, subdomains: 'abcd' });
+    _tiles.satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
+    _tiles.sat_lbl   = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, opacity: 0.85 });
+    _tiles.terrain   = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, subdomains: 'abc' });
+    _tiles.streets.addTo(_map);
 
-    _map.on('click', e => {
+    _map.on('click', function(e) {
       if (!_addMode) return;
       _pendingCoords = { lat: e.latlng.lat, lng: e.latlng.lng };
-      document.getElementById('add-coords-lbl').textContent =
-        `${_pendingCoords.lat.toFixed(5)}, ${_pendingCoords.lng.toFixed(5)}`;
+      var el = document.getElementById('add-coords-lbl');
+      if (el) el.textContent = _pendingCoords.lat.toFixed(5) + ', ' + _pendingCoords.lng.toFixed(5);
       UI.hideErr('add-err');
       UI.openModal('add-modal');
     });
 
     buildTypeFilters();
-    buildCountrySelect();
     renderMarkers();
   }
 
   function setLayer(name) {
-    const t = window._mapTiles;
-    Object.values(t).forEach(l => { if (_map.hasLayer(l)) _map.removeLayer(l); });
-    if (name === 'satellite') { t.satellite.addTo(_map); t.sat_labels.addTo(_map); }
-    else if (name === 'terrain') { t.terrain.addTo(_map); }
-    else { t.streets.addTo(_map); }
-    document.querySelectorAll('.layer-btn').forEach(b => b.classList.toggle('active', b.dataset.layer === name));
+    Object.values(_tiles).forEach(function(l) { if (_map.hasLayer(l)) _map.removeLayer(l); });
+    if (name === 'satellite') { _tiles.satellite.addTo(_map); _tiles.sat_lbl.addTo(_map); }
+    else if (name === 'terrain') { _tiles.terrain.addTo(_map); }
+    else { _tiles.streets.addTo(_map); }
+    document.querySelectorAll('.layer-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.layer === name);
+    });
   }
 
   function buildTypeFilters() {
-    const counts = {};
-    App.locations.forEach(l => { counts[l.type] = (counts[l.type] || 0) + 1; });
-    const el = document.getElementById('type-filters');
-    const rows = [
-      ['all', 'Todos', null, App.locations.length],
-      ...Object.entries(TYPE_CONFIG).map(([k, v]) => [k, v.label, v.color, counts[k] || 0])
-    ];
-    el.innerHTML = rows.map(([k, l, c, n]) => `
-      <div class="fitem ${k === 'all' ? 'on' : ''}" data-t="${k}" onclick="Map.setType('${k}')">
-        ${c ? `<span class="fitem-dot" style="background:${c};"></span>` : '<span style="width:9px;display:inline-block;"></span>'}
-        <span>${l}</span>
-        <span class="fitem-count">${n}</span>
-      </div>`).join('');
+    var counts = {};
+    App.locations.forEach(function(l) { counts[l.type] = (counts[l.type] || 0) + 1; });
+    var el = document.getElementById('type-filters');
+    if (!el) return;
+
+    var html = '<div class="fitem on" data-t="all" onclick="Map.setType(\'all\')">' +
+      '<span style="width:9px;display:inline-block;"></span>' +
+      '<span>Todos</span>' +
+      '<span class="fitem-count">' + App.locations.length + '</span>' +
+      '</div>';
+
+    Object.keys(TYPE_CONFIG).forEach(function(k) {
+      var v = TYPE_CONFIG[k];
+      html += '<div class="fitem" data-t="' + k + '" onclick="Map.setType(\'' + k + '\')">' +
+        '<span class="fitem-dot" style="background:' + v.color + ';"></span>' +
+        '<span>' + v.label + '</span>' +
+        '<span class="fitem-count">' + (counts[k] || 0) + '</span>' +
+        '</div>';
+    });
+    el.innerHTML = html;
   }
 
   function setType(t) {
     _activeType = t;
-    document.querySelectorAll('.fitem').forEach(el => el.classList.toggle('on', el.dataset.t === t));
+    document.querySelectorAll('.fitem').forEach(function(el) {
+      el.classList.toggle('on', el.dataset.t === t);
+    });
     renderMarkers();
   }
 
-  function buildCountrySelect() {
-    const sel = document.getElementById('country-sel');
-    const cur = sel.value;
-    const cs = [...new Set(App.locations.map(l => l.country))].sort();
-    sel.innerHTML = '<option value="all">Todos os países</option>' +
-      cs.map(c => `<option value="${c}"${c === cur ? ' selected' : ''}>${c}</option>`).join('');
-    const dl = document.getElementById('countries-list');
-    if (dl) dl.innerHTML = COUNTRIES.map(c => `<option value="${c}">`).join('');
-  }
-
   function renderMarkers() {
-    _markers.forEach(m => m.remove()); _markers = [];
-    const q  = (document.getElementById('global-search') || {}).value || '';
-    const ct = (document.getElementById('country-sel')   || {}).value || 'all';
-
-    App.locations.filter(l => {
+    _markers.forEach(function(m) { m.remove(); });
+    _markers = [];
+    var q  = (document.getElementById('global-search') || {value:''}).value || '';
+    var filtered = App.locations.filter(function(l) {
       if (_activeType !== 'all' && l.type !== _activeType) return false;
-      if (ct !== 'all' && l.country !== ct) return false;
-      if (q && !`${l.name} ${l.city} ${l.country}`.toLowerCase().includes(q.toLowerCase())) return false;
+      if (q && !_matchSearch(l, q)) return false;
       return true;
-    }).forEach(loc => {
-      const cfg = TYPE_CONFIG[loc.type] || TYPE_CONFIG['cafe'];
-      const svgHtml = getMarkerSVG(loc.type, cfg.color);
-      const icon = L.divIcon({
+    });
+
+    filtered.forEach(function(loc) {
+      var svgHtml = getMarkerSVG(loc.type, '#ffffff');
+      var icon = L.divIcon({
         className: '',
-        html: `<div style="width:28px;height:34px;cursor:pointer;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));">${svgHtml}</div>`,
-        iconSize: [28, 34], iconAnchor: [14, 34]
+        html: '<div style="width:32px;height:40px;cursor:pointer;">' + svgHtml + '</div>',
+        iconSize: [32, 40], iconAnchor: [16, 40]
       });
-      const m = L.marker([loc.lat, loc.lng], { icon }).addTo(_map);
-      m.on('click', () => openPanel(loc.id));
+      var m = L.marker([loc.lat, loc.lng], { icon: icon }).addTo(_map);
+      m.on('click', function() { openPanel(loc.id); });
       _markers.push(m);
     });
-    renderStats();
   }
 
-  function search() { renderMarkers(); }
+  function _matchSearch(loc, q) {
+    var s = (loc.name + ' ' + loc.city + ' ' + loc.country + ' ' + (loc.address||'')).toLowerCase();
+    return s.indexOf(q.toLowerCase()) !== -1;
+  }
+
+  function search(q) {
+    var clearBtn = document.getElementById('search-clear');
+    if (clearBtn) clearBtn.style.display = q ? 'flex' : 'none';
+
+    renderMarkers();
+
+    var resultsBox  = document.getElementById('search-results-box');
+    var resultsList = document.getElementById('search-results-list');
+    if (!resultsBox || !resultsList) return;
+
+    if (!q || q.length < 2) {
+      resultsBox.style.display = 'none';
+      return;
+    }
+
+    var matches = App.locations.filter(function(l) { return _matchSearch(l, q); })
+      .slice(0, 8);
+
+    if (matches.length === 0) {
+      resultsBox.style.display = 'block';
+      resultsList.innerHTML = '<p class="no-results">Nenhum local encontrado.</p>';
+      return;
+    }
+
+    var html = '';
+    matches.forEach(function(loc) {
+      var cfg = TYPE_CONFIG[loc.type] || TYPE_CONFIG['cafe'];
+      html += '<div class="search-result-item" onclick="Map.flyTo(\'' + loc.id + '\')">' +
+        '<div class="sr-dot" style="background:' + cfg.color + ';"></div>' +
+        '<div class="sr-info">' +
+          '<div class="sr-name">' + loc.name + '</div>' +
+          '<div class="sr-meta">' + cfg.label + ' · ' + loc.city + ', ' + loc.country + '</div>' +
+        '</div>' +
+        '</div>';
+    });
+    resultsList.innerHTML = html;
+    resultsBox.style.display = 'block';
+  }
+
+  function clearSearch() {
+    var input = document.getElementById('global-search');
+    if (input) input.value = '';
+    var clearBtn = document.getElementById('search-clear');
+    if (clearBtn) clearBtn.style.display = 'none';
+    var resultsBox = document.getElementById('search-results-box');
+    if (resultsBox) resultsBox.style.display = 'none';
+    renderMarkers();
+  }
+
+  function flyTo(id) {
+    var loc = App.locations.find(function(l) { return l.id === id; });
+    if (!loc) return;
+    _map.flyTo([loc.lat, loc.lng], 15, { duration: 1.2 });
+    setTimeout(function() { openPanel(id); }, 1300);
+    // close search results
+    var resultsBox = document.getElementById('search-results-box');
+    if (resultsBox) resultsBox.style.display = 'none';
+  }
 
   function openPanel(id) {
-    const loc = App.locations.find(l => l.id === id); if (!loc) return;
+    var loc = App.locations.find(function(l) { return l.id === id; });
+    if (!loc) return;
     _selId = id;
-    const cfg = TYPE_CONFIG[loc.type] || TYPE_CONFIG['cafe'];
-    // Icon: SVG inside coloured circle
-    const iconSVG = getMarkerSVG(loc.type, '#ffffff');
-    const iconEl  = document.getElementById('sp-icon');
-    iconEl.style.background = cfg.color;
-    iconEl.innerHTML = '<div style="width:26px;height:32px;display:flex;align-items:center;justify-content:center;">' + iconSVG + '</div>';
-    document.getElementById('sp-name').textContent = loc.name;
-    document.getElementById('sp-sub').textContent  = `${cfg.label} · ${loc.city}, ${loc.country}`;
-    document.getElementById('sp-addr').textContent = loc.address || '';
-    const tags = [`<span class="spot-tag ${loc.verified ? 'tag-verified' : 'tag-pending'}">${loc.verified ? 'Verificado' : 'Pendente'}</span>`];
-    if (loc.hours) tags.push(`<span class="spot-tag tag-hours">${loc.hours}</span>`);
-    document.getElementById('sp-tags').innerHTML  = tags.join('');
-    document.getElementById('sp-prods').innerHTML = (loc.products || []).map(p => `<span class="chip">${p}</span>`).join('');
-    let byHtml = `Adicionado por <strong>${loc.addedBy}</strong>`;
-    if (loc.note) byHtml += `<div class="spot-note">"${loc.note}"</div>`;
-    document.getElementById('sp-by').innerHTML    = byHtml;
-    document.getElementById('sp-upv').textContent = loc.upvotes || 0;
+    var cfg = TYPE_CONFIG[loc.type] || TYPE_CONFIG['cafe'];
+
+    // Icon with SVG inside coloured square
+    var iconEl = document.getElementById('sp-icon');
+    if (iconEl) {
+      iconEl.style.background = cfg.color;
+      var svgHtml = getMarkerSVG(loc.type, '#ffffff');
+      iconEl.innerHTML = '<div style="width:28px;height:35px;display:flex;align-items:center;justify-content:center;">' + svgHtml + '</div>';
+    }
+
+    var nameEl = document.getElementById('sp-name');
+    if (nameEl) nameEl.textContent = loc.name;
+
+    var subEl = document.getElementById('sp-sub');
+    if (subEl) subEl.textContent = cfg.label + ' · ' + loc.city + ', ' + loc.country;
+
+    var addrEl = document.getElementById('sp-addr');
+    if (addrEl) addrEl.textContent = loc.address || '';
+
+    var tagsEl = document.getElementById('sp-tags');
+    if (tagsEl) {
+      var tags = '';
+      tags += '<span class="spot-tag ' + (loc.verified ? 'tag-verified' : 'tag-pending') + '">' + (loc.verified ? 'Verificado' : 'Pendente') + '</span>';
+      if (loc.hours) tags += '<span class="spot-tag tag-hours">' + loc.hours + '</span>';
+      tagsEl.innerHTML = tags;
+    }
+
+    var prodsEl = document.getElementById('sp-prods');
+    if (prodsEl) {
+      prodsEl.innerHTML = (loc.products || []).map(function(p) {
+        return '<span class="chip">' + p + '</span>';
+      }).join('');
+    }
+
+    var byEl = document.getElementById('sp-by');
+    if (byEl) {
+      var byHtml = 'Adicionado por <strong>' + loc.addedBy + '</strong>';
+      if (loc.note) byHtml += '<div class="spot-note">"' + loc.note + '"</div>';
+      byEl.innerHTML = byHtml;
+    }
+
     document.getElementById('spot-panel').classList.remove('hidden');
   }
 
-  function closePanel() { document.getElementById('spot-panel').classList.add('hidden'); _selId = null; }
-
-  function upvote() {} // removed
-  function report()  {} // removed
+  function closePanel() {
+    var p = document.getElementById('spot-panel');
+    if (p) p.classList.add('hidden');
+    _selId = null;
+  }
 
   function startAdd() {
     _addMode = true;
     document.getElementById('add-banner').classList.add('active');
     document.getElementById('map').classList.add('crosshair');
-    const btn = document.getElementById('add-btn');
-    if (btn) { btn.textContent = 'Cancelar'; btn.classList.add('active'); }
-    closePanel(); UI.showTab('map');
+    var fab = document.querySelector('.fab-add');
+    if (fab) fab.style.display = 'none';
+    closePanel();
+    UI.showTab('map');
     UI.toast('Clica no mapa para marcar o local.');
   }
 
   function cancelAdd() {
-    _addMode = false; _pendingCoords = null;
+    _addMode = false;
+    _pendingCoords = null;
     document.getElementById('add-banner').classList.remove('active');
     document.getElementById('map').classList.remove('crosshair');
-    const btn = document.getElementById('add-btn');
-    if (btn) { btn.textContent = '+ Adicionar'; btn.classList.remove('active'); }
+    var fab = document.querySelector('.fab-add');
+    if (fab) fab.style.display = 'flex';
     UI.closeModal('add-modal');
   }
 
   function submitSpot() {
     UI.hideErr('add-err');
-    const name    = document.getElementById('add-name').value.trim();
-    const country = document.getElementById('add-country').value.trim();
-    const city    = document.getElementById('add-city').value.trim();
-    const addr    = document.getElementById('add-addr').value.trim();
-    const hours   = document.getElementById('add-hours').value.trim();
-    const note    = document.getElementById('add-note').value.trim();
-    const type    = document.getElementById('add-type').value;
-    const products = [...document.querySelectorAll('.ptag.on')].map(t => t.dataset.p);
+    var name    = (document.getElementById('add-name')    || {value:''}).value.trim();
+    var country = (document.getElementById('add-country') || {value:''}).value.trim();
+    var city    = (document.getElementById('add-city')    || {value:''}).value.trim();
+    var addr    = (document.getElementById('add-addr')    || {value:''}).value.trim();
+    var hours   = (document.getElementById('add-hours')   || {value:''}).value.trim();
+    var note    = (document.getElementById('add-note')    || {value:''}).value.trim();
+    var type    = (document.getElementById('add-type')    || {value:'cafe'}).value;
+    var products = [];
+    document.querySelectorAll('.ptag.on').forEach(function(t) { products.push(t.dataset.p); });
 
     if (!name)    { UI.showErr('add-err', 'O nome do local é obrigatório.'); return; }
     if (!country) { UI.showErr('add-err', 'O país é obrigatório.'); return; }
     if (!city)    { UI.showErr('add-err', 'A cidade é obrigatória.'); return; }
-    if (!_pendingCoords) { UI.showErr('add-err', 'Fecha e clica no mapa para definir a posição.'); return; }
+    if (!_pendingCoords) { UI.showErr('add-err', 'Fecha este formulário e clica no mapa.'); return; }
 
-    const isFirst = App.locations.filter(l => l.ownerEmail === App.currentUser.email).length === 0;
-    const oldPts  = App.currentUser.points || 0;
-    const oldLv   = Gamification.getLevel(oldPts);
+    var isFirst = App.locations.filter(function(l) { return l.ownerEmail === App.currentUser.email; }).length === 0;
+    var oldPts  = App.currentUser.points || 0;
+    var oldLv   = Gamification.getLevel(oldPts);
 
-    const loc = {
-      id: 'u-' + Date.now(), name, country, city,
+    var loc = {
+      id: 'u-' + Date.now(), name: name, country: country, city: city,
       address: addr, hours: hours || null, note: note || null,
-      type, products,
+      type: type, products: products,
       lat: _pendingCoords.lat, lng: _pendingCoords.lng,
       verified: false, addedBy: App.currentUser.name,
       ownerEmail: App.currentUser.email, upvotes: 0,
@@ -180,10 +265,10 @@ const Map = (() => {
     App.locations.push(loc);
     App.saveUserLocations();
 
-    let earned = Gamification.addPoints(App.currentUser.email, 'ADD_LOCATION');
+    var earned = Gamification.addPoints(App.currentUser.email, 'ADD_LOCATION');
     if (isFirst) earned += Gamification.addPoints(App.currentUser.email, 'FIRST_LOCATION');
 
-    const users = Store.getUsers();
+    var users = Store.getUsers();
     if (users[App.currentUser.email]) {
       users[App.currentUser.email].contributions = (users[App.currentUser.email].contributions || 0) + 1;
       Store.saveUsers(users);
@@ -191,33 +276,27 @@ const Map = (() => {
       App.currentUser.points = users[App.currentUser.email].points;
       Store.saveSession(App.currentUser);
     }
-    buildTypeFilters(); buildCountrySelect(); renderMarkers(); UI.renderTopbar();
-    cancelAdd();
-    UI.toast(`Local adicionado. +${earned} pontos.`);
-    const newLv = Gamification.getLevel(App.currentUser.points);
-    if (newLv.level > oldLv.level) setTimeout(() => UI.toast(`Subiste para Nível ${newLv.level} — ${newLv.name}.`), 1800);
-  }
 
-  function renderStats() {
-    const users = Store.getUsers();
-    const el = document.getElementById('stats-grid');
-    if (!el) return;
-    el.innerHTML = [
-      [App.locations.length, 'Locais'],
-      [new Set(App.locations.map(l => l.country)).size, 'Países'],
-      [App.locations.filter(l => l.verified).length, 'Verificados'],
-      [Object.keys(users).length, 'Membros'],
-    ].map(([v, l]) => `<div class="stat-cell"><div class="stat-num">${v}</div><div class="stat-lbl">${l}</div></div>`).join('');
+    buildTypeFilters();
+    renderMarkers();
+    UI.renderTopbar();
+    cancelAdd();
+    UI.toast('Local adicionado! +' + earned + ' pontos.');
+
+    var newLv = Gamification.getLevel(App.currentUser.points);
+    if (newLv.level > oldLv.level) {
+      setTimeout(function() { UI.toast('Subiste para Nível ' + newLv.level + ' — ' + newLv.name + '!'); }, 1800);
+    }
   }
 
   function locateMe() {
     if (!navigator.geolocation) { UI.toast('Geolocalização não disponível.'); return; }
-    navigator.geolocation.getCurrentPosition(pos => {
+    navigator.geolocation.getCurrentPosition(function(pos) {
       _map.setView([pos.coords.latitude, pos.coords.longitude], 14);
       L.circleMarker([pos.coords.latitude, pos.coords.longitude], {
         radius: 9, color: '#1a6eb5', fillColor: '#3b9ae1', fillOpacity: .35, weight: 2
       }).addTo(_map).bindPopup('A tua localização').openPopup();
-    }, () => UI.toast('Não foi possível obter a localização.'));
+    }, function() { UI.toast('Não foi possível obter a localização.'); });
   }
 
   function fitAll() {
@@ -225,5 +304,12 @@ const Map = (() => {
     else _map.setView([39.5, -8.0], 6);
   }
 
-  return { init, renderMarkers, setType, search, openPanel, closePanel, upvote, report, startAdd, cancelAdd, submitSpot, locateMe, fitAll, setLayer, buildTypeFilters, buildCountrySelect };
+  return {
+    init: init, setLayer: setLayer, setType: setType,
+    search: search, clearSearch: clearSearch, flyTo: flyTo,
+    renderMarkers: renderMarkers, buildTypeFilters: buildTypeFilters,
+    openPanel: openPanel, closePanel: closePanel,
+    startAdd: startAdd, cancelAdd: cancelAdd, submitSpot: submitSpot,
+    locateMe: locateMe, fitAll: fitAll
+  };
 })();
