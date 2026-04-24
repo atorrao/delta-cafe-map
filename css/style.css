@@ -780,3 +780,22 @@ a, button { -webkit-tap-highlight-color: transparent; }
   background: #92400e; color: #fff;
   border-radius: 50%; font-size: 10px; font-weight: 800;
 }
+
+/* ── Admin warning ── */
+.admin-warning {
+  background: #fff8e1;
+  border: 1px solid rgba(176,125,46,.35);
+  border-left: 4px solid var(--d-gold);
+  border-radius: var(--r-sm);
+  padding: 12px 14px;
+  font-size: 12px;
+  color: #6b4a0e;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+.admin-separator {
+  color: var(--brd);
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 2px;
+}

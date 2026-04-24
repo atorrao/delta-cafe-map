@@ -58,6 +58,12 @@ var Admin = {
 
     var html = Admin._tabHeader();
 
+    /* localStorage warning */
+    html += '<div class="admin-warning">' +
+      '<strong>Atenção:</strong> Os dados de utilizadores estão guardados localmente neste browser. ' +
+      'Utilize "Exportar" e "Importar" para partilhar utilizadores entre dispositivos ou browsers.' +
+    '</div>';
+
     /* Stats */
     html += '<div class="admin-stats">' +
       '<div class="admin-stat-cell"><div class="admin-stat-num">' + allUsers.length + '</div><div class="admin-stat-lbl">Total</div></div>' +
@@ -94,7 +100,15 @@ var Admin = {
               '<option value="pending">Pendente</option>' +
             '</select></div>' +
         '</div>' +
-        '<button class="admin-btn admin-btn-approve" style="padding:9px 24px;font-size:12px;margin-top:8px;" onclick="Admin.createUser()">+ Criar Utilizador</button>' +
+        '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;">' +
+          '<button class="admin-btn admin-btn-approve" style="padding:9px 24px;font-size:12px;" onclick="Admin.createUser()">+ Criar Utilizador</button>' +
+          '<div class="admin-separator">|</div>' +
+          '<button class="admin-btn admin-btn-reset" style="padding:9px 16px;font-size:11px;" onclick="Admin.exportUsers()">Exportar Utilizadores</button>' +
+          '<label class="admin-btn admin-btn-reset" style="padding:9px 16px;font-size:11px;cursor:pointer;">' +
+            'Importar Utilizadores' +
+            '<input type="file" accept=".json" style="display:none;" onchange="Admin.importUsers(this)">' +
+          '</label>' +
+        '</div>' +
         '<div class="err-box" id="create-err" style="margin-top:10px;"></div>' +
       '</div>' +
     '</div>';
@@ -160,6 +174,43 @@ var Admin = {
     Store.saveUsers(users);
     UI.toast('Utilizador ' + name + ' criado!', 'success');
     Admin.render();
+  },
+
+  exportUsers: function() {
+    var users = Store.getUsers();
+    var data  = JSON.stringify(users, null, 2);
+    var blob  = new Blob([data], {type:'application/json'});
+    var url   = URL.createObjectURL(blob);
+    var a     = document.createElement('a');
+    a.href    = url;
+    a.download= 'delta-users-' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    UI.toast('Utilizadores exportados.');
+  },
+
+  importUsers: function(input) {
+    var file = input.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        var imported = JSON.parse(e.target.result);
+        var existing = Store.getUsers();
+        // Merge — imported wins for new users, existing wins for admin
+        Object.keys(imported).forEach(function(email) {
+          if (email !== 'admin@delta.pt' && email !== 'admin') {
+            existing[email] = imported[email];
+          }
+        });
+        Store.saveUsers(existing);
+        UI.toast('Utilizadores importados com sucesso!', 'success');
+        Admin.render();
+      } catch(err) {
+        UI.toast('Erro ao importar ficheiro.', 'error');
+      }
+    };
+    reader.readAsText(file);
   },
 
   /* ── LOCATIONS TAB ───────────────────────────────────────── */
