@@ -163,12 +163,11 @@ var Map = (function() {
     _selId = id;
     var cfg = TYPE_CONFIG[loc.type] || TYPE_CONFIG['cafe'];
 
-    // Icon with SVG inside coloured square
+    // Icon — flat icon only (no pin), white on brand color
     var iconEl = document.getElementById('sp-icon');
     if (iconEl) {
       iconEl.style.background = cfg.color;
-      var svgHtml = getMarkerSVG(loc.type, '#ffffff');
-      iconEl.innerHTML = '<div style="width:28px;height:35px;display:flex;align-items:center;justify-content:center;">' + svgHtml + '</div>';
+      iconEl.innerHTML = getPanelIcon(loc.type);
     }
 
     var nameEl = document.getElementById('sp-name');
@@ -189,11 +188,7 @@ var Map = (function() {
     }
 
     var prodsEl = document.getElementById('sp-prods');
-    if (prodsEl) {
-      prodsEl.innerHTML = (loc.products || []).map(function(p) {
-        return '<span class="chip">' + p + '</span>';
-      }).join('');
-    }
+    if (prodsEl) prodsEl.innerHTML = ''; // products hidden from card
 
     var byEl = document.getElementById('sp-by');
     if (byEl) {
@@ -213,13 +208,49 @@ var Map = (function() {
 
   function startAdd() {
     _addMode = true;
+    _pendingCoords = null;
     document.getElementById('add-banner').classList.add('active');
     document.getElementById('map').classList.add('crosshair');
     var fab = document.querySelector('.fab-add');
     if (fab) fab.style.display = 'none';
     closePanel();
     UI.showTab('map');
-    UI.toast('Clica no mapa para marcar o local.');
+
+    // Reset form
+    var nameEl = document.getElementById('add-name');
+    if (nameEl) nameEl.value = '';
+    var hoursEl = document.getElementById('add-hours');
+    if (hoursEl) hoursEl.value = '';
+    var noteEl = document.getElementById('add-note');
+    if (noteEl) noteEl.value = '';
+    document.querySelectorAll('.ptag.on').forEach(function(t){ t.classList.remove('on'); });
+    UI.hideErr('add-err');
+
+    // Try to get user location and open modal
+    var coordsLbl = document.getElementById('add-coords-lbl');
+    if (coordsLbl) coordsLbl.textContent = 'A detectar a tua localização...';
+
+    UI.openModal('add-modal');
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function(pos) {
+          _pendingCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          if (coordsLbl) coordsLbl.textContent = 'Localização detectada: ' + _pendingCoords.lat.toFixed(4) + ', ' + _pendingCoords.lng.toFixed(4);
+          // Fly map to user location
+          _map.flyTo([_pendingCoords.lat, _pendingCoords.lng], 15, { duration: 1 });
+        },
+        function() {
+          if (coordsLbl) coordsLbl.textContent = 'Localização não disponível — clica no mapa para marcar o local';
+          UI.closeModal('add-modal');
+          UI.toast('Clica no mapa para marcar o local');
+        },
+        { timeout: 8000, enableHighAccuracy: true }
+      );
+    } else {
+      if (coordsLbl) coordsLbl.textContent = 'Clica no mapa para marcar o local';
+      UI.closeModal('add-modal');
+    }
   }
 
   function cancelAdd() {
@@ -234,28 +265,24 @@ var Map = (function() {
 
   function submitSpot() {
     UI.hideErr('add-err');
-    var name    = (document.getElementById('add-name')    || {value:''}).value.trim();
-    var country = (document.getElementById('add-country') || {value:''}).value.trim();
-    var city    = (document.getElementById('add-city')    || {value:''}).value.trim();
-    var addr    = (document.getElementById('add-addr')    || {value:''}).value.trim();
-    var hours   = (document.getElementById('add-hours')   || {value:''}).value.trim();
-    var note    = (document.getElementById('add-note')    || {value:''}).value.trim();
-    var type    = (document.getElementById('add-type')    || {value:'cafe'}).value;
+    var name     = (document.getElementById('add-name')  || {value:''}).value.trim();
+    var hours    = (document.getElementById('add-hours') || {value:''}).value.trim();
+    var note     = (document.getElementById('add-note')  || {value:''}).value.trim();
+    var type     = (document.getElementById('add-type')  || {value:'cafe'}).value;
     var products = [];
     document.querySelectorAll('.ptag.on').forEach(function(t) { products.push(t.dataset.p); });
 
-    if (!name)    { UI.showErr('add-err', 'O nome do local é obrigatório.'); return; }
-    if (!country) { UI.showErr('add-err', 'O país é obrigatório.'); return; }
-    if (!city)    { UI.showErr('add-err', 'A cidade é obrigatória.'); return; }
-    if (!_pendingCoords) { UI.showErr('add-err', 'Fecha este formulário e clica no mapa.'); return; }
+    if (!name)          { UI.showErr('add-err', 'O nome do local é obrigatório.'); return; }
+    if (!_pendingCoords){ UI.showErr('add-err', 'Localização não detectada. Fecha e clica no mapa para marcar o local.'); return; }
 
     var isFirst = App.locations.filter(function(l) { return l.ownerEmail === App.currentUser.email; }).length === 0;
     var oldPts  = App.currentUser.points || 0;
     var oldLv   = Gamification.getLevel(oldPts);
 
     var loc = {
-      id: 'u-' + Date.now(), name: name, country: country, city: city,
-      address: addr, hours: hours || null, note: note || null,
+      id: 'u-' + Date.now(), name: name,
+      country: 'Portugal', city: '',
+      address: '', hours: hours || null, note: note || null,
       type: type, products: products,
       lat: _pendingCoords.lat, lng: _pendingCoords.lng,
       verified: false, addedBy: App.currentUser.name,

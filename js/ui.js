@@ -174,7 +174,7 @@ const UI = {
     html += '<div class="profile-stats-row">';
     html += '<div class="profile-stat"><div class="profile-stat-num">' + pts + '</div><div class="profile-stat-lbl">Pontos</div></div>';
     html += '<div class="profile-stat"><div class="profile-stat-num">' + (u.contributions||0) + '</div><div class="profile-stat-lbl">Locais</div></div>';
-    html += '<div class="profile-stat"><div class="profile-stat-num">' + totalUp + '</div><div class="profile-stat-lbl">Upvotes</div></div>';
+    html += '<div class="profile-stat"><div class="profile-stat-num">N' + lv.level + '</div><div class="profile-stat-lbl">Nível</div></div>';
     html += '</div></div>';
 
     // ── ACCOUNT CARD ──────────────────────────────────────────
@@ -211,9 +211,9 @@ const UI = {
     html += '<div class="account-field"><span class="account-label">Nome</span><span class="account-value">' + u.name + '</span></div>';
     html += '<div class="account-field"><span class="account-label">E-mail</span><span class="account-value">' + u.email + '</span></div>';
     html += '<div class="account-field"><span class="account-label">Password</span><span class="account-value">••••••••</span></div>';
-    html += '<div class="account-field" style="border-bottom:none;flex-direction:column;align-items:flex-start;gap:8px;">';
+    html += '<div class="account-field" style="border-bottom:none;">';
     html += '<span class="account-label">Avatar</span>';
-    html += '<div class="avatar-level-row">' + avatarViewHtml + '</div>';
+    html += '<span class="account-value account-value-muted">Visível ao editar o perfil</span>';
     html += '</div></div>';
 
     // Edit mode
@@ -307,7 +307,6 @@ const UI = {
           html += '<div class="spot-list-loc">' + l.city + ', ' + l.country + '</div>';
           html += '</div>';
           html += '<div class="spot-list-right">';
-          html += '<div class="spot-upvote-count">' + (l.upvotes||0) + '<span> upvotes</span></div>';
           html += '<span class="spot-badge ' + (l.verified?'spot-badge-ok':'spot-badge-pend') + '">' + (l.verified?'Verificado':'Pendente') + '</span>';
           html += '</div></div>';
         });

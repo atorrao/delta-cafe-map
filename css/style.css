@@ -48,11 +48,9 @@ input,select,textarea { font-family:'Poppins','DM Sans',sans-serif; }
   border-bottom:1px solid rgba(200,168,75,.15);
 }
 
-.logo { display:flex; align-items:center; gap:8px; cursor:pointer; flex-shrink:0; }
-.logo-icon { font-size:20px; }
-.logo-text { display:flex; flex-direction:column; gap:0; line-height:1.1; }
-.logo-line1 { font-family:'Playfair Display',serif; font-weight:700; font-size:11px; color:rgba(245,238,216,.7); letter-spacing:.5px; }
-.logo-line2 { font-family:'Playfair Display',serif; font-weight:900; font-size:16px; color:var(--d-cream); letter-spacing:-.2px; }
+.logo { display:flex; align-items:center; gap:0; cursor:pointer; flex-shrink:0; }
+.logo-text { display:flex; align-items:center; }
+.logo-app-name { font-family:'Poppins',sans-serif; font-weight:700; font-size:16px; color:var(--d-cream); letter-spacing:-.3px; white-space:nowrap; }
 
 .topbar-center { flex:1; max-width:500px; }
 .search-bar {
@@ -364,3 +362,13 @@ select.finput { cursor:pointer; }
   .form-grid { grid-template-columns:1fr; }
   .form-col-full { grid-column:1; }
 }
+
+/* ── Additional v5.1 styles ── */
+.optional-label { font-size:9px; font-weight:400; color:var(--mut-lt); text-transform:none; letter-spacing:0; margin-left:4px; font-style:italic; }
+.account-value-muted { font-size:12px; color:var(--mut-lt); font-style:italic; }
+/* Profile stats — 3 col, no upvotes */
+.profile-stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+/* Spot list right — no upvotes, just badge */
+.spot-list-right { padding:10px 12px; display:flex; align-items:center; justify-content:flex-end; flex-shrink:0; }
+/* Remove add btn from topbar — FAB only */
+#add-btn { display:none !important; }

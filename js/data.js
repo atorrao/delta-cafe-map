@@ -179,3 +179,27 @@ const SEED_LOCATIONS = [
     address:'Praça Luís de Camões 2, 1200-243 Lisboa', hours:'Todos os dias 07h-22h',
     verified:true, addedBy:'Delta Oficial', products:['Espresso','Descafeinado'] },
 ];
+
+/* ── Flat panel icon (no pin shape) ─────────────────────────────────────── */
+function getPanelIcon(type) {
+  var isCup = (MARKER_TYPE[type] === 'cup');
+  if (isCup) {
+    // Clean cup icon
+    return '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" width="28" height="28">' +
+      '<rect x="6" y="13" width="14" height="11" rx="2" fill="white" opacity="0.95"/>' +
+      '<path d="M20 15 Q26 15 26 19 Q26 23 20 23" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.95"/>' +
+      '<line x1="5" y1="24.5" x2="22" y2="24.5" stroke="white" stroke-width="1.2" opacity="0.5"/>' +
+      '<path d="M10 11 Q10.8 9 10 7" fill="none" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity="0.7"/>' +
+      '<path d="M14 10.5 Q14.8 8.5 14 6.5" fill="none" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity="0.7"/>' +
+      '<path d="M18 11 Q18.8 9 18 7" fill="none" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity="0.7"/>' +
+    '</svg>';
+  } else {
+    // Clean capsule icon
+    return '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" width="28" height="28">' +
+      '<ellipse cx="16" cy="18" rx="7" ry="9" fill="white" opacity="0.95"/>' +
+      '<rect x="13" y="8" width="6" height="3.5" rx="1.8" fill="white" opacity="0.9"/>' +
+      '<ellipse cx="13.5" cy="16" rx="2" ry="3.5" fill="rgba(0,0,0,0.1)"/>' +
+      '<path d="M11 25.5 Q16 29 21 25.5" fill="white" opacity="0.5"/>' +
+    '</svg>';
+  }
+}

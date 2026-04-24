@@ -16,10 +16,8 @@
   <!-- TOPBAR -->
   <header id="topbar">
     <div class="logo" onclick="App.closeAllOverlays()">
-      <div class="logo-icon">☕</div>
       <div class="logo-text">
-        <span class="logo-line1">Where's my</span>
-        <span class="logo-line2">Delta?</span>
+        <span class="logo-app-name">Where's my Delta?</span>
       </div>
     </div>
     <div class="topbar-center">
@@ -146,41 +144,28 @@
 <div class="modal-bg" id="add-modal">
   <div class="modal modal-add">
     <button class="modal-close" onclick="Map.cancelAdd()">×</button>
-    <h2>Novo Local Delta</h2>
-    <p class="modal-sub" id="add-coords-lbl">Clica no mapa para definir a posição</p>
+    <h2>Adicionar Novo Local</h2>
+    <p class="modal-sub" id="add-coords-lbl">A detectar a tua localização...</p>
     <div class="err-box" id="add-err"></div>
     <div class="form-grid">
       <div class="form-col-full">
-        <label class="flabel">Nome do local *</label>
+        <label class="flabel">Nome do Local *</label>
         <input class="finput" id="add-name" placeholder="Ex: Delta Espresso Colombo">
       </div>
-      <div>
+      <div class="form-col-full">
         <label class="flabel">Tipo *</label>
         <select class="finput" id="add-type"></select>
       </div>
-      <div>
-        <label class="flabel">País *</label>
-        <input class="finput" id="add-country" value="Portugal" list="countries-list">
-        <datalist id="countries-list"></datalist>
-      </div>
-      <div>
-        <label class="flabel">Cidade *</label>
-        <input class="finput" id="add-city" placeholder="Lisboa">
+      <div class="form-col-full">
+        <label class="flabel">Horário de Funcionamento <span class="optional-label">opcional</span></label>
+        <input class="finput" id="add-hours" placeholder="Ex: Seg-Sex 08h-20h, Sáb 09h-18h">
       </div>
       <div class="form-col-full">
-        <label class="flabel">Morada</label>
-        <input class="finput" id="add-addr" placeholder="Rua e número">
-      </div>
-      <div class="form-col-full">
-        <label class="flabel">Horário</label>
-        <input class="finput" id="add-hours" placeholder="Ex: Seg-Sex 08h-20h">
-      </div>
-      <div class="form-col-full">
-        <label class="flabel">Produtos disponíveis</label>
+        <label class="flabel">Produtos Disponíveis</label>
         <div class="ptags-wrap" id="prod-tags"></div>
       </div>
       <div class="form-col-full">
-        <label class="flabel">Nota</label>
+        <label class="flabel">Nota <span class="optional-label">opcional</span></label>
         <textarea class="finput" id="add-note" rows="2" placeholder="Informação útil para outros exploradores..."></textarea>
       </div>
     </div>
