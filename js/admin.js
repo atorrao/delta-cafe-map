@@ -54,11 +54,7 @@ var Admin = {
 
   /* ── TAB HEADER ──────────────────────────────────────────── */
   _tabHeader: function() {
-    var users    = Store.getUsers();
-    var allUsers = Object.values(users).filter(function(u) {
-      return u.email !== 'admin@delta.pt' && u.email !== 'admin';
-    });
-    var pendingUsers = allUsers.filter(function(u){ return (u.status||'pending') === 'pending'; }).length;
+    var pendingUsers = Admin._sbUsers.filter(function(u){ return (u.status||'pending') === 'pending'; }).length;
     var pendingLocs  = App.locations.filter(function(l){ return l.ownerEmail && !l.verified && (l.status === 'pending' || !l.status); }).length;
 
     return '<div class="admin-tabs">' +
@@ -73,7 +69,7 @@ var Admin = {
 
   _switchTab: function(tab) {
     Admin._tab = tab;
-    Admin.render();
+    Admin._loadAndRender();
   },
 
   /* ── USERS TAB ───────────────────────────────────────────── */
@@ -186,7 +182,7 @@ var Admin = {
     '</div>';
   },
 
-  createUser: function() {
+  createUser: async function() {
     var errEl = document.getElementById('create-err');
     errEl.classList.remove('show');
     var name   = (document.getElementById('new-u-name')  ||{value:''}).value.trim();

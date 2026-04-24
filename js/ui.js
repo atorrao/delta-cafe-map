@@ -407,7 +407,7 @@ UI.showRegistrationPending = function() {
 };
 
 /* ── Admin Panel ── */
-UI.openAdminPanel = function() { Admin.open(); };
+UI.openAdminPanel = function() { Admin.open().catch(function(e){ console.error('Admin panel error:', e); UI.toast('Erro ao carregar painel admin.', 'error'); }); };
 
 
 
