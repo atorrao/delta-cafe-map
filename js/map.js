@@ -425,19 +425,19 @@ var Map = (function() {
       createdAt: new Date().toISOString()
     };
     App.locations.push(loc);
-    App.saveUserLocations();
+    App.saveLocation(loc); // async — saves to Supabase
 
     var earned = Gamification.addPoints(App.currentUser.email, 'ADD_LOCATION');
     if (isFirst) earned += Gamification.addPoints(App.currentUser.email, 'FIRST_LOCATION');
 
-    var users = Store.getUsers();
-    if (users[App.currentUser.email]) {
-      users[App.currentUser.email].contributions = (users[App.currentUser.email].contributions || 0) + 1;
-      Store.saveUsers(users);
-      App.currentUser.contributions = users[App.currentUser.email].contributions;
-      App.currentUser.points = users[App.currentUser.email].points;
-      Store.saveSession(App.currentUser);
-    }
+    // Update user points and contributions in Supabase
+    App.currentUser.contributions = (App.currentUser.contributions || 0) + 1;
+    App.currentUser.points = (App.currentUser.points || 0) + earned;
+    DB.saveSession(App.currentUser);
+    DB.updateUser(App.currentUser.email, {
+      contributions: App.currentUser.contributions,
+      points: App.currentUser.points
+    }).catch(function(e){ console.warn('updateUser failed:', e); });
 
     buildTypeFilters();
     renderMarkers();

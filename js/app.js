@@ -1,29 +1,16 @@
 /* ═══════════════════════════════════════════════════
-   APP — Bootstrap e estado global
+   APP — Bootstrap com Supabase
    ═══════════════════════════════════════════════════ */
 
 const App = {
   currentUser: null,
-  locations: [],
+  locations:   [],
 
-  init() {
-    // Load seed + user locations
+  async init() {
+    // Load seed locations immediately (always available)
     this.locations = [...SEED_LOCATIONS];
-    const userLocs = Store.getLocs();
-    const seedIds = new Set(SEED_LOCATIONS.map(s => s.id));
-    userLocs.forEach(l => {
-      if (!seedIds.has(l.id)) {
-        // Normalise older submissions that may lack status field
-        if (!l.status && l.ownerEmail) l.status = 'pending';
-        if (!l.status && !l.ownerEmail) l.status = 'approved';
-        this.locations.push(l);
-      }
-    });
 
-    // Init auth (restores session, ensures admin exists)
-    this.currentUser = Auth.init();
-
-    // Build add-spot type select and product tags
+    // Init type select & product tags
     const sel = document.getElementById('add-type');
     if (sel) {
       sel.innerHTML = Object.entries(TYPE_CONFIG)
@@ -37,16 +24,107 @@ const App = {
 
     // Close modals on background click
     document.querySelectorAll('.modal-bg').forEach(bg => {
-      bg.addEventListener('click', e => {
-        if (e.target === bg) bg.classList.remove('open');
-      });
+      bg.addEventListener('click', e => { if (e.target === bg) bg.classList.remove('open'); });
     });
 
-    // Topbar
+    // Restore session
+    this.currentUser = await Auth.init();
     UI.renderTopbar();
 
-    // Map
+    // Load user locations from Supabase
+    await this.loadLocations();
+
+    // Init map
     Map.init();
+  },
+
+  async loadLocations() {
+    try {
+      const rows = await DB.getAllLocations();
+      const seedIds = new Set(SEED_LOCATIONS.map(s => s.id));
+      rows.forEach(l => {
+        if (!seedIds.has(l.id)) {
+          // Map snake_case from DB to camelCase
+          const loc = {
+            id:         l.id,
+            name:       l.name,
+            type:       l.type,
+            lat:        l.lat,
+            lng:        l.lng,
+            country:    l.country || '',
+            city:       l.city    || '',
+            address:    l.address || '',
+            hours:      l.hours   || null,
+            note:       l.note    || null,
+            products:   l.products || [],
+            verified:   l.verified || false,
+            status:     l.status  || 'pending',
+            addedBy:    l.added_by || '',
+            ownerEmail: l.owner_email || null,
+            upvotes:    l.upvotes || 0,
+            createdAt:  l.created_at
+          };
+          this.locations.push(loc);
+        }
+      });
+    } catch(e) {
+      console.warn('Could not load locations from Supabase:', e);
+      // Fallback to localStorage
+      const local = Store.getLocs();
+      const seedIds = new Set(SEED_LOCATIONS.map(s => s.id));
+      local.forEach(l => { if (!seedIds.has(l.id)) { if (!l.status && l.ownerEmail) l.status='pending'; this.locations.push(l); } });
+    }
+  },
+
+  async saveLocation(loc) {
+    // Convert camelCase to snake_case for Supabase
+    const row = {
+      id:          loc.id,
+      name:        loc.name,
+      type:        loc.type,
+      lat:         loc.lat,
+      lng:         loc.lng,
+      country:     loc.country || '',
+      city:        loc.city    || '',
+      address:     loc.address || '',
+      hours:       loc.hours   || null,
+      note:        loc.note    || null,
+      products:    loc.products || [],
+      verified:    loc.verified || false,
+      status:      loc.status  || 'pending',
+      added_by:    loc.addedBy || '',
+      owner_email: loc.ownerEmail || null,
+      upvotes:     loc.upvotes || 0,
+      created_at:  loc.createdAt || new Date().toISOString()
+    };
+    try {
+      await DB.createLocation(row);
+    } catch(e) {
+      console.warn('Supabase save failed, using localStorage fallback:', e);
+      Store.saveLocs(this.locations.filter(l => !SEED_LOCATIONS.find(s => s.id === l.id)));
+    }
+  },
+
+  async updateLocation(id, data) {
+    // Map camelCase to snake_case
+    const row = {};
+    if (data.verified  !== undefined) row.verified = data.verified;
+    if (data.status    !== undefined) row.status   = data.status;
+    if (data.upvotes   !== undefined) row.upvotes  = data.upvotes;
+    try {
+      await DB.updateLocation(id, row);
+    } catch(e) { console.warn('updateLocation failed:', e); }
+  },
+
+  async removeLocation(id) {
+    try {
+      await DB.deleteLocation(id);
+    } catch(e) { console.warn('removeLocation failed:', e); }
+  },
+
+  // Legacy — keep for compatibility
+  saveUserLocations() {
+    Store.saveLocs(this.locations.filter(l => !SEED_LOCATIONS.find(s => s.id === l.id)));
   },
 
   setUser(user) {
@@ -54,10 +132,7 @@ const App = {
     UI.renderTopbar();
   },
 
-  saveUserLocations() {
-    const seedIds = new Set(SEED_LOCATIONS.map(s => s.id));
-    Store.saveLocs(this.locations.filter(l => !seedIds.has(l.id)));
-  }
+  closeAllOverlays() { UI.closeAllOverlays(); }
 };
 
 window.addEventListener('load', () => App.init());

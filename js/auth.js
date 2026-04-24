@@ -1,12 +1,15 @@
 /* ═══════════════════════════════════════════════════
-   AUTH — Autenticação, aprovação e gestão
+   AUTH — Autenticação via Supabase
    ═══════════════════════════════════════════════════ */
 
+/* Keep Store for backward compat (session only) */
 const Store = {
+  getSession()   { return DB.getSession(); },
+  saveSession(s) { DB.saveSession(s); },
+  clearSession() { DB.clearSession(); },
+  /* Legacy localStorage helpers — used during migration */
   getUsers()     { try { return JSON.parse(localStorage.getItem('dcm_users') || '{}'); } catch { return {}; } },
   saveUsers(u)   { try { localStorage.setItem('dcm_users', JSON.stringify(u)); } catch {} },
-  getSession()   { try { return JSON.parse(localStorage.getItem('dcm_session') || 'null'); } catch { return null; } },
-  saveSession(s) { try { localStorage.setItem('dcm_session', JSON.stringify(s)); } catch {} },
   getLocs()      { try { return JSON.parse(localStorage.getItem('dcm_locs') || '[]'); } catch { return []; } },
   saveLocs(l)    { try { localStorage.setItem('dcm_locs', JSON.stringify(l)); } catch {} },
 };
@@ -14,50 +17,18 @@ const Store = {
 const Auth = {
   mode: 'login',
 
-  init() {
-    const users = Store.getUsers();
-
-    // Ensure admin account always exists and is approved
-    // Main admin — email login
-    if (!users['admin@delta.pt']) {
-      users['admin@delta.pt'] = {
-        email: 'admin@delta.pt', name: 'Administrador', avatar: 'A',
-        password: 'admin1234', role: 'admin', status: 'approved',
-        joined: '2024-01-01T00:00:00Z',
-        contributions: 0, points: 500, selectedAvatar: 5
-      };
-    } else {
-      users['admin@delta.pt'].role = 'admin';
-      users['admin@delta.pt'].status = 'approved';
-    }
-
-    // Simple admin alias — login: admin / 1234
-    if (!users['admin']) {
-      users['admin'] = {
-        email: 'admin', name: 'Admin', avatar: 'A',
-        password: '1234', role: 'admin', status: 'approved',
-        joined: '2024-01-01T00:00:00Z',
-        contributions: 0, points: 500, selectedAvatar: 5
-      };
-    } else {
-      users['admin'].role = 'admin';
-      users['admin'].status = 'approved';
-    }
-
-    Store.saveUsers(users);
-
-    const sess = Store.getSession();
-    if (sess) {
-      const u = users[sess.email];
+  async init() {
+    const sess = DB.getSession();
+    if (!sess) return null;
+    try {
+      const u = await DB.getUser(sess.email);
       if (u && u.status === 'approved') {
         const { password: _, ...safe } = u;
-        Store.saveSession(safe);
+        DB.saveSession(safe);
         return safe;
-      } else {
-        Store.saveSession(null);
-        return null;
       }
-    }
+    } catch(e) { console.warn('Session restore failed:', e); }
+    DB.clearSession();
     return null;
   },
 
@@ -83,53 +54,63 @@ const Auth = {
 
   toggleMode() { this.showModal(this.mode === 'login' ? 'register' : 'login'); },
 
-  submit() {
+  async submit() {
     UI.hideErr('auth-err');
     const email = document.getElementById('a-email').value.trim().toLowerCase();
     const pass  = document.getElementById('a-pass').value.trim();
     if (!email || !pass) { UI.showErr('auth-err', 'Preenche email e palavra-passe.'); return; }
-    const users = Store.getUsers();
 
-    if (this.mode === 'login') {
-      const u = users[email];
-      if (!u) { UI.showErr('auth-err', 'Não existe nenhuma conta com este email.'); return; }
-      if (u.password !== pass) { UI.showErr('auth-err', 'Palavra-passe incorreta.'); return; }
-      if (u.status === 'pending')   { UI.showErr('auth-err', 'A tua conta está a aguardar aprovação pelo administrador.'); return; }
-      if (u.status === 'inactive')  { UI.showErr('auth-err', 'A tua conta foi desativada. Contacta o administrador.'); return; }
-      if (u.status === 'rejected')  { UI.showErr('auth-err', 'O teu registo foi recusado. Contacta o administrador.'); return; }
-      const { password: _, ...safe } = u;
-      Store.saveSession(safe);
-      App.setUser(safe);
-      UI.closeModal('auth-modal');
-      UI.toast('Bem-vindo/a, ' + safe.name + '!');
+    // Show loading
+    const btn = document.getElementById('auth-btn');
+    const orig = btn.textContent;
+    btn.textContent = 'A aguardar...';
+    btn.disabled = true;
 
-    } else {
-      const name = document.getElementById('a-name').value.trim();
-      const conf = document.getElementById('a-conf').value;
-      if (!name)             { UI.showErr('auth-err', 'Insere o teu nome.'); return; }
-      if (users[email])      { UI.showErr('auth-err', 'Este email já está registado.'); return; }
-      if (pass !== conf)     { UI.showErr('auth-err', 'As palavras-passe não coincidem.'); return; }
-      if (pass.length < 6)   { UI.showErr('auth-err', 'Palavra-passe precisa de 6 ou mais caracteres.'); return; }
+    try {
+      if (this.mode === 'login') {
+        const u = await DB.getUser(email);
+        btn.textContent = orig; btn.disabled = false;
+        if (!u)              { UI.showErr('auth-err', 'Não existe nenhuma conta com este email.'); return; }
+        if (u.password !== pass) { UI.showErr('auth-err', 'Palavra-passe incorreta.'); return; }
+        if (u.status === 'pending')  { UI.showErr('auth-err', 'A tua conta aguarda aprovação pelo administrador.'); return; }
+        if (u.status === 'inactive') { UI.showErr('auth-err', 'A tua conta foi desativada. Contacta o administrador.'); return; }
+        if (u.status === 'rejected') { UI.showErr('auth-err', 'O teu registo foi recusado. Contacta o administrador.'); return; }
+        const { password: _, ...safe } = u;
+        DB.saveSession(safe);
+        App.setUser(safe);
+        UI.closeModal('auth-modal');
+        UI.toast('Bem-vindo/a, ' + safe.name + '!');
 
-      const user = {
-        email, name, avatar: name[0].toUpperCase(), password: pass,
-        role: 'user', status: 'pending',
-        joined: new Date().toISOString(),
-        contributions: 0, points: 0
-      };
-      users[email] = user;
-      Store.saveUsers(users);
-      UI.closeModal('auth-modal');
-      UI.showRegistrationPending();
+      } else {
+        const name = document.getElementById('a-name').value.trim();
+        const conf = document.getElementById('a-conf').value.trim();
+        if (!name)           { btn.textContent=orig; btn.disabled=false; UI.showErr('auth-err', 'Insere o teu nome.'); return; }
+        if (pass !== conf)   { btn.textContent=orig; btn.disabled=false; UI.showErr('auth-err', 'As palavras-passe não coincidem.'); return; }
+        if (pass.length < 6) { btn.textContent=orig; btn.disabled=false; UI.showErr('auth-err', 'Palavra-passe precisa de 6+ caracteres.'); return; }
+        const existing = await DB.getUser(email);
+        if (existing)        { btn.textContent=orig; btn.disabled=false; UI.showErr('auth-err', 'Este email já está registado.'); return; }
+
+        await DB.createUser({
+          email, name, avatar: name[0].toUpperCase(), password: pass,
+          role: 'user', status: 'pending',
+          joined: new Date().toISOString(),
+          contributions: 0, points: 0
+        });
+        btn.textContent = orig; btn.disabled = false;
+        UI.closeModal('auth-modal');
+        UI.showRegistrationPending();
+      }
+    } catch(e) {
+      btn.textContent = orig; btn.disabled = false;
+      UI.showErr('auth-err', 'Erro de ligação. Tenta novamente.');
+      console.error(e);
     }
   },
 
   logout() {
-    Store.saveSession(null);
+    DB.clearSession();
     App.setUser(null);
-    // Close all overlays, go to map
     UI.closeAllOverlays();
-    // Re-render markers (will hide "added by" on seed locs — already handled)
     Map.renderMarkers();
     UI.toast('Sessão terminada.');
   },

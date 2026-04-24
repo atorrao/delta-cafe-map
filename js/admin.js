@@ -5,19 +5,51 @@
 var Admin = {
   _tab: 'users', // 'users' | 'locations'
 
-  open: function() {
+  open: async function() {
     if (!App.currentUser || App.currentUser.role !== 'admin') {
       UI.toast('Acesso não autorizado.', 'error');
       return;
     }
     UI.closeAllOverlays();
     Admin._tab = 'users';
-    Admin.render();
     document.getElementById('admin-overlay').classList.remove('hidden');
+    document.getElementById('admin-body').innerHTML = '<div style="text-align:center;padding:40px;color:var(--mut);">A carregar...</div>';
+    await Admin._loadAndRender();
   },
 
   render: function() {
     Admin._tab === 'locations' ? Admin._renderLocations() : Admin._renderUsers();
+  },
+
+  _sbUsers: [], // cached from Supabase
+
+  _loadAndRender: async function() {
+    try {
+      // Load users from Supabase
+      const uRows = await DB.getAllUsers();
+      Admin._sbUsers = uRows.filter(function(u){ return u.email !== 'admin@delta.pt' && u.email !== 'admin'; });
+    } catch(e) { console.warn('load users:', e); Admin._sbUsers = []; }
+
+    try {
+      // Refresh App.locations from Supabase before rendering
+      const rows = await DB.getAllLocations();
+      const seedIds = new Set(SEED_LOCATIONS.map(s => s.id));
+      // Remove old user locs and reload
+      App.locations = [...SEED_LOCATIONS];
+      rows.forEach(function(l) {
+        if (!seedIds.has(l.id)) {
+          App.locations.push({
+            id: l.id, name: l.name, type: l.type, lat: l.lat, lng: l.lng,
+            country: l.country||'', city: l.city||'', address: l.address||'',
+            hours: l.hours||null, note: l.note||null, products: l.products||[],
+            verified: l.verified||false, status: l.status||'pending',
+            addedBy: l.added_by||'', ownerEmail: l.owner_email||null,
+            upvotes: l.upvotes||0, createdAt: l.created_at
+          });
+        }
+      });
+    } catch(e) { console.warn('loadAndRender:', e); }
+    Admin.render();
   },
 
   /* ── TAB HEADER ──────────────────────────────────────────── */
@@ -46,10 +78,7 @@ var Admin = {
 
   /* ── USERS TAB ───────────────────────────────────────────── */
   _renderUsers: function() {
-    var users    = Store.getUsers();
-    var allUsers = Object.values(users).filter(function(u) {
-      return u.email !== 'admin@delta.pt' && u.email !== 'admin';
-    });
+    var allUsers = Admin._sbUsers.length ? Admin._sbUsers : [];
     allUsers.sort(function(a,b){ return new Date(b.joined)-new Date(a.joined); });
 
     var pending  = allUsers.filter(function(u){ return (u.status||'pending')==='pending'; });
@@ -170,14 +199,19 @@ var Admin = {
     if (pass.length<6){ errEl.textContent='Password precisa de 6+ chars.';errEl.classList.add('show'); return; }
     var users = Store.getUsers();
     if (users[email]) { errEl.textContent='Email já registado.';          errEl.classList.add('show'); return; }
-    users[email] = { email:email, name:name, avatar:name[0].toUpperCase(), password:pass, role:'user', status:status, joined:new Date().toISOString(), contributions:0, points:0 };
-    Store.saveUsers(users);
-    UI.toast('Utilizador ' + name + ' criado!', 'success');
-    Admin.render();
+    try {
+      await DB.createUser({ email:email, name:name, avatar:name[0].toUpperCase(), password:pass, role:'user', status:status, joined:new Date().toISOString(), contributions:0, points:0 });
+      UI.toast('Utilizador ' + name + ' criado!', 'success');
+      await Admin._loadAndRender();
+    } catch(e) {
+      errEl.textContent = 'Erro ao criar utilizador: ' + (e.message || 'tenta novamente.');
+      errEl.classList.add('show');
+    }
   },
 
   exportUsers: function() {
-    var users = Store.getUsers();
+    var users = {};
+    Admin._sbUsers.forEach(function(u){ users[u.email] = u; });
     var data  = JSON.stringify(users, null, 2);
     var blob  = new Blob([data], {type:'application/json'});
     var url   = URL.createObjectURL(blob);
@@ -282,17 +316,16 @@ var Admin = {
   },
 
   /* ── ACTIONS ─────────────────────────────────────────────── */
-  handleAction: function(act, id) {
+  handleAction: async function(act, id) {
     /* Location actions */
     if (act === 'approve-loc') {
       var loc = App.locations.find(function(l){ return l.id === id; });
       if (loc) {
-        loc.verified = true;
-        loc.status   = 'approved';
-        App.saveUserLocations();
+        loc.verified = true; loc.status = 'approved';
+        await App.updateLocation(id, { verified: true, status: 'approved' });
         Map.renderMarkers();
         UI.toast('Local aprovado e publicado!', 'success');
-        Admin.render();
+        await Admin._loadAndRender();
       }
       return;
     }
@@ -300,34 +333,37 @@ var Admin = {
       var idx = App.locations.findIndex(function(l){ return l.id === id; });
       if (idx > -1) {
         App.locations.splice(idx, 1);
-        App.saveUserLocations();
+        await App.removeLocation(id);
         Map.renderMarkers();
         UI.toast(act === 'reject-loc' ? 'Local recusado.' : 'Local removido.');
-        Admin.render();
+        await Admin._loadAndRender();
       }
       return;
     }
-    /* User actions */
-    var users = Store.getUsers();
-    if (!users[id]) return;
+    /* User actions — via Supabase */
+    var updateData = {};
+    var toastMsg = '';
     if (act === 'approve') {
-      users[id].status = 'approved';
-      UI.toast(users[id].name + ' aprovado/a.', 'success');
+      updateData = { status: 'approved' };
+      toastMsg = 'Utilizador aprovado.';
     } else if (act === 'reject') {
-      users[id].status = 'rejected';
-      UI.toast('Registo recusado.');
+      updateData = { status: 'rejected' };
+      toastMsg = 'Registo recusado.';
     } else if (act === 'inactive') {
-      users[id].status = 'inactive';
-      UI.toast('Conta desativada.');
+      updateData = { status: 'inactive' };
+      toastMsg = 'Conta desativada.';
     } else if (act === 'reset') {
       var np = 'Delta' + Math.floor(1000 + Math.random()*9000);
-      users[id].password = np;
-      Store.saveUsers(users);
-      UI.toast('Nova password: ' + np, 'success');
-      return;
+      updateData = { password: np };
+      toastMsg = 'Nova password: ' + np;
     }
-    Store.saveUsers(users);
-    Admin.render();
+    try {
+      await DB.updateUser(id, updateData);
+      UI.toast(toastMsg, act === 'approve' || act === 'reset' ? 'success' : 'info');
+      await Admin._loadAndRender();
+    } catch(e) {
+      UI.toast('Erro ao atualizar. Tenta novamente.', 'error');
+    }
   }
 };
 

@@ -121,13 +121,18 @@ const Gamification = {
   },
   getAllPrizeLevels() { return LEVELS.filter(l => l.prize); },
   addPoints(userEmail, reason) {
-    var users = Store.getUsers();
-    if (!users[userEmail]) return 0;
     var pts = POINT_RULES[reason] || 0;
-    users[userEmail].points = (users[userEmail].points || 0) + pts;
-    Store.saveUsers(users);
-    var sess = Store.getSession();
-    if (sess && sess.email === userEmail) { sess.points = users[userEmail].points; Store.saveSession(sess); }
+    // Update session immediately for UI responsiveness
+    var sess = DB.getSession();
+    if (sess && sess.email === userEmail) {
+      sess.points = (sess.points || 0) + pts;
+      DB.saveSession(sess);
+    }
+    // Persist to Supabase asynchronously
+    if (App.currentUser && App.currentUser.email === userEmail) {
+      var newPts = (App.currentUser.points || 0) + pts;
+      DB.updateUser(userEmail, { points: newPts }).catch(function(e){ console.warn('points update failed:', e); });
+    }
     return pts;
   }
 };
