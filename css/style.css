@@ -682,3 +682,12 @@ a, button { -webkit-tap-highlight-color: transparent; }
 @media (max-width: 600px) {
   .admin-form-row { grid-template-columns: 1fr; }
 }
+
+/* ── Admin pending card highlight ── */
+.admin-card-pending {
+  border-color: rgba(146,64,14,.35) !important;
+  background: #fffdf8;
+}
+.admin-card-pending .admin-user-row {
+  border-left: 3px solid #92400e;
+}
