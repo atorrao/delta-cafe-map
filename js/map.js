@@ -25,10 +25,18 @@ var Map = (function() {
     _map.on('click', function(e) {
       if (!_addMode) return;
       _pendingCoords = { lat: e.latlng.lat, lng: e.latlng.lng };
-      var el = document.getElementById('add-coords-lbl');
-      if (el) el.textContent = _pendingCoords.lat.toFixed(5) + ', ' + _pendingCoords.lng.toFixed(5);
+      var coordsLbl = document.getElementById('add-coords-lbl');
+      if (coordsLbl) coordsLbl.textContent = 'A obter morada...';
       UI.hideErr('add-err');
       UI.openModal('add-modal');
+      // Reverse geocode from map click
+      _reverseGeocode(_pendingCoords.lat, _pendingCoords.lng, function(result) {
+        var addrEl = document.getElementById('add-addr');
+        if (addrEl) addrEl.value = result.address;
+        _pendingCity    = result.city;
+        _pendingCountry = result.country;
+        if (coordsLbl) coordsLbl.textContent = result.display || (_pendingCoords.lat.toFixed(5) + ', ' + _pendingCoords.lng.toFixed(5));
+      });
     });
 
     buildTypeFilters();
@@ -71,6 +79,31 @@ var Map = (function() {
     document.querySelectorAll('.layer-btn').forEach(function(b) {
       b.classList.toggle('active', b.dataset.layer === name);
     });
+  }
+
+  function _reverseGeocode(lat, lng, callback) {
+    var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + lat + '&lon=' + lng + '&zoom=18&addressdetails=1&accept-language=pt';
+    fetch(url, { headers: { 'Accept': 'application/json' } })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        var a = d.address || {};
+        var road     = a.road || a.pedestrian || a.footway || a.path || a.street || '';
+        var num      = a.house_number ? ' ' + a.house_number : '';
+        var postcode = a.postcode || '';
+        var city     = a.city || a.town || a.municipality || a.village || a.county || '';
+        var country  = a.country || '';
+        // Build full address string
+        var parts = [];
+        if (road) parts.push(road + num);
+        if (postcode) parts.push(postcode);
+        if (city) parts.push(city);
+        var address = parts.slice(0,2).join(', '); // road + postcode
+        var display = d.display_name ? d.display_name.split(',').slice(0,3).join(',') : (address || lat.toFixed(4) + ', ' + lng.toFixed(4));
+        callback({ address: address, city: city, country: country, display: display });
+      })
+      .catch(function() {
+        callback({ address: '', city: '', country: 'Portugal', display: lat.toFixed(5) + ', ' + lng.toFixed(5) });
+      });
   }
 
   function _haversine(lat1, lng1, lat2, lng2) {
@@ -328,31 +361,14 @@ var Map = (function() {
           _pendingCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
           if (coordsLbl) coordsLbl.textContent = 'Localização detectada. A obter morada...';
           _map.flyTo([_pendingCoords.lat, _pendingCoords.lng], 15, { duration: 1 });
-          // Reverse geocode with Nominatim
-          fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + _pendingCoords.lat + '&lon=' + _pendingCoords.lng + '&accept-language=pt')
-            .then(function(r){ return r.json(); })
-            .then(function(d){
-              var addr = d.address || {};
-              var road    = addr.road || addr.pedestrian || addr.footway || '';
-              var number  = addr.house_number ? ', ' + addr.house_number : '';
-              var city    = addr.city || addr.town || addr.village || addr.county || '';
-              var country = addr.country || 'Portugal';
-              var postcode= addr.postcode ? ', ' + addr.postcode : '';
-              var full    = road + number + postcode;
-
-              // Pre-fill address field
-              var addrEl = document.getElementById('add-addr');
-              if (addrEl && full.trim()) addrEl.value = full;
-
-              // Pre-fill city and country hidden fields for loc object
-              _pendingCity    = city;
-              _pendingCountry = country;
-
-              if (coordsLbl) coordsLbl.textContent = (full || city) ? (full + (city ? ' · ' + city : '')) : 'Morada não encontrada — podes preencher manualmente';
-            })
-            .catch(function(){
-              if (coordsLbl) coordsLbl.textContent = 'Localização detectada · morada não disponível';
-            });
+          // Reverse geocode via Nominatim
+          _reverseGeocode(_pendingCoords.lat, _pendingCoords.lng, function(result) {
+            var addrEl = document.getElementById('add-addr');
+            if (addrEl) addrEl.value = result.address;
+            _pendingCity    = result.city;
+            _pendingCountry = result.country;
+            if (coordsLbl) coordsLbl.textContent = result.display || 'Morada detectada';
+          });
         },
         function() {
           if (coordsLbl) coordsLbl.textContent = 'Localização não disponível — clica no mapa para marcar o local';
