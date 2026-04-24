@@ -27,7 +27,7 @@
   --sh-md:    0 4px 20px rgba(0,0,0,.12);
   --sh-lg:    0 8px 40px rgba(0,0,0,.17);
   --r-sm: 8px; --r-md: 12px; --r-lg: 18px; --r-xl: 24px;
-  --topbar-h: 58px; --sidebar-w: 244px; --bnav-h: 62px;
+  --topbar-h: 68px; --sidebar-w: 244px; --bnav-h: 62px;
 }
 
 *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
@@ -50,7 +50,7 @@ input,select,textarea { font-family:'Poppins','DM Sans',sans-serif; }
 
 .logo { display:flex; align-items:center; gap:0; cursor:pointer; flex-shrink:0; }
 .logo-text { display:flex; align-items:center; }
-.logo-app-name { font-family:'Poppins',sans-serif; font-weight:700; font-size:16px; color:var(--d-cream); letter-spacing:-.3px; white-space:nowrap; }
+.logo-app-name { font-family:'Poppins',sans-serif; font-weight:700; font-size:18px; color:var(--d-cream); letter-spacing:-.4px; white-space:nowrap; }
 
 .topbar-center { flex:1; max-width:500px; }
 .search-bar {
@@ -372,3 +372,201 @@ select.finput { cursor:pointer; }
 .spot-list-right { padding:10px 12px; display:flex; align-items:center; justify-content:flex-end; flex-shrink:0; }
 /* Remove add btn from topbar — FAB only */
 #add-btn { display:none !important; }
+
+/* ── Profile stats 2 col ── */
+.profile-stats-2 { grid-template-columns: repeat(2,1fr) !important; }
+
+/* ── Profile overlay header font ── */
+#profile-overlay .overlay-header h2 { font-family:'Poppins',sans-serif; font-weight:700; font-size:1.15rem; }
+#ranking-overlay .overlay-header h2 { font-family:'Poppins',sans-serif; font-weight:700; font-size:1.15rem; }
+
+/* ══════════════════════════════════════════════════════
+   MOBILE OPTIMISATION — full responsive pass
+   Target: iOS Safari, Android Chrome, 320px–768px
+══════════════════════════════════════════════════════ */
+
+/* ── Prevent iOS zoom on input focus ── */
+input, select, textarea { font-size: 16px !important; }
+@media (min-width: 769px) {
+  input, select, textarea { font-size: 13px !important; }
+  .flabel ~ .finput, .finput { font-size: 13px !important; }
+}
+
+/* ── Safe area insets (iPhone notch/Dynamic Island) ── */
+#topbar {
+  padding-top: env(safe-area-inset-top, 0px);
+  height: calc(var(--topbar-h) + env(safe-area-inset-top, 0px));
+}
+#bottom-nav {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  height: calc(var(--bnav-h) + env(safe-area-inset-bottom, 0px));
+}
+.fab-add {
+  bottom: calc(var(--bnav-h) + env(safe-area-inset-bottom, 0px) + 16px);
+}
+
+/* ── Touch targets: minimum 44×44px ── */
+.bnav-btn  { min-height: 44px; min-width: 44px; }
+.map-ctrl-btn { min-height: 44px; min-width: 44px; width: 44px; height: 44px; }
+.layer-btn { min-height: 36px; padding: 6px 12px; }
+.spot-close { min-height: 44px; min-width: 44px; display: flex; align-items: center; justify-content: center; }
+.modal-close { min-height: 44px; min-width: 44px; width: 36px; height: 36px; }
+.fitem { min-height: 40px; }
+.avatar-btn { min-height: 44px; min-width: 44px; width: 38px; height: 38px; }
+.tbtn { min-height: 40px; }
+
+/* ── Mobile layout ── */
+@media (max-width: 768px) {
+  /* Variables override */
+  :root { --sidebar-w: 0px; }
+
+  /* Overlay covers full screen below topbar+bnav */
+  .overlay {
+    inset: calc(var(--topbar-h) + env(safe-area-inset-top, 0px)) 0 calc(var(--bnav-h) + env(safe-area-inset-bottom, 0px)) 0;
+  }
+
+  /* Topbar: logo left, avatar right, no search */
+  #topbar { padding: 0 12px; gap: 0; }
+  .topbar-center { display: none; }
+  .logo { flex: 1; }
+  .logo-app-name { font-size: 16px; }
+  .topbar-right { flex-shrink: 0; }
+
+  /* Spot panel — full width bottom sheet */
+  .spot-panel {
+    left: 0; right: 0;
+    transform: none !important;
+    width: 100% !important;
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    bottom: calc(var(--bnav-h) + env(safe-area-inset-bottom, 0px));
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  .spot-panel.hidden {
+    transform: translateY(100%) !important;
+    opacity: 1;
+  }
+
+  /* FAB position above bottom nav */
+  .fab-add {
+    right: 16px;
+    bottom: calc(var(--bnav-h) + env(safe-area-inset-bottom, 0px) + 14px);
+    width: 54px; height: 54px;
+  }
+
+  /* Layer switcher smaller on mobile */
+  .layer-switcher { top: 8px; right: 8px; }
+  .layer-btn { font-size: 10px; padding: 5px 9px; }
+
+  /* Map controls closer to FAB */
+  .map-controls {
+    bottom: calc(var(--bnav-h) + env(safe-area-inset-bottom, 0px) + 80px);
+    right: 12px;
+  }
+
+  /* Modal full-screen on small phones */
+  .modal-bg { align-items: flex-end; padding: 0; }
+  .modal {
+    width: 100%;
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    max-height: 92vh;
+    padding: 1.5rem 1.2rem;
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  }
+  .modal-add { width: 100%; }
+
+  /* Form grid → single column */
+  .form-grid { grid-template-columns: 1fr; }
+  .form-col-full { grid-column: 1; }
+
+  /* Profile overlay body padding */
+  .overlay-body { padding: 14px 14px 24px; }
+
+  /* Profile hero more compact */
+  .profile-hero { padding: 18px 16px; border-radius: var(--r-md); }
+  .profile-greeting { font-size: 1.1rem; }
+
+  /* Account fields full width */
+  .account-field { flex-direction: column; align-items: flex-start; gap: 3px; }
+  .account-value { font-size: 13px; }
+
+  /* Prizes timeline on mobile */
+  .prize-code { font-size: 10px; padding: 3px 8px; }
+
+  /* Earn grid 1 col on small */
+  .earn-grid { grid-template-columns: 1fr; }
+
+  /* Bottom nav labels */
+  .bnav-btn span { font-size: 9px; letter-spacing: 0.2px; }
+
+  /* Auth modal fills from bottom */
+  .modal-auth { padding-top: 2rem; }
+
+  /* Add banner */
+  #add-banner { font-size: 11px; padding: 8px 12px; }
+
+  /* Search results in overlay */
+  #search-results-box { display: none !important; }
+}
+
+/* ── Very small phones (320px) ── */
+@media (max-width: 360px) {
+  .logo-app-name { font-size: 14px; }
+  .profile-stats-row { gap: 7px; }
+  .profile-stat-num { font-size: 18px; }
+  .tbtn { padding: 6px 10px; font-size: 11px; }
+}
+
+/* ── Landscape mobile ── */
+@media (max-width: 768px) and (orientation: landscape) {
+  .spot-panel { max-height: 50vh; }
+  .modal { max-height: 95vh; }
+  #topbar { height: 52px; }
+}
+
+/* ── Scroll momentum on iOS ── */
+.overlay, .overlay-body, .modal, #sidebar { -webkit-overflow-scrolling: touch; }
+
+/* ── Prevent overscroll bounce on map ── */
+#map { overscroll-behavior: none; }
+body { overscroll-behavior: none; }
+
+/* ── Tap highlight removal ── */
+* { -webkit-tap-highlight-color: transparent; }
+a, button { -webkit-tap-highlight-color: transparent; }
+
+/* ── Mobile search overlay ── */
+.mobile-search-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--brd);
+  position: sticky; top: 0; z-index: 10;
+}
+.mobile-search-bar {
+  flex: 1; display: flex; align-items: center; gap: 8px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--brd);
+  border-radius: 30px; padding: 9px 14px;
+}
+.mobile-search-bar:focus-within { border-color: var(--d-gold); }
+#mobile-search-input {
+  background: none; border: none; outline: none;
+  color: var(--text); font-size: 15px !important;
+  width: 100%; font-family: 'Poppins', sans-serif;
+}
+#mobile-search-input::placeholder { color: var(--mut-lt); }
+.mobile-search-cancel {
+  background: none; border: none;
+  font-size: 13px; font-weight: 600; color: var(--d-red);
+  padding: 6px; white-space: nowrap; min-height: 44px;
+}
+#mobile-search-results { padding-top: 8px; }
+#mobile-search-results .search-result-item { padding: 12px 4px; }
+#mobile-search-results .sr-name { font-size: 13px; }
+
+/* Desktop: hide mobile search button in bottom nav */
+@media (min-width: 769px) {
+  [data-view="search"] { display: none; }
+  #mobile-search-overlay { display: none !important; }
+}

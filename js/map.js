@@ -14,7 +14,13 @@ var Map = (function() {
     _tiles.satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
     _tiles.sat_lbl   = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, opacity: 0.85 });
     _tiles.terrain   = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, subdomains: 'abc' });
-    _tiles.streets.addTo(_map);
+    _tiles.satellite.addTo(_map);
+    _tiles.sat_lbl.addTo(_map);
+    // Mark satellite as default
+    setTimeout(function(){
+      var btns=document.querySelectorAll(".layer-btn");
+      btns.forEach(function(b){b.classList.toggle("active",b.dataset.layer==="satellite");});
+    },100);
 
     _map.on('click', function(e) {
       if (!_addMode) return;
@@ -33,7 +39,13 @@ var Map = (function() {
     Object.values(_tiles).forEach(function(l) { if (_map.hasLayer(l)) _map.removeLayer(l); });
     if (name === 'satellite') { _tiles.satellite.addTo(_map); _tiles.sat_lbl.addTo(_map); }
     else if (name === 'terrain') { _tiles.terrain.addTo(_map); }
-    else { _tiles.streets.addTo(_map); }
+    else { _tiles.satellite.addTo(_map);
+    _tiles.sat_lbl.addTo(_map);
+    // Mark satellite as default
+    setTimeout(function(){
+      var btns=document.querySelectorAll(".layer-btn");
+      btns.forEach(function(b){b.classList.toggle("active",b.dataset.layer==="satellite");});
+    },100); }
     document.querySelectorAll('.layer-btn').forEach(function(b) {
       b.classList.toggle('active', b.dataset.layer === name);
     });

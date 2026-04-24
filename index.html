@@ -2,9 +2,13 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="description" content="Descobre onde beber e comprar Café Delta em Portugal e no Mundo.">
 <meta name="theme-color" content="#2C1810">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Where's my Delta?">
+<meta name="mobile-web-app-capable" content="yes">
 <title>Where's my Delta? ☕</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
@@ -93,9 +97,25 @@
   <!-- BOTTOM NAV (mobile) -->
   <nav id="bottom-nav">
     <button class="bnav-btn active" data-view="map"     onclick="UI.showTab('map')"><span>Mapa</span></button>
+    <button class="bnav-btn"        data-view="search"  onclick="UI.showMobileSearch()"><span>Pesquisar</span></button>
     <button class="bnav-btn"        data-view="ranking" onclick="UI.showTab('ranking')"><span>Ranking</span></button>
     <button class="bnav-btn"        data-view="profile" onclick="UI.showTab('profile')"><span>Perfil</span></button>
   </nav>
+
+  <!-- Mobile search overlay -->
+  <div id="mobile-search-overlay" class="overlay hidden">
+    <div class="mobile-search-header">
+      <div class="mobile-search-bar">
+        <span class="search-icon">⌕</span>
+        <input id="mobile-search-input" placeholder="Where's my Delta?" oninput="UI.mobileSearch(this.value)" autocomplete="off">
+        <button class="search-clear" onclick="UI.clearMobileSearch()">×</button>
+      </div>
+      <button class="mobile-search-cancel" onclick="UI.closeMobileSearch()">Cancelar</button>
+    </div>
+    <div class="overlay-body" id="mobile-search-results">
+      <p class="no-results" style="padding:20px 0;">Pesquisa por cidade, país ou nome do local.</p>
+    </div>
+  </div>
 
   <!-- FAB -->
   <button class="fab-add" onclick="Auth.requireLogin(function(){Map.startAdd();})" title="Adicionar local">

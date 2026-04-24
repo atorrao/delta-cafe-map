@@ -171,10 +171,9 @@ const UI = {
     html += '<div class="profile-level-pill" style="background:' + lv.bg + ';color:' + lv.fg + ';border-color:' + lv.color + '50;">Nível ' + lv.level + ' &nbsp;·&nbsp; ' + lv.name + '</div>';
     html += '<div class="profile-since">Membro desde ' + new Date(u.joined).toLocaleDateString('pt-PT',{month:'long',year:'numeric'}) + '</div>';
     html += '</div></div>';
-    html += '<div class="profile-stats-row">';
+    html += '<div class="profile-stats-row profile-stats-2">';
     html += '<div class="profile-stat"><div class="profile-stat-num">' + pts + '</div><div class="profile-stat-lbl">Pontos</div></div>';
     html += '<div class="profile-stat"><div class="profile-stat-num">' + (u.contributions||0) + '</div><div class="profile-stat-lbl">Locais</div></div>';
-    html += '<div class="profile-stat"><div class="profile-stat-num">N' + lv.level + '</div><div class="profile-stat-lbl">Nível</div></div>';
     html += '</div></div>';
 
     // ── ACCOUNT CARD ──────────────────────────────────────────
@@ -201,7 +200,7 @@ const UI = {
 
     html += '<div class="profile-card" id="account-card">';
     html += '<div style="display:flex;align-items:center;margin-bottom:14px;">';
-    html += '<div class="card-section-title" style="margin-bottom:0;">Conta</div>';
+    html += '<div class="card-section-title" style="margin-bottom:0;">Os Meus Dados</div>';
     html += '<button class="edit-toggle-btn" onclick="UI.toggleEditMode()">Editar</button>';
     html += '</div>';
 
@@ -211,10 +210,7 @@ const UI = {
     html += '<div class="account-field"><span class="account-label">Nome</span><span class="account-value">' + u.name + '</span></div>';
     html += '<div class="account-field"><span class="account-label">E-mail</span><span class="account-value">' + u.email + '</span></div>';
     html += '<div class="account-field"><span class="account-label">Password</span><span class="account-value">••••••••</span></div>';
-    html += '<div class="account-field" style="border-bottom:none;">';
-    html += '<span class="account-label">Avatar</span>';
-    html += '<span class="account-value account-value-muted">Visível ao editar o perfil</span>';
-    html += '</div></div>';
+    html += '</div>';
 
     // Edit mode
     html += '<div id="account-edit" style="display:none;">';
@@ -227,7 +223,6 @@ const UI = {
     html += '<button class="btn-cancel-edit" onclick="UI.toggleEditMode()">Cancelar</button>';
     html += '<button class="btn-save" onclick="UI.saveProfile()">Guardar</button>';
     html += '</div></div></div>';
-
     // ── LEVEL PROGRESS ────────────────────────────────────────
     html += '<div class="profile-card">';
     html += '<div class="card-section-title">Progressão</div>';
@@ -247,42 +242,6 @@ const UI = {
       html += '</div>';
     }
     html += '</div>';
-
-    // ── EARN POINTS ───────────────────────────────────────────
-    html += '<div class="profile-card">';
-    html += '<div class="card-section-title">Como ganhar pontos</div>';
-    html += '<div class="earn-grid">';
-    var earns = [
-      ['Adicionar local','+25 pts'],['Primeiro local','+40 pts bónus'],
-      ['Receber upvote','+8 pts'],['Local verificado','+30 pts']
-    ];
-    earns.forEach(function(e){
-      html += '<div class="earn-item"><div class="earn-dot" style="background:' + lv.color + ';"></div><div class="earn-label">' + e[0] + '</div><div class="earn-pts" style="color:' + lv.color + ';">' + e[1] + '</div></div>';
-    });
-    html += '</div></div>';
-
-    // ── PRIZES ───────────────────────────────────────────────
-    html += '<div class="profile-card">';
-    html += '<div class="card-section-title">Prémios</div>';
-    html += '<div class="prizes-timeline">';
-    allPrize.forEach(function(lev){
-      var unlocked = pts >= lev.minPts;
-      html += '<div class="prize-row ' + (unlocked?'prize-unlocked':'prize-locked') + '">';
-      html += '<div class="prize-indicator">';
-      html += '<div class="prize-dot" style="background:' + (unlocked?lev.color:'#ddd') + ';' + (unlocked?'box-shadow:0 0 0 3px '+lev.color+'25;':'') + '"></div>';
-      html += '<div class="prize-line"></div></div>';
-      html += '<div class="prize-body">';
-      html += '<div class="prize-level-label" style="color:' + (unlocked?lev.color:'#bbb') + ';">Nível ' + lev.level + ' — ' + lev.name + '</div>';
-      html += '<div class="prize-title' + (unlocked?'':' prize-blurred') + '">' + lev.prize.name + '</div>';
-      if (unlocked) {
-        html += '<div class="prize-desc-text">' + lev.prize.desc + '</div>';
-        html += '<div class="prize-code-row"><span class="prize-code-label">Código:</span><code class="prize-code">' + lev.prize.code + '</code></div>';
-      } else {
-        html += '<div class="prize-locked-msg">Disponível a partir de ' + lev.minPts + ' pontos</div>';
-      }
-      html += '</div></div>';
-    });
-    html += '</div></div>';
 
     // ── MY SPOTS ─────────────────────────────────────────────
     html += '<div class="profile-card">';
@@ -315,10 +274,47 @@ const UI = {
     }
     html += '</div>';
 
+    // ── PRIZES ───────────────────────────────────────────────
+    html += '<div class="profile-card">';
+    html += '<div class="card-section-title">Prémios</div>';
+    html += '<div class="prizes-timeline">';
+    allPrize.forEach(function(lev){
+      var unlocked = pts >= lev.minPts;
+      html += '<div class="prize-row ' + (unlocked?'prize-unlocked':'prize-locked') + '">';
+      html += '<div class="prize-indicator">';
+      html += '<div class="prize-dot" style="background:' + (unlocked?lev.color:'#ddd') + ';' + (unlocked?'box-shadow:0 0 0 3px '+lev.color+'25;':'') + '"></div>';
+      html += '<div class="prize-line"></div></div>';
+      html += '<div class="prize-body">';
+      html += '<div class="prize-level-label" style="color:' + (unlocked?lev.color:'#bbb') + ';">Nível ' + lev.level + ' — ' + lev.name + '</div>';
+      html += '<div class="prize-title' + (unlocked?'':' prize-blurred') + '">' + lev.prize.name + '</div>';
+      if (unlocked) {
+        html += '<div class="prize-desc-text">' + lev.prize.desc + '</div>';
+        html += '<div class="prize-code-row"><span class="prize-code-label">Código:</span><code class="prize-code">' + lev.prize.code + '</code></div>';
+      } else {
+        html += '<div class="prize-locked-msg">Disponível a partir de ' + lev.minPts + ' pontos</div>';
+      }
+      html += '</div></div>';
+    });
+    html += '</div></div>';
+
+    // ── EARN POINTS ───────────────────────────────────────────
+    html += '<div class="profile-card">';
+    html += '<div class="card-section-title">Como ganhar pontos</div>';
+    html += '<div class="earn-grid">';
+    var earns = [
+      ['Adicionar local','+25 pts'],['Primeiro local','+40 pts bónus'],
+      ['Receber upvote','+8 pts'],['Local verificado','+30 pts']
+    ];
+    earns.forEach(function(e){
+      html += '<div class="earn-item"><div class="earn-dot" style="background:' + lv.color + ';"></div><div class="earn-label">' + e[0] + '</div><div class="earn-pts" style="color:' + lv.color + ';">' + e[1] + '</div></div>';
+    });
+    html += '</div></div>';
+
     // ── LOGOUT ───────────────────────────────────────────────
     html += '<div class="profile-card" style="padding:0;">';
     html += '<button class="logout-btn" onclick="Auth.logout()">Terminar Sessão</button>';
     html += '</div>';
+
 
     document.getElementById('profile-body').innerHTML = html;
   },
@@ -385,3 +381,58 @@ const UI = {
 };
 
 function toast(msg, type) { UI.toast(msg, type); }
+
+/* ── Mobile search ── */
+UI.showMobileSearch = function() {
+  document.querySelectorAll('.bnav-btn').forEach(function(b){b.classList.toggle('active',b.dataset.view==='search');});
+  UI.closeAllOverlays();
+  document.getElementById('mobile-search-overlay').classList.remove('hidden');
+  setTimeout(function(){ var el=document.getElementById('mobile-search-input'); if(el)el.focus(); }, 200);
+};
+
+UI.closeMobileSearch = function() {
+  document.getElementById('mobile-search-overlay').classList.add('hidden');
+  document.querySelectorAll('.bnav-btn').forEach(function(b){b.classList.toggle('active',b.dataset.view==='map');});
+};
+
+UI.clearMobileSearch = function() {
+  var el = document.getElementById('mobile-search-input');
+  if(el) el.value = '';
+  document.getElementById('mobile-search-results').innerHTML = '<p class="no-results" style="padding:20px 0;">Pesquisa por cidade, país ou nome do local.</p>';
+};
+
+UI.mobileSearch = function(q) {
+  var container = document.getElementById('mobile-search-results');
+  if (!container) return;
+  if (!q || q.length < 2) {
+    container.innerHTML = '<p class="no-results" style="padding:20px 0;">Pesquisa por cidade, país ou nome do local.</p>';
+    return;
+  }
+  var matches = App.locations.filter(function(l){
+    return (l.name+' '+l.city+' '+l.country+(l.address||'')).toLowerCase().indexOf(q.toLowerCase()) !== -1;
+  }).slice(0,12);
+  if (!matches.length) {
+    container.innerHTML = '<p class="no-results">Nenhum local encontrado.</p>';
+    return;
+  }
+  var html = '';
+  matches.forEach(function(loc){
+    var cfg = TYPE_CONFIG[loc.type] || {label:loc.type, color:'#888'};
+    html += '<div class="search-result-item" onclick="UI._mobileSelectResult(\'' + loc.id + '\')">' +
+      '<div class="sr-dot" style="background:'+cfg.color+';"></div>' +
+      '<div class="sr-info">' +
+        '<div class="sr-name">'+loc.name+'</div>' +
+        '<div class="sr-meta">'+cfg.label+' · '+loc.city+', '+loc.country+'</div>' +
+      '</div></div>';
+  });
+  container.innerHTML = html;
+};
+
+UI._mobileSelectResult = function(id) {
+  UI.closeMobileSearch();
+  UI.showTab('map');
+  setTimeout(function(){ Map.flyTo(id); }, 300);
+};
+
+App.closeAllOverlays = function() { UI.closeAllOverlays(); };
+
