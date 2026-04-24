@@ -27,6 +27,37 @@ var Admin = {
 
     var html = '';
 
+    // ── Pending spot submissions ───────────────────────────────
+    var pendingSpots = App.locations.filter(function(l) {
+      return !l.verified && l.status === 'pending' && l.ownerEmail;
+    });
+
+    if (pendingSpots.length) {
+      html += '<div class="admin-card admin-card-pending">';
+      html += '<div class="card-section-title" style="color:#92400e;display:flex;align-items:center;gap:8px;">' +
+        '<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:#92400e;color:#fff;border-radius:50%;font-size:10px;font-weight:800;">' + pendingSpots.length + '</span>' +
+        ' Locais Pendentes de Aprovação</div>';
+      pendingSpots.forEach(function(loc) {
+        var cfg = TYPE_CONFIG[loc.type] || { label: loc.type, color: '#888' };
+        html += '<div class="admin-user-row" style="border-left:3px solid ' + cfg.color + ';">' +
+          '<div class="admin-user-av" style="background:' + cfg.color + ';font-size:10px;">📍</div>' +
+          '<div class="admin-user-info">' +
+            '<div class="admin-user-name">' + loc.name + '</div>' +
+            '<div class="admin-user-email">' + (loc.address ? loc.address + ' · ' : '') + (loc.city || '') + (loc.country ? ', ' + loc.country : '') + '</div>' +
+            '<div class="admin-user-meta">Submetido por <strong>' + loc.addedBy + '</strong> · ' + cfg.label + ' · ' + new Date(loc.createdAt||Date.now()).toLocaleDateString('pt-PT',{day:'numeric',month:'short',year:'numeric'}) + '</div>' +
+          '</div>' +
+          '<div class="admin-user-right">' +
+            '<span class="admin-status-badge" style="background:#fef3e2;color:#92400e;">Pendente</span>' +
+            '<div class="admin-actions">' +
+              '<button class="admin-btn admin-btn-approve" data-act="approve-loc" data-em="' + loc.id + '">Aprovar</button>' +
+              '<button class="admin-btn admin-btn-reject"  data-act="reject-loc"  data-em="' + loc.id + '">Recusar</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      });
+      html += '</div>';
+    }
+
     // ── Stats ─────────────────────────────────────────────────
     html += '<div class="admin-stats">' +
       '<div class="admin-stat-cell"><div class="admin-stat-num">' + allUsers.length + '</div><div class="admin-stat-lbl">Total</div></div>' +
