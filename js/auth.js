@@ -1,47 +1,47 @@
 /* ═══════════════════════════════════════════════════
-   AUTH — Autenticação e gestão de utilizadores
+   AUTH — Autenticação, aprovação e gestão
    ═══════════════════════════════════════════════════ */
 
-/* ── Storage helpers ── */
 const Store = {
-  getUsers()       { try { return JSON.parse(localStorage.getItem('dcm_users') || '{}'); } catch { return {}; } },
-  saveUsers(u)     { try { localStorage.setItem('dcm_users', JSON.stringify(u)); } catch {} },
-  getSession()     { try { return JSON.parse(localStorage.getItem('dcm_session') || 'null'); } catch { return null; } },
-  saveSession(s)   { try { localStorage.setItem('dcm_session', JSON.stringify(s)); } catch {} },
-  getLocs()        { try { return JSON.parse(localStorage.getItem('dcm_locs') || '[]'); } catch { return []; } },
-  saveLocs(l)      { try { localStorage.setItem('dcm_locs', JSON.stringify(l)); } catch {} },
+  getUsers()     { try { return JSON.parse(localStorage.getItem('dcm_users') || '{}'); } catch { return {}; } },
+  saveUsers(u)   { try { localStorage.setItem('dcm_users', JSON.stringify(u)); } catch {} },
+  getSession()   { try { return JSON.parse(localStorage.getItem('dcm_session') || 'null'); } catch { return null; } },
+  saveSession(s) { try { localStorage.setItem('dcm_session', JSON.stringify(s)); } catch {} },
+  getLocs()      { try { return JSON.parse(localStorage.getItem('dcm_locs') || '[]'); } catch { return []; } },
+  saveLocs(l)    { try { localStorage.setItem('dcm_locs', JSON.stringify(l)); } catch {} },
 };
 
 const Auth = {
-  mode: 'login', // 'login' | 'register'
+  mode: 'login',
 
   init() {
-    // Ensure admin account always exists
     const users = Store.getUsers();
+
+    // Ensure admin account always exists and is approved
     if (!users['admin@delta.pt']) {
       users['admin@delta.pt'] = {
-        email: 'admin@delta.pt',
-        name: 'Admin Delta',
-        avatar: 'A',
-        password: 'admin1234',
+        email: 'admin@delta.pt', name: 'Administrador', avatar: 'A',
+        password: 'admin1234', role: 'admin', status: 'approved',
         joined: '2024-01-01T00:00:00Z',
-        contributions: 5,
-        points: 200,
-        upvotesReceived: 0,
-        country: 'Portugal'
+        contributions: 0, points: 500, selectedAvatar: 5
       };
+      Store.saveUsers(users);
+    } else if (!users['admin@delta.pt'].role) {
+      users['admin@delta.pt'].role = 'admin';
+      users['admin@delta.pt'].status = 'approved';
       Store.saveUsers(users);
     }
 
-    // Restore session
     const sess = Store.getSession();
     if (sess) {
-      // Refresh from stored users
       const u = users[sess.email];
-      if (u) {
+      if (u && u.status === 'approved') {
         const { password: _, ...safe } = u;
         Store.saveSession(safe);
         return safe;
+      } else {
+        Store.saveSession(null);
+        return null;
       }
     }
     return null;
@@ -50,16 +50,16 @@ const Auth = {
   showModal(mode = 'login') {
     this.mode = mode;
     const isReg = mode === 'register';
-    document.getElementById('auth-title').textContent = isReg ? 'Criar Conta' : 'Iniciar Sessão';
-    document.getElementById('auth-sub').textContent = isReg ? 'Junta-te à comunidade Delta Map' : 'Entra para explorar e contribuir';
+    document.getElementById('auth-title').textContent   = isReg ? 'Criar Conta' : 'Iniciar Sessão';
+    document.getElementById('auth-sub').textContent     = isReg ? 'Registo sujeito a aprovação' : 'Entra para explorar e contribuir';
     document.getElementById('auth-name-row').classList.toggle('hidden', !isReg);
     document.getElementById('auth-conf-row').classList.toggle('hidden', !isReg);
-    document.getElementById('auth-btn').textContent = isReg ? 'Criar conta' : 'Entrar';
-    document.getElementById('auth-sw-txt').textContent = isReg ? 'Já tens conta? ' : 'Não tens conta? ';
-    document.getElementById('auth-sw-lnk').textContent = isReg ? 'Entrar' : 'Registar';
-    document.getElementById('demo-hint').style.display = isReg ? 'none' : 'block';
+    document.getElementById('auth-btn').textContent     = isReg ? 'Pedir Registo' : 'Entrar';
+    document.getElementById('auth-sw-txt').textContent  = isReg ? 'Já tens conta? ' : 'Não tens conta? ';
+    document.getElementById('auth-sw-lnk').textContent  = isReg ? 'Entrar' : 'Registar';
+    document.getElementById('demo-hint').style.display  = isReg ? 'none' : 'block';
     UI.hideErr('auth-err');
-    ['a-name', 'a-email', 'a-pass', 'a-conf'].forEach(id => {
+    ['a-name','a-email','a-pass','a-conf'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
@@ -67,59 +67,56 @@ const Auth = {
     setTimeout(() => document.getElementById('a-email').focus(), 250);
   },
 
-  toggleMode() {
-    this.showModal(this.mode === 'login' ? 'register' : 'login');
-  },
+  toggleMode() { this.showModal(this.mode === 'login' ? 'register' : 'login'); },
 
   submit() {
     UI.hideErr('auth-err');
     const email = document.getElementById('a-email').value.trim().toLowerCase();
-    const pass = document.getElementById('a-pass').value;
+    const pass  = document.getElementById('a-pass').value;
     if (!email || !pass) { UI.showErr('auth-err', 'Preenche email e palavra-passe.'); return; }
-
     const users = Store.getUsers();
 
     if (this.mode === 'login') {
       const u = users[email];
       if (!u || u.password !== pass) { UI.showErr('auth-err', 'Email ou palavra-passe incorretos.'); return; }
+      if (u.status === 'pending')   { UI.showErr('auth-err', 'A tua conta está a aguardar aprovação pelo administrador.'); return; }
+      if (u.status === 'inactive')  { UI.showErr('auth-err', 'A tua conta foi desativada. Contacta o administrador.'); return; }
+      if (u.status === 'rejected')  { UI.showErr('auth-err', 'O teu registo foi recusado. Contacta o administrador.'); return; }
       const { password: _, ...safe } = u;
       Store.saveSession(safe);
       App.setUser(safe);
       UI.closeModal('auth-modal');
-      UI.toast(`Bem-vindo/a de volta, ${safe.name}! ☕`, 'success');
+      UI.toast('Bem-vindo/a, ' + safe.name + '!');
 
     } else {
       const name = document.getElementById('a-name').value.trim();
       const conf = document.getElementById('a-conf').value;
-      if (!name) { UI.showErr('auth-err', 'Insere o teu nome.'); return; }
-      if (users[email]) { UI.showErr('auth-err', 'Este email já está registado.'); return; }
-      if (pass !== conf) { UI.showErr('auth-err', 'As palavras-passe não coincidem.'); return; }
-      if (pass.length < 6) { UI.showErr('auth-err', 'Palavra-passe precisa de 6 ou mais caracteres.'); return; }
+      if (!name)             { UI.showErr('auth-err', 'Insere o teu nome.'); return; }
+      if (users[email])      { UI.showErr('auth-err', 'Este email já está registado.'); return; }
+      if (pass !== conf)     { UI.showErr('auth-err', 'As palavras-passe não coincidem.'); return; }
+      if (pass.length < 6)   { UI.showErr('auth-err', 'Palavra-passe precisa de 6 ou mais caracteres.'); return; }
 
       const user = {
-        email, name,
-        avatar: name[0].toUpperCase(),
-        password: pass,
+        email, name, avatar: name[0].toUpperCase(), password: pass,
+        role: 'user', status: 'pending',
         joined: new Date().toISOString(),
-        contributions: 0,
-        points: 10, // welcome bonus
-        upvotesReceived: 0,
-        country: 'Portugal'
+        contributions: 0, points: 0
       };
       users[email] = user;
       Store.saveUsers(users);
-      const { password: _, ...safe } = user;
-      Store.saveSession(safe);
-      App.setUser(safe);
       UI.closeModal('auth-modal');
-      UI.toast(`Bem-vindo/a, ${name}! Ganhaste 10 pontos de boas-vindas ☕`, 'success');
+      UI.showRegistrationPending();
     }
   },
 
   logout() {
     Store.saveSession(null);
     App.setUser(null);
-    UI.toast('Sessão terminada. Até logo! ☕');
+    // Close all overlays, go to map
+    UI.closeAllOverlays();
+    // Re-render markers (will hide "added by" on seed locs — already handled)
+    Map.renderMarkers();
+    UI.toast('Sessão terminada.');
   },
 
   requireLogin(callback) {
@@ -128,5 +125,9 @@ const Auth = {
     } else {
       Auth.showModal('login');
     }
+  },
+
+  isAdmin() {
+    return App.currentUser && App.currentUser.role === 'admin';
   }
 };

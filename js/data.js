@@ -18,7 +18,7 @@ const TYPE_CONFIG = {
   'espresso':     { label: 'Delta Espresso',    color: DELTA.red     },
   'loja-oficial': { label: 'Loja Delta',         color: DELTA.espresso},
   'delta-q':      { label: 'Delta Q',            color: DELTA.brown   },
-  'cafe':         { label: 'Café / Restaurante', color: DELTA.teal    },
+  'cafe':         { label: 'Café / Restaurante', color: '#E8820C'    },  // warm amber-orange, satellite-visible
   'fabrica':      { label: 'Fábrica / Museu',    color: DELTA.gold    },
 };
 
@@ -51,20 +51,20 @@ function getMarkerSVG(type, iconColor) {
         '<path d="M19.5 9.5 Q20.1 8 19.5 6.5" fill="none" stroke="' + c + '" stroke-width="1.1" stroke-linecap="round" opacity="0.7"/>' +
       '</g></svg>';
   } else {
+    // Capsule: dome top + conical body + flat rim base (icon 2 in reference)
     return '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40">' +
       '<defs><filter id="d' + uid + '"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,.4)"/></filter></defs>' +
       '<g filter="url(#d' + uid + ')">' +
-        /* pin background */
         '<path d="M16 2C9.4 2 4 7.4 4 14c0 8.5 12 24 12 24s12-15.5 12-24C28 7.4 22.6 2 16 2z" fill="' + (TYPE_CONFIG[type]||TYPE_CONFIG['loja-oficial']).color + '"/>' +
-        /* aro superior da cápsula — elipse */ 
-        '<ellipse cx="16" cy="9" rx="5.5" ry="1.8" fill="rgba(255,255,255,0.55)"/>' +
-        /* corpo cónico — trapézio arredondado */
-        '<path d="M10.5 9 L11.5 20 Q16 22.5 20.5 20 L21.5 9 Q16 11.5 10.5 9Z" fill="' + c + '" opacity="0.95"/>' +
-        /* reflexo lateral esquerdo */
-        '<path d="M10.5 9 L11.5 18 Q12.5 11 13 9.5Z" fill="rgba(255,255,255,0.25)"/>' +
-        /* bico inferior */
-        '<ellipse cx="16" cy="20.5" rx="3" ry="1.1" fill="' + c + '" opacity="0.9"/>' +
-        '<ellipse cx="16" cy="21.5" rx="1.4" ry="0.7" fill="rgba(255,255,255,0.4)"/>' +
+        /* dome top — rounded bump */
+        '<path d="M12 13 Q12 7.5 16 7.5 Q20 7.5 20 13Z" fill="' + c + '" opacity="0.95"/>' +
+        /* conical body widening downward */
+        '<path d="M12 13 L10.5 19.5 Q16 21.5 21.5 19.5 L20 13Z" fill="' + c + '" opacity="0.92"/>' +
+        /* flat rim / base ring */
+        '<ellipse cx="16" cy="19.5" rx="5.5" ry="1.5" fill="' + c + '" opacity="0.7"/>' +
+        '<ellipse cx="16" cy="19.5" rx="5.5" ry="1.5" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="0.8"/>' +
+        /* dome highlight */
+        '<ellipse cx="14.5" cy="10" rx="1.5" ry="1.8" fill="rgba(255,255,255,0.35)"/>' +
       '</g></svg>';
   }
 }
@@ -199,17 +199,17 @@ function getPanelIcon(type) {
       '<path d="M18 11 Q18.8 9 18 7" fill="none" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity="0.7"/>' +
     '</svg>';
   } else {
-    // Capsule icon — aro + corpo cónico + bico, vista frontal
+    // Panel capsule: dome + body + rim (icon 2 style)
     return '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" width="28" height="28">' +
-      /* aro superior */
-      '<ellipse cx="16" cy="7" rx="7.5" ry="2.5" fill="rgba(255,255,255,0.6)"/>' +
-      /* corpo trapezoidal cónico */
-      '<path d="M8.5 7 L10 22 Q16 25.5 22 22 L23.5 7 Q16 10.5 8.5 7Z" fill="white" opacity="0.95"/>' +
-      /* reflexo esquerdo */
-      '<path d="M8.5 7 L10 20 Q11 11 12 8Z" fill="rgba(255,255,255,0.3)"/>' +
-      /* bico inferior */
-      '<ellipse cx="16" cy="22.5" rx="4" ry="1.5" fill="white" opacity="0.85"/>' +
-      '<ellipse cx="16" cy="24" rx="2" ry="0.9" fill="rgba(255,255,255,0.5)"/>' +
+      /* dome top */
+      '<path d="M10 16 Q10 8 16 8 Q22 8 22 16Z" fill="white" opacity="0.95"/>' +
+      /* conical body */
+      '<path d="M10 16 L8.5 24 Q16 27 23.5 24 L22 16Z" fill="white" opacity="0.9"/>' +
+      /* base rim */
+      '<ellipse cx="16" cy="24" rx="7.5" ry="2" fill="white" opacity="0.7"/>' +
+      '<ellipse cx="16" cy="24" rx="7.5" ry="2" fill="none" stroke="rgba(0,0,0,0.1)" stroke-width="0.8"/>' +
+      /* dome shine */
+      '<ellipse cx="13.5" cy="12" rx="2" ry="2.5" fill="rgba(255,255,255,0.4)"/>' +
     '</svg>';
   }
 }

@@ -125,11 +125,21 @@
     </svg>
   </button>
 
+  <!-- ADMIN OVERLAY -->
+  <div id="admin-overlay" class="overlay hidden">
+    <div class="overlay-header">
+      <button class="back-btn" onclick="UI.closeOverlay('admin-overlay')">← Voltar</button>
+      <h2>Painel de Administração</h2>
+      <div></div>
+    </div>
+    <div id="admin-body" class="overlay-body"></div>
+  </div>
+
 </div><!-- /app -->
 
 <!-- AUTH MODAL -->
 <div class="modal-bg" id="auth-modal">
-  <div class="modal modal-auth">
+  <div class="modal modal-auth modal-poppins">
     <button class="modal-close" onclick="UI.closeModal('auth-modal')">×</button>
     <div class="modal-logo">☕</div>
     <h2 id="auth-title">Iniciar Sessão</h2>

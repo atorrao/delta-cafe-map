@@ -228,7 +228,11 @@ var Map = (function() {
 
     var byEl = document.getElementById('sp-by');
     if (byEl) {
-      var byHtml = 'Adicionado por <strong>' + loc.addedBy + '</strong>';
+      var byHtml = '';
+      // Only show submitter info when logged in
+      if (App.currentUser) {
+        byHtml = 'Adicionado por <strong>' + loc.addedBy + '</strong>';
+      }
       if (loc.note) byHtml += '<div class="spot-note">"' + loc.note + '"</div>';
       byEl.innerHTML = byHtml;
     }

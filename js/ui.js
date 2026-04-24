@@ -382,6 +382,136 @@ const UI = {
 
 function toast(msg, type) { UI.toast(msg, type); }
 
+/* ── Registration pending screen ── */
+UI.showRegistrationPending = function() {
+  UI.closeAllOverlays();
+  var el = document.getElementById('pending-overlay');
+  if (el) { el.classList.remove('hidden'); return; }
+  // Create overlay dynamically
+  var ov = document.createElement('div');
+  ov.id = 'pending-overlay';
+  ov.className = 'overlay';
+  ov.style.cssText = 'display:flex;align-items:center;justify-content:center;background:var(--d-foam);';
+  ov.innerHTML =
+    '<div style="text-align:center;padding:2rem;max-width:340px;">' +
+      '<div style="font-size:48px;margin-bottom:16px;">☕</div>' +
+      '<h2 style="font-family:Poppins,sans-serif;font-size:1.3rem;color:var(--d-espresso);margin-bottom:10px;">Registo recebido!</h2>' +
+      '<p style="font-size:13px;color:var(--mut);line-height:1.7;margin-bottom:20px;">O teu pedido foi enviado e está a aguardar aprovação pelo administrador. Receberás acesso assim que for aprovado.</p>' +
+      '<button onclick="document.getElementById(&quot;pending-overlay&quot;).classList.add(&quot;hidden&quot;)" style="padding:10px 24px;background:var(--d-red);color:#fff;border:none;border-radius:8px;font-family:Poppins,sans-serif;font-size:13px;font-weight:600;cursor:pointer;">Voltar ao Mapa</button>' +
+    '</div>';
+  document.getElementById('app').appendChild(ov);
+};
+
+/* ── Admin Panel ── */
+UI.openAdminPanel = function() {
+  if (!Auth.isAdmin()) return;
+  UI.closeAllOverlays();
+  UI.renderAdminPanel();
+  document.getElementById('admin-overlay').classList.remove('hidden');
+};
+
+UI.renderAdminPanel = function() {
+  var users = Store.getUsers();
+  var userList = Object.values(users).filter(function(u){ return u.email !== 'admin@delta.pt'; });
+
+  var statusLabel = { approved:'Aprovado', pending:'Pendente', inactive:'Inativo', rejected:'Recusado' };
+  var statusColor = { approved:'#1a6b3c', pending:'#92400e', inactive:'#6b7280', rejected:'#7a1524' };
+  var statusBg    = { approved:'#e6f4ec',  pending:'#fef3e2',  inactive:'#f3f4f6',  rejected:'#fde8eb' };
+
+  var locs = App.locations;
+
+  var html = '<div class="admin-section">';
+  html += '<div class="card-section-title">Utilizadores (' + userList.length + ')</div>';
+
+  if (!userList.length) {
+    html += '<p class="no-spots-msg">Nenhum utilizador registado ainda.</p>';
+  } else {
+    userList.sort(function(a,b){ return new Date(b.joined) - new Date(a.joined); });
+    userList.forEach(function(u) {
+      var st  = u.status || 'pending';
+      var pts = u.points || 0;
+      var lv  = Gamification.getLevel(pts);
+      var userLocs = locs.filter(function(l){ return l.ownerEmail === u.email; }).length;
+      html +=
+        '<div class="admin-user-row" id="arow-' + u.email.replace(/[@.]/g,'_') + '">' +
+          '<div class="admin-user-av" style="background:var(--d-red);">' + u.avatar + '</div>' +
+          '<div class="admin-user-info">' +
+            '<div class="admin-user-name">' + u.name + '</div>' +
+            '<div class="admin-user-email">' + u.email + '</div>' +
+            '<div class="admin-user-meta">' +
+              'Membro desde ' + new Date(u.joined).toLocaleDateString('pt-PT',{day:'numeric',month:'short',year:'numeric'}) +
+              ' &nbsp;·&nbsp; ' + pts + ' pts &nbsp;·&nbsp; ' + userLocs + ' locais &nbsp;·&nbsp; ' +
+              '<span style="color:' + lv.color + ';font-weight:600;">' + lv.name + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="admin-user-right">' +
+            '<span class="admin-status-badge" style="background:' + (statusBg[st]||'#f3f4f6') + ';color:' + (statusColor[st]||'#666') + ';">' + (statusLabel[st]||st) + '</span>' +
+            '<div class="admin-actions">' +
+              (st === 'pending'  ? '<button class="admin-btn admin-btn-approve" onclick="UI.adminApprove(\'' + u.email + '\')" >Aprovar</button>' : '') +
+              (st === 'pending'  ? '<button class="admin-btn admin-btn-reject"  onclick="UI.adminReject(\'' + u.email + '\')" >Recusar</button>' : '') +
+              (st === 'approved' ? '<button class="admin-btn admin-btn-inactive" onclick="UI.adminSetStatus(\'' + u.email + '\',\'inactive\')">Desativar</button>' : '') +
+              (st === 'inactive' ? '<button class="admin-btn admin-btn-approve"  onclick="UI.adminApprove(\'' + u.email + '\')" >Reativar</button>' : '') +
+              '<button class="admin-btn admin-btn-reset" onclick="UI.adminResetPass(\'' + u.email + '\')" >Reset Pass</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    });
+  }
+  html += '</div>';
+
+  // Stats summary
+  var pending  = userList.filter(function(u){ return u.status==='pending';  }).length;
+  var approved = userList.filter(function(u){ return u.status==='approved'; }).length;
+  var inactive = userList.filter(function(u){ return u.status==='inactive'; }).length;
+
+  var summaryHtml =
+    '<div class="admin-stats">' +
+      '<div class="admin-stat-cell"><div class="admin-stat-num">' + userList.length + '</div><div class="admin-stat-lbl">Total</div></div>' +
+      '<div class="admin-stat-cell" style="border-color:#2e7d5e;"><div class="admin-stat-num" style="color:#1a6b3c;">' + approved + '</div><div class="admin-stat-lbl">Aprovados</div></div>' +
+      '<div class="admin-stat-cell" style="border-color:#b07d2e;"><div class="admin-stat-num" style="color:#92400e;">' + pending + '</div><div class="admin-stat-lbl">Pendentes</div></div>' +
+      '<div class="admin-stat-cell" style="border-color:#9ca3af;"><div class="admin-stat-num" style="color:#6b7280;">' + inactive + '</div><div class="admin-stat-lbl">Inativos</div></div>' +
+    '</div>';
+
+  document.getElementById('admin-body').innerHTML = summaryHtml + html;
+};
+
+UI.adminApprove = function(email) {
+  var users = Store.getUsers();
+  if (!users[email]) return;
+  users[email].status = 'approved';
+  Store.saveUsers(users);
+  UI.renderAdminPanel();
+  UI.toast(users[email].name + ' aprovado/a.');
+};
+
+UI.adminReject = function(email) {
+  var users = Store.getUsers();
+  if (!users[email]) return;
+  users[email].status = 'rejected';
+  Store.saveUsers(users);
+  UI.renderAdminPanel();
+  UI.toast('Registo recusado.');
+};
+
+UI.adminSetStatus = function(email, status) {
+  var users = Store.getUsers();
+  if (!users[email]) return;
+  users[email].status = status;
+  Store.saveUsers(users);
+  UI.renderAdminPanel();
+  UI.toast('Estado atualizado.');
+};
+
+UI.adminResetPass = function(email) {
+  var users = Store.getUsers();
+  if (!users[email]) return;
+  var newPass = 'Delta' + Math.floor(1000 + Math.random()*9000);
+  users[email].password = newPass;
+  Store.saveUsers(users);
+  UI.toast('Nova password: ' + newPass + ' (guarda já!)', 'success');
+};
+
+
 /* ── Mobile search ── */
 UI.showMobileSearch = function() {
   document.querySelectorAll('.bnav-btn').forEach(function(b){b.classList.toggle('active',b.dataset.view==='search');});
