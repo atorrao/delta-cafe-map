@@ -691,3 +691,8 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .admin-card-pending .admin-user-row {
   border-left: 3px solid #92400e;
 }
+
+/* Earn grid — 3 cols on desktop for 6 items */
+@media (min-width: 480px) {
+  .earn-grid { grid-template-columns: 1fr 1fr 1fr; }
+}

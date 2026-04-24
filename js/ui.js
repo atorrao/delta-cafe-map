@@ -306,8 +306,12 @@ const UI = {
     html += '<div class="card-section-title">Como ganhar pontos</div>';
     html += '<div class="earn-grid">';
     var earns = [
-      ['Adicionar local','+25 pts'],['Primeiro local','+40 pts bónus'],
-      ['Receber upvote','+8 pts'],['Local verificado','+30 pts']
+      ['Primeiro local adicionado', '+40 pts bónus'],
+      ['Adicionar um local',        '+25 pts'],
+      ['Local verificado pela equipa', '+30 pts'],
+      ['Foto ou nota detalhada',    '+10 pts'],
+      ['Partilhar a app',           '+5 pts'],
+      ['Subir de nível',            'Prémio desbloqueado'],
     ];
     earns.forEach(function(e){
       html += '<div class="earn-item"><div class="earn-dot" style="background:' + lv.color + ';"></div><div class="earn-label">' + e[0] + '</div><div class="earn-pts" style="color:' + lv.color + ';">' + e[1] + '</div></div>';
