@@ -26,8 +26,9 @@ const UI = {
 
   closeOverlay(id) { document.getElementById(id).classList.add('hidden'); },
   closeAllOverlays: function() {
-    ['profile-overlay','ranking-overlay'].forEach(function(id) {
-      document.getElementById(id).classList.add('hidden');
+    ['profile-overlay','ranking-overlay','admin-overlay'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.classList.add('hidden');
     });
   },
 
