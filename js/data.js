@@ -54,12 +54,17 @@ function getMarkerSVG(type, iconColor) {
     return '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40">' +
       '<defs><filter id="d' + uid + '"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,.4)"/></filter></defs>' +
       '<g filter="url(#d' + uid + ')">' +
+        /* pin background */
         '<path d="M16 2C9.4 2 4 7.4 4 14c0 8.5 12 24 12 24s12-15.5 12-24C28 7.4 22.6 2 16 2z" fill="' + (TYPE_CONFIG[type]||TYPE_CONFIG['loja-oficial']).color + '"/>' +
-        '<circle cx="16" cy="14" r="9" fill="rgba(255,255,255,0.1)"/>' +
-        '<ellipse cx="16" cy="15" rx="4.5" ry="6.5" fill="' + c + '" opacity="0.95"/>' +
-        '<rect x="14.2" y="7.5" width="3.6" height="2.2" rx="1.1" fill="' + c + '" opacity="0.9"/>' +
-        '<ellipse cx="14.2" cy="13.5" rx="1.2" ry="2.2" fill="rgba(0,0,0,0.1)"/>' +
-        '<path d="M13 20.5 Q16 23.5 19 20.5" fill="' + c + '" opacity="0.6"/>' +
+        /* aro superior da cápsula — elipse */ 
+        '<ellipse cx="16" cy="9" rx="5.5" ry="1.8" fill="rgba(255,255,255,0.55)"/>' +
+        /* corpo cónico — trapézio arredondado */
+        '<path d="M10.5 9 L11.5 20 Q16 22.5 20.5 20 L21.5 9 Q16 11.5 10.5 9Z" fill="' + c + '" opacity="0.95"/>' +
+        /* reflexo lateral esquerdo */
+        '<path d="M10.5 9 L11.5 18 Q12.5 11 13 9.5Z" fill="rgba(255,255,255,0.25)"/>' +
+        /* bico inferior */
+        '<ellipse cx="16" cy="20.5" rx="3" ry="1.1" fill="' + c + '" opacity="0.9"/>' +
+        '<ellipse cx="16" cy="21.5" rx="1.4" ry="0.7" fill="rgba(255,255,255,0.4)"/>' +
       '</g></svg>';
   }
 }
@@ -194,12 +199,17 @@ function getPanelIcon(type) {
       '<path d="M18 11 Q18.8 9 18 7" fill="none" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity="0.7"/>' +
     '</svg>';
   } else {
-    // Clean capsule icon
+    // Capsule icon — aro + corpo cónico + bico, vista frontal
     return '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" width="28" height="28">' +
-      '<ellipse cx="16" cy="18" rx="7" ry="9" fill="white" opacity="0.95"/>' +
-      '<rect x="13" y="8" width="6" height="3.5" rx="1.8" fill="white" opacity="0.9"/>' +
-      '<ellipse cx="13.5" cy="16" rx="2" ry="3.5" fill="rgba(0,0,0,0.1)"/>' +
-      '<path d="M11 25.5 Q16 29 21 25.5" fill="white" opacity="0.5"/>' +
+      /* aro superior */
+      '<ellipse cx="16" cy="7" rx="7.5" ry="2.5" fill="rgba(255,255,255,0.6)"/>' +
+      /* corpo trapezoidal cónico */
+      '<path d="M8.5 7 L10 22 Q16 25.5 22 22 L23.5 7 Q16 10.5 8.5 7Z" fill="white" opacity="0.95"/>' +
+      /* reflexo esquerdo */
+      '<path d="M8.5 7 L10 20 Q11 11 12 8Z" fill="rgba(255,255,255,0.3)"/>' +
+      /* bico inferior */
+      '<ellipse cx="16" cy="22.5" rx="4" ry="1.5" fill="white" opacity="0.85"/>' +
+      '<ellipse cx="16" cy="24" rx="2" ry="0.9" fill="rgba(255,255,255,0.5)"/>' +
     '</svg>';
   }
 }

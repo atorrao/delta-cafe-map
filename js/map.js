@@ -33,6 +33,30 @@ var Map = (function() {
 
     buildTypeFilters();
     renderMarkers();
+
+    // Go to user location on startup
+    _locateOnStart();
+  }
+
+  function _locateOnStart() {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      function(pos) {
+        _map.setView([pos.coords.latitude, pos.coords.longitude], 14);
+        // Add subtle user dot
+        L.circleMarker([pos.coords.latitude, pos.coords.longitude], {
+          radius: 8,
+          color: '#2C1810',
+          fillColor: '#C8A84B',
+          fillOpacity: 0.85,
+          weight: 2.5
+        }).addTo(_map).bindPopup('<strong>A tua localização</strong>');
+      },
+      function() {
+        // Permission denied or unavailable — stay on default Portugal view
+      },
+      { timeout: 6000, enableHighAccuracy: true, maximumAge: 60000 }
+    );
   }
 
   function setLayer(name) {
