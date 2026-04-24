@@ -692,3 +692,54 @@ a, button { -webkit-tap-highlight-color: transparent; }
   border-left: 3px solid #92400e;
 }
 
+
+/* ── Nearest Delta Alert ── */
+.nearest-alert {
+  position: fixed;
+  top: calc(var(--topbar-h) + 12px);
+  left: 50%; transform: translateX(-50%);
+  z-index: 950;
+  width: min(420px, calc(100vw - 24px));
+  animation: slideDown .35s cubic-bezier(.2,0,.2,1);
+}
+@keyframes slideDown { from { opacity:0; transform:translateX(-50%) translateY(-12px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+.nearest-alert.hidden { display: none; }
+.nearest-alert-inner {
+  background: var(--d-espresso);
+  border-radius: var(--r-lg);
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: var(--sh-lg);
+  border: 1px solid rgba(200,168,75,.2);
+  position: relative;
+}
+.nearest-close {
+  position: absolute; top: 8px; right: 10px;
+  background: rgba(255,255,255,.1); border: none;
+  color: rgba(245,238,216,.6); font-size: 14px;
+  width: 22px; height: 22px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; line-height: 1;
+}
+.nearest-close:hover { background: rgba(255,255,255,.2); color: var(--d-cream); }
+.nearest-icon {
+  width: 42px; height: 42px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; overflow: visible;
+}
+.nearest-content { flex: 1; min-width: 0; }
+.nearest-label { font-size: 9px; font-weight: 700; color: var(--d-gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+.nearest-name { font-size: 13px; font-weight: 700; color: var(--d-cream); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nearest-dist { font-size: 11px; color: rgba(245,238,216,.5); margin-top: 2px; }
+.nearest-go {
+  background: var(--d-gold); color: var(--d-espresso);
+  border: none; border-radius: var(--r-sm);
+  font-size: 11px; font-weight: 700;
+  padding: 7px 14px; cursor: pointer; flex-shrink: 0;
+  font-family: 'Poppins', sans-serif;
+  transition: background .15s;
+}
+.nearest-go:hover { background: var(--d-gold-lt); }
+@media (max-width: 768px) {
+  .nearest-alert { top: calc(var(--topbar-h) + env(safe-area-inset-top,0px) + 8px); }
+}

@@ -42,15 +42,13 @@ var Map = (function() {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
       function(pos) {
-        _map.setView([pos.coords.latitude, pos.coords.longitude], 14);
-        // Add subtle user dot
-        L.circleMarker([pos.coords.latitude, pos.coords.longitude], {
-          radius: 8,
-          color: '#2C1810',
-          fillColor: '#C8A84B',
-          fillOpacity: 0.85,
-          weight: 2.5
+        var lat = pos.coords.latitude, lng = pos.coords.longitude;
+        _map.setView([lat, lng], 14);
+        L.circleMarker([lat, lng], {
+          radius: 8, color: '#2C1810', fillColor: '#C8A84B', fillOpacity: 0.85, weight: 2.5
         }).addTo(_map).bindPopup('<strong>A tua localização</strong>');
+        // Show nearest Delta alert
+        _showNearestAlert(lat, lng);
       },
       function() {
         // Permission denied or unavailable — stay on default Portugal view
@@ -73,6 +71,56 @@ var Map = (function() {
     document.querySelectorAll('.layer-btn').forEach(function(b) {
       b.classList.toggle('active', b.dataset.layer === name);
     });
+  }
+
+  function _haversine(lat1, lng1, lat2, lng2) {
+    var R = 6371, dLat = (lat2-lat1)*Math.PI/180, dLng = (lng2-lng1)*Math.PI/180;
+    var a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+            Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
+            Math.sin(dLng/2)*Math.sin(dLng/2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  }
+
+  function _showNearestAlert(userLat, userLng) {
+    var visible = App.locations.filter(function(l) {
+      return l.verified && !(l.status === 'pending' && l.ownerEmail);
+    });
+    if (!visible.length) return;
+
+    var nearest = null, minDist = Infinity;
+    visible.forEach(function(l) {
+      var d = _haversine(userLat, userLng, l.lat, l.lng);
+      if (d < minDist) { minDist = d; nearest = l; }
+    });
+    if (!nearest) return;
+
+    var distStr = minDist < 1
+      ? Math.round(minDist * 1000) + ' m'
+      : minDist.toFixed(1) + ' km';
+
+    var cfg = TYPE_CONFIG[nearest.type] || TYPE_CONFIG['cafe'];
+    var iconEl = document.getElementById('na-icon');
+    if (iconEl) {
+      iconEl.style.background = cfg.color;
+      iconEl.innerHTML = getPanelIcon(nearest.type);
+    }
+    var nameEl = document.getElementById('na-name');
+    if (nameEl) nameEl.textContent = nearest.name;
+    var distEl = document.getElementById('na-dist');
+    if (distEl) distEl.textContent = distStr + ' · ' + nearest.city;
+
+    var goBtn = document.getElementById('na-go');
+    if (goBtn) goBtn.onclick = function() {
+      document.getElementById('nearest-alert').classList.add('hidden');
+      flyTo(nearest.id);
+    };
+
+    var alert = document.getElementById('nearest-alert');
+    if (alert) {
+      alert.classList.remove('hidden');
+      // Auto-hide after 8 seconds
+      setTimeout(function() { alert.classList.add('hidden'); }, 8000);
+    }
   }
 
   function buildTypeFilters() {
@@ -113,6 +161,8 @@ var Map = (function() {
     var filtered = App.locations.filter(function(l) {
       if (_activeType !== 'all' && l.type !== _activeType) return false;
       if (q && !_matchSearch(l, q)) return false;
+      // Hide user-submitted pending locations from public map
+      if (!l.verified && l.status === 'pending' && l.ownerEmail) return false;
       return true;
     });
 
@@ -276,9 +326,33 @@ var Map = (function() {
       navigator.geolocation.getCurrentPosition(
         function(pos) {
           _pendingCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          if (coordsLbl) coordsLbl.textContent = 'Localização detectada: ' + _pendingCoords.lat.toFixed(4) + ', ' + _pendingCoords.lng.toFixed(4);
-          // Fly map to user location
+          if (coordsLbl) coordsLbl.textContent = 'Localização detectada. A obter morada...';
           _map.flyTo([_pendingCoords.lat, _pendingCoords.lng], 15, { duration: 1 });
+          // Reverse geocode with Nominatim
+          fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + _pendingCoords.lat + '&lon=' + _pendingCoords.lng + '&accept-language=pt')
+            .then(function(r){ return r.json(); })
+            .then(function(d){
+              var addr = d.address || {};
+              var road    = addr.road || addr.pedestrian || addr.footway || '';
+              var number  = addr.house_number ? ', ' + addr.house_number : '';
+              var city    = addr.city || addr.town || addr.village || addr.county || '';
+              var country = addr.country || 'Portugal';
+              var postcode= addr.postcode ? ', ' + addr.postcode : '';
+              var full    = road + number + postcode;
+
+              // Pre-fill address field
+              var addrEl = document.getElementById('add-addr');
+              if (addrEl && full.trim()) addrEl.value = full;
+
+              // Pre-fill city and country hidden fields for loc object
+              _pendingCity    = city;
+              _pendingCountry = country;
+
+              if (coordsLbl) coordsLbl.textContent = (full || city) ? (full + (city ? ' · ' + city : '')) : 'Morada não encontrada — podes preencher manualmente';
+            })
+            .catch(function(){
+              if (coordsLbl) coordsLbl.textContent = 'Localização detectada · morada não disponível';
+            });
         },
         function() {
           if (coordsLbl) coordsLbl.textContent = 'Localização não disponível — clica no mapa para marcar o local';
@@ -319,13 +393,18 @@ var Map = (function() {
     var oldPts  = App.currentUser.points || 0;
     var oldLv   = Gamification.getLevel(oldPts);
 
+    var addrVal = (document.getElementById('add-addr')||{value:''}).value.trim();
     var loc = {
       id: 'u-' + Date.now(), name: name,
-      country: 'Portugal', city: '',
-      address: '', hours: hours || null, note: note || null,
+      country: _pendingCountry || 'Portugal',
+      city: _pendingCity || '',
+      address: addrVal,
+      hours: hours || null, note: note || null,
       type: type, products: products,
       lat: _pendingCoords.lat, lng: _pendingCoords.lng,
-      verified: false, addedBy: App.currentUser.name,
+      verified: false,
+      status: 'pending',
+      addedBy: App.currentUser.name,
       ownerEmail: App.currentUser.email, upvotes: 0,
       createdAt: new Date().toISOString()
     };
@@ -348,7 +427,7 @@ var Map = (function() {
     renderMarkers();
     UI.renderTopbar();
     cancelAdd();
-    UI.toast('Local adicionado! +' + earned + ' pontos.');
+    UI.toast('Local submetido para aprovação! +' + earned + ' pontos.');
 
     var newLv = Gamification.getLevel(App.currentUser.points);
     if (newLv.level > oldLv.level) {

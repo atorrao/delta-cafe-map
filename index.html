@@ -117,6 +117,20 @@
     </div>
   </div>
 
+  <!-- NEAREST DELTA ALERT -->
+  <div id="nearest-alert" class="nearest-alert hidden">
+    <div class="nearest-alert-inner">
+      <button class="nearest-close" onclick="document.getElementById('nearest-alert').classList.add('hidden')">×</button>
+      <div class="nearest-icon" id="na-icon"></div>
+      <div class="nearest-content">
+        <div class="nearest-label">Delta mais próximo</div>
+        <div class="nearest-name" id="na-name"></div>
+        <div class="nearest-dist" id="na-dist"></div>
+      </div>
+      <button class="nearest-go" id="na-go">Ver no mapa</button>
+    </div>
+  </div>
+
   <!-- FAB -->
   <button class="fab-add" onclick="Auth.requireLogin(function(){Map.startAdd();})" title="Adicionar local">
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -185,6 +199,10 @@
       <div class="form-col-full">
         <label class="flabel">Tipo *</label>
         <select class="finput" id="add-type"></select>
+      </div>
+      <div class="form-col-full">
+        <label class="flabel">Morada <span class="optional-label">preenchida automaticamente</span></label>
+        <input class="finput" id="add-addr" placeholder="A detectar a tua morada...">
       </div>
       <div class="form-col-full">
         <label class="flabel">Horário de Funcionamento <span class="optional-label">opcional</span></label>

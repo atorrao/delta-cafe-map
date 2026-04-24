@@ -151,21 +151,33 @@ var Admin = {
     Admin.render();
   },
 
-  handleAction: function(act, email) {
+  handleAction: function(act, id) {
+    // Location actions
+    if (act === 'approve-loc') {
+      var loc = App.locations.find(function(l){ return l.id === id; });
+      if (loc) { loc.verified = true; loc.status = 'approved'; App.saveUserLocations(); Map.renderMarkers(); UI.toast('Local aprovado e publicado!', 'success'); Admin.render(); }
+      return;
+    }
+    if (act === 'reject-loc') {
+      var idx = App.locations.findIndex(function(l){ return l.id === id; });
+      if (idx > -1) { App.locations.splice(idx, 1); App.saveUserLocations(); UI.toast('Local recusado.'); Admin.render(); }
+      return;
+    }
+    // User actions
     var users = Store.getUsers();
-    if (!users[email]) return;
+    if (!users[id]) return;
     if (act === 'approve') {
-      users[email].status = 'approved';
-      UI.toast(users[email].name + ' aprovado/a.');
+      users[id].status = 'approved';
+      UI.toast(users[id].name + ' aprovado/a.');
     } else if (act === 'reject') {
-      users[email].status = 'rejected';
+      users[id].status = 'rejected';
       UI.toast('Registo recusado.');
     } else if (act === 'inactive') {
-      users[email].status = 'inactive';
+      users[id].status = 'inactive';
       UI.toast('Conta desativada.');
     } else if (act === 'reset') {
       var np = 'Delta' + Math.floor(1000 + Math.random()*9000);
-      users[email].password = np;
+      users[id].password = np;
       Store.saveUsers(users);
       UI.toast('Nova password: ' + np, 'success');
       return;

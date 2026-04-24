@@ -51,34 +51,29 @@ function getMarkerSVG(type, iconColor) {
         '<path d="M19.5 9.5 Q20.1 8 19.5 6.5" fill="none" stroke="' + c + '" stroke-width="1.1" stroke-linecap="round" opacity="0.7"/>' +
       '</g></svg>';
   } else {
-    // Capsule: icon-1 style — 3/4 perspective, body on left, circular base facing viewer on right
+    // Capsule: top-view icon — nozzle top, trapezoid body, oval base rim
     var bg = (TYPE_CONFIG[type]||TYPE_CONFIG['loja-oficial']).color;
     return '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40">' +
       '<defs><filter id="d' + uid + '"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,.4)"/></filter></defs>' +
       '<g filter="url(#d' + uid + ')">' +
-        /* pin teardrop background */
+        /* pin teardrop */
         '<path d="M16 2C9.4 2 4 7.4 4 14c0 8.5 12 24 12 24s12-15.5 12-24C28 7.4 22.6 2 16 2z" fill="' + bg + '"/>' +
-        /* main capsule body — rounded rectangle, slight tilt */
-        '<path d="M7 11 Q7 7 11 7 L19 9 Q22 10 22 14 Q22 18 19 19 L11 20 Q7 20 7 17 Z" fill="' + c + '" opacity="0.95"/>' +
-        /* circular base / rim — foil side facing viewer, right side */
-        '<ellipse cx="21" cy="14" rx="3.5" ry="5" fill="' + c + '" opacity="0.75"/>' +
-        /* inner foil circle — lighter */
-        '<ellipse cx="21" cy="14" rx="2.2" ry="3.4" fill="rgba(255,255,255,0.3)"/>' +
-        /* rim ring outline */
-        '<ellipse cx="21" cy="14" rx="3.5" ry="5" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="0.8"/>' +
-        /* dome top of body — left curved end */
-        '<ellipse cx="9" cy="13.5" rx="2.5" ry="4.5" fill="' + c + '" opacity="0.9"/>' +
-        /* highlight stripe on body */
-        '<path d="M8 10 Q10 8.5 14 9.5" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.2" stroke-linecap="round"/>' +
-        /* small shine on dome */
-        '<ellipse cx="8.5" cy="11" rx="1" ry="2" fill="rgba(255,255,255,0.35)"/>' +
+        /* base rim — oval at bottom */
+        '<ellipse cx="16" cy="21" rx="6.5" ry="1.8" fill="none" stroke="' + c + '" stroke-width="1" opacity="0.7"/>' +
+        /* trapezoidal body — wide at base, narrow at top */
+        '<path d="M10.5 20.5 L12 10 Q16 8.5 20 10 L21.5 20.5 Q16 22.5 10.5 20.5Z" fill="' + c + '" opacity="0.95"/>' +
+        /* nozzle top — small circle */
+        '<ellipse cx="16" cy="9.5" rx="2" ry="1.2" fill="none" stroke="' + c + '" stroke-width="1.2" opacity="0.9"/>' +
+        /* body shine/line */
+        '<line x1="18" y1="11" x2="19" y2="20" stroke="rgba(255,255,255,0.3)" stroke-width="1" stroke-linecap="round"/>' +
+        /* small shine top-left */
+        '<line x1="14" y1="11" x2="13.5" y2="13" stroke="rgba(255,255,255,0.35)" stroke-width="1" stroke-linecap="round"/>' +
       '</g></svg>';
   }
 }
 
 const PRODUCTS = [
-  'Espresso', 'Delta Q Cápsulas', 'Café Moído', 'Café em Grão',
-  'Descafeinado', 'Máquinas Delta Q', 'Acessórios', 'Loja Gourmet'
+  'Café Moído', 'Café em Grão', 'Cápsulas Delta', 'Descafeinado'
 ];
 
 const COUNTRIES = [
@@ -206,20 +201,17 @@ function getPanelIcon(type) {
       '<path d="M18 11 Q18.8 9 18 7" fill="none" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity="0.7"/>' +
     '</svg>';
   } else {
-    // Panel capsule — icon-1 3/4 perspective, flat white
+    // Panel capsule — top-view icon, flat white
     return '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" width="28" height="28">' +
-      /* capsule body */
-      '<path d="M5 12 Q5 7 10 7 L21 9.5 Q25 11 25 16 Q25 21 21 22 L10 23 Q5 23 5 18 Z" fill="white" opacity="0.95"/>' +
-      /* circular base — foil facing viewer */
-      '<ellipse cx="23.5" cy="15.5" rx="4" ry="6.5" fill="rgba(255,255,255,0.65)"/>' +
-      '<ellipse cx="23.5" cy="15.5" rx="2.5" ry="4.2" fill="rgba(255,255,255,0.4)"/>' +
-      '<ellipse cx="23.5" cy="15.5" rx="4" ry="6.5" fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>' +
-      /* dome left */
-      '<ellipse cx="7" cy="15" rx="3" ry="5.5" fill="white" opacity="0.85"/>' +
-      /* body highlight */
-      '<path d="M6 10.5 Q11 8 17 9.5" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/>' +
-      /* shine on dome */
-      '<ellipse cx="6.5" cy="12" rx="1.2" ry="2.5" fill="rgba(255,255,255,0.4)"/>' +
+      /* base rim */
+      '<ellipse cx="16" cy="25" rx="9" ry="2.5" fill="none" stroke="white" stroke-width="1.2" opacity="0.7"/>' +
+      /* trapezoidal body */
+      '<path d="M7 24 L10 8 Q16 5.5 22 8 L25 24 Q16 27 7 24Z" fill="white" opacity="0.95"/>' +
+      /* nozzle */
+      '<ellipse cx="16" cy="7.5" rx="3" ry="1.8" fill="none" stroke="white" stroke-width="1.5" opacity="0.9"/>' +
+      /* shine line */
+      '<line x1="21" y1="10" x2="22.5" y2="23" stroke="rgba(255,255,255,0.35)" stroke-width="1.2" stroke-linecap="round"/>' +
+      '<line x1="13" y1="10" x2="12" y2="14" stroke="rgba(255,255,255,0.4)" stroke-width="1.2" stroke-linecap="round"/>' +
     '</svg>';
   }
 }
