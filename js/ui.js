@@ -411,60 +411,22 @@ UI.openAdminPanel = function() {
 };
 
 UI.renderAdminPanel = function() {
-  var users = Store.getUsers();
+  var users    = Store.getUsers();
   var userList = Object.values(users).filter(function(u){ return u.email !== 'admin@delta.pt'; });
+  userList.sort(function(a,b){ return new Date(b.joined)-new Date(a.joined); });
 
-  var statusLabel = { approved:'Aprovado', pending:'Pendente', inactive:'Inativo', rejected:'Recusado' };
-  var statusColor = { approved:'#1a6b3c', pending:'#92400e', inactive:'#6b7280', rejected:'#7a1524' };
-  var statusBg    = { approved:'#e6f4ec',  pending:'#fef3e2',  inactive:'#f3f4f6',  rejected:'#fde8eb' };
+  var SL = { approved:'Aprovado', pending:'Pendente', inactive:'Inativo', rejected:'Recusado' };
+  var SC = { approved:'#1a6b3c', pending:'#92400e', inactive:'#6b7280', rejected:'#7a1524' };
+  var SB = { approved:'#e6f4ec', pending:'#fef3e2', inactive:'#f3f4f6', rejected:'#fde8eb' };
 
-  var locs = App.locations;
-
-  var html = '<div class="admin-section">';
-  html += '<div class="card-section-title">Utilizadores (' + userList.length + ')</div>';
-
-  if (!userList.length) {
-    html += '<p class="no-spots-msg">Nenhum utilizador registado ainda.</p>';
-  } else {
-    userList.sort(function(a,b){ return new Date(b.joined) - new Date(a.joined); });
-    userList.forEach(function(u) {
-      var st  = u.status || 'pending';
-      var pts = u.points || 0;
-      var lv  = Gamification.getLevel(pts);
-      var userLocs = locs.filter(function(l){ return l.ownerEmail === u.email; }).length;
-      html +=
-        '<div class="admin-user-row" id="arow-' + u.email.replace(/[@.]/g,'_') + '">' +
-          '<div class="admin-user-av" style="background:var(--d-red);">' + u.avatar + '</div>' +
-          '<div class="admin-user-info">' +
-            '<div class="admin-user-name">' + u.name + '</div>' +
-            '<div class="admin-user-email">' + u.email + '</div>' +
-            '<div class="admin-user-meta">' +
-              'Membro desde ' + new Date(u.joined).toLocaleDateString('pt-PT',{day:'numeric',month:'short',year:'numeric'}) +
-              ' &nbsp;·&nbsp; ' + pts + ' pts &nbsp;·&nbsp; ' + userLocs + ' locais &nbsp;·&nbsp; ' +
-              '<span style="color:' + lv.color + ';font-weight:600;">' + lv.name + '</span>' +
-            '</div>' +
-          '</div>' +
-          '<div class="admin-user-right">' +
-            '<span class="admin-status-badge" style="background:' + (statusBg[st]||'#f3f4f6') + ';color:' + (statusColor[st]||'#666') + ';">' + (statusLabel[st]||st) + '</span>' +
-            '<div class="admin-actions">' +
-              (st === 'pending'  ? '<button class="admin-btn admin-btn-approve" onclick="UI.adminApprove(\'' + u.email + '\')" >Aprovar</button>' : '') +
-              (st === 'pending'  ? '<button class="admin-btn admin-btn-reject"  onclick="UI.adminReject(\'' + u.email + '\')" >Recusar</button>' : '') +
-              (st === 'approved' ? '<button class="admin-btn admin-btn-inactive" onclick="UI.adminSetStatus(\'' + u.email + '\',\'inactive\')">Desativar</button>' : '') +
-              (st === 'inactive' ? '<button class="admin-btn admin-btn-approve"  onclick="UI.adminApprove(\'' + u.email + '\')" >Reativar</button>' : '') +
-              '<button class="admin-btn admin-btn-reset" onclick="UI.adminResetPass(\'' + u.email + '\')" >Reset Pass</button>' +
-            '</div>' +
-          '</div>' +
-        '</div>';
-    });
-  }
-  html += '</div>';
-
-  // Stats summary
   var pending  = userList.filter(function(u){ return u.status==='pending';  }).length;
   var approved = userList.filter(function(u){ return u.status==='approved'; }).length;
   var inactive = userList.filter(function(u){ return u.status==='inactive'; }).length;
 
-  var summaryHtml =
+  var html = '';
+
+  // ── Stats ──
+  html +=
     '<div class="admin-stats">' +
       '<div class="admin-stat-cell"><div class="admin-stat-num">' + userList.length + '</div><div class="admin-stat-lbl">Total</div></div>' +
       '<div class="admin-stat-cell" style="border-color:#2e7d5e;"><div class="admin-stat-num" style="color:#1a6b3c;">' + approved + '</div><div class="admin-stat-lbl">Aprovados</div></div>' +
@@ -472,7 +434,103 @@ UI.renderAdminPanel = function() {
       '<div class="admin-stat-cell" style="border-color:#9ca3af;"><div class="admin-stat-num" style="color:#6b7280;">' + inactive + '</div><div class="admin-stat-lbl">Inativos</div></div>' +
     '</div>';
 
-  document.getElementById('admin-body').innerHTML = summaryHtml + html;
+  // ── Pending first ──
+  if (pending > 0) {
+    html += '<div class="admin-card">';
+    html += '<div class="card-section-title" style="color:#92400e;">Pendentes de Aprovação (' + pending + ')</div>';
+    userList.filter(function(u){ return u.status==='pending'; }).forEach(function(u) {
+      html += UI._adminUserRow(u, SL, SC, SB);
+    });
+    html += '</div>';
+  }
+
+  // ── Create new user ──
+  html +=
+    '<div class="admin-card">' +
+      '<div class="card-section-title">Criar Novo Utilizador</div>' +
+      '<div class="admin-create-form">' +
+        '<div class="admin-form-row">' +
+          '<div><label class="flabel">Nome</label><input class="finput admin-inp" id="new-u-name" placeholder="Nome completo"></div>' +
+          '<div><label class="flabel">Email</label><input class="finput admin-inp" id="new-u-email" type="email" placeholder="email@exemplo.com"></div>' +
+        '</div>' +
+        '<div class="admin-form-row">' +
+          '<div><label class="flabel">Password</label><input class="finput admin-inp" id="new-u-pass" type="password" placeholder="Mínimo 6 caracteres"></div>' +
+          '<div><label class="flabel">Estado</label>' +
+            '<select class="finput admin-inp" id="new-u-status">' +
+              '<option value="approved">Aprovado</option>' +
+              '<option value="pending">Pendente</option>' +
+            '</select>' +
+          '</div>' +
+        '</div>' +
+        '<button class="admin-btn admin-btn-approve" style="padding:8px 20px;font-size:12px;" onclick="UI.adminCreateUser()">Criar Utilizador</button>' +
+      '</div>' +
+    '</div>';
+
+  // ── All users ──
+  html += '<div class="admin-card">';
+  html += '<div class="card-section-title">Todos os Utilizadores</div>';
+  if (!userList.length) {
+    html += '<p class="no-spots-msg">Nenhum utilizador registado ainda.</p>';
+  } else {
+    userList.forEach(function(u) {
+      html += UI._adminUserRow(u, SL, SC, SB);
+    });
+  }
+  html += '</div>';
+
+  document.getElementById('admin-body').innerHTML = html;
+};
+
+UI._adminUserRow = function(u, SL, SC, SB) {
+  var st  = u.status || 'pending';
+  var pts = u.points || 0;
+  var lv  = Gamification.getLevel(pts);
+  var userLocs = App.locations.filter(function(l){ return l.ownerEmail === u.email; }).length;
+  var em  = u.email;
+
+  var actionBtns = '';
+  if (st === 'pending')  actionBtns += '<button class="admin-btn admin-btn-approve" data-action="approve" data-email="' + em + '">Aprovar</button>';
+  if (st === 'pending')  actionBtns += '<button class="admin-btn admin-btn-reject"  data-action="reject"  data-email="' + em + '">Recusar</button>';
+  if (st === 'approved') actionBtns += '<button class="admin-btn admin-btn-inactive" data-action="inactive" data-email="' + em + '">Desativar</button>';
+  if (st === 'inactive' || st === 'rejected') actionBtns += '<button class="admin-btn admin-btn-approve" data-action="approve" data-email="' + em + '">Reativar</button>';
+  actionBtns += '<button class="admin-btn admin-btn-reset" data-action="reset" data-email="' + em + '">Reset Pass</button>';
+
+  return '<div class="admin-user-row">' +
+    '<div class="admin-user-av" style="background:var(--d-red);">' + u.avatar + '</div>' +
+    '<div class="admin-user-info">' +
+      '<div class="admin-user-name">' + u.name + '</div>' +
+      '<div class="admin-user-email">' + em + '</div>' +
+      '<div class="admin-user-meta">' +
+        new Date(u.joined).toLocaleDateString('pt-PT',{day:'numeric',month:'short',year:'numeric'}) +
+        ' &nbsp;&middot;&nbsp; ' + pts + ' pts' +
+        ' &nbsp;&middot;&nbsp; ' + userLocs + ' locais' +
+        ' &nbsp;&middot;&nbsp; <span style="color:' + lv.color + ';font-weight:600;">' + lv.name + '</span>' +
+      '</div>' +
+    '</div>' +
+    '<div class="admin-user-right">' +
+      '<span class="admin-status-badge" style="background:' + (SB[st]||'#f3f4f6') + ';color:' + (SC[st]||'#666') + ';">' + (SL[st]||st) + '</span>' +
+      '<div class="admin-actions">' + actionBtns + '</div>' +
+    '</div>' +
+  '</div>';
+};
+
+UI.adminCreateUser = function() {
+  var name  = (document.getElementById('new-u-name')   ||{value:''}).value.trim();
+  var email = (document.getElementById('new-u-email')  ||{value:''}).value.trim().toLowerCase();
+  var pass  = (document.getElementById('new-u-pass')   ||{value:''}).value;
+  var status= (document.getElementById('new-u-status') ||{value:'approved'}).value;
+  if (!name || !email || !pass) { UI.toast('Preenche todos os campos.', 'error'); return; }
+  if (pass.length < 6)          { UI.toast('Password precisa de 6+ caracteres.', 'error'); return; }
+  var users = Store.getUsers();
+  if (users[email])              { UI.toast('Este email já existe.', 'error'); return; }
+  users[email] = {
+    email: email, name: name, avatar: name[0].toUpperCase(),
+    password: pass, role: 'user', status: status,
+    joined: new Date().toISOString(), contributions: 0, points: 0
+  };
+  Store.saveUsers(users);
+  UI.toast('Utilizador ' + name + ' criado!', 'success');
+  UI.renderAdminPanel();
 };
 
 UI.adminApprove = function(email) {
@@ -565,4 +623,17 @@ UI._mobileSelectResult = function(id) {
 };
 
 App.closeAllOverlays = function() { UI.closeAllOverlays(); };
+
+// Admin button delegation — avoids inline onclick with email strings
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  var action = btn.dataset.action;
+  var email  = btn.dataset.email;
+  if (!email) return;
+  if (action === 'approve')  UI.adminApprove(email);
+  if (action === 'reject')   UI.adminReject(email);
+  if (action === 'inactive') UI.adminSetStatus(email, 'inactive');
+  if (action === 'reset')    UI.adminResetPass(email);
+});
 
