@@ -98,7 +98,7 @@ const LEVELS = [
 ];
 
 const POINT_RULES = {
-  ADD_LOCATION:   25,
+  ADD_LOCATION:   15,
   UPVOTE_RECEIVED: 8,
   UPVOTE_GIVEN:    1,
   VERIFIED:       30,

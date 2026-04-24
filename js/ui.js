@@ -307,11 +307,7 @@ const UI = {
     html += '<div class="earn-grid">';
     var earns = [
       ['Primeiro local adicionado', '+40 pts bónus'],
-      ['Adicionar um local',        '+25 pts'],
-      ['Local verificado pela equipa', '+30 pts'],
-      ['Foto ou nota detalhada',    '+10 pts'],
-      ['Partilhar a app',           '+5 pts'],
-      ['Subir de nível',            'Prémio desbloqueado'],
+      ['Adicionar um local',        '+15 pts'],
     ];
     earns.forEach(function(e){
       html += '<div class="earn-item"><div class="earn-dot" style="background:' + lv.color + ';"></div><div class="earn-label">' + e[0] + '</div><div class="earn-pts" style="color:' + lv.color + ';">' + e[1] + '</div></div>';
