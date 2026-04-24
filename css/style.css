@@ -799,3 +799,16 @@ a, button { -webkit-tap-highlight-color: transparent; }
   line-height: 1;
   padding: 0 2px;
 }
+
+/* ── Add spot modal — Poppins font ── */
+.modal-add,
+.modal-add h2,
+.modal-add .modal-sub,
+.modal-add .flabel,
+.modal-add .finput,
+.modal-add .mbtn,
+.modal-add .optional-label,
+.modal-add .ptag {
+  font-family: 'Poppins', 'DM Sans', sans-serif;
+}
+.modal-add h2 { font-family: 'Poppins', sans-serif; font-weight: 700; text-align: left; }

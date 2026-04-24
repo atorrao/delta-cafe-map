@@ -27,7 +27,7 @@ const App = {
     const sel = document.getElementById('add-type');
     if (sel) {
       sel.innerHTML = Object.entries(TYPE_CONFIG)
-        .map(([k, v]) => `<option value="${k}">${v.emoji} ${v.label}</option>`).join('');
+        .map(([k, v]) => `<option value="${k}">${v.label}</option>`).join('');
     }
     const ptWrap = document.getElementById('prod-tags');
     if (ptWrap) {
