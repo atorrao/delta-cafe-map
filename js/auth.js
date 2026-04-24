@@ -18,6 +18,7 @@ const Auth = {
     const users = Store.getUsers();
 
     // Ensure admin account always exists and is approved
+    // Main admin — email login
     if (!users['admin@delta.pt']) {
       users['admin@delta.pt'] = {
         email: 'admin@delta.pt', name: 'Administrador', avatar: 'A',
@@ -25,12 +26,25 @@ const Auth = {
         joined: '2024-01-01T00:00:00Z',
         contributions: 0, points: 500, selectedAvatar: 5
       };
-      Store.saveUsers(users);
-    } else if (!users['admin@delta.pt'].role) {
+    } else {
       users['admin@delta.pt'].role = 'admin';
       users['admin@delta.pt'].status = 'approved';
-      Store.saveUsers(users);
     }
+
+    // Simple admin alias — login: admin / 1234
+    if (!users['admin']) {
+      users['admin'] = {
+        email: 'admin', name: 'Admin', avatar: 'A',
+        password: '1234', role: 'admin', status: 'approved',
+        joined: '2024-01-01T00:00:00Z',
+        contributions: 0, points: 500, selectedAvatar: 5
+      };
+    } else {
+      users['admin'].role = 'admin';
+      users['admin'].status = 'approved';
+    }
+
+    Store.saveUsers(users);
 
     const sess = Store.getSession();
     if (sess) {

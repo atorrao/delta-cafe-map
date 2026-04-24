@@ -51,24 +51,27 @@ function getMarkerSVG(type, iconColor) {
         '<path d="M19.5 9.5 Q20.1 8 19.5 6.5" fill="none" stroke="' + c + '" stroke-width="1.1" stroke-linecap="round" opacity="0.7"/>' +
       '</g></svg>';
   } else {
-    // Capsule lying on its side — dome left, conical body, rim/nozzle right
+    // Capsule: icon-1 style — 3/4 perspective, body on left, circular base facing viewer on right
     var bg = (TYPE_CONFIG[type]||TYPE_CONFIG['loja-oficial']).color;
     return '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40">' +
       '<defs><filter id="d' + uid + '"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,.4)"/></filter></defs>' +
       '<g filter="url(#d' + uid + ')">' +
-        /* pin teardrop */
+        /* pin teardrop background */
         '<path d="M16 2C9.4 2 4 7.4 4 14c0 8.5 12 24 12 24s12-15.5 12-24C28 7.4 22.6 2 16 2z" fill="' + bg + '"/>' +
-        /* capsule body — horizontal ellipse, slightly tilted */
-        '<ellipse cx="15.5" cy="14.5" rx="8" ry="5.5" fill="' + c + '" opacity="0.95" transform="rotate(-15 15.5 14.5)"/>' +
-        /* dome — left rounded end */
-        '<ellipse cx="10" cy="12" rx="3.5" ry="5" fill="' + c + '" opacity="0.95" transform="rotate(-15 10 12)"/>' +
-        /* rim ring — right flat end */
-        '<ellipse cx="21.5" cy="17" rx="2" ry="3.5" fill="' + bg + '" opacity="0.6" transform="rotate(-15 21.5 17)"/>' +
-        '<ellipse cx="21.5" cy="17" rx="2" ry="3.5" fill="none" stroke="' + c + '" stroke-width="1.2" opacity="0.8" transform="rotate(-15 21.5 17)"/>' +
-        /* nozzle tip */
-        '<ellipse cx="23.5" cy="18" rx="1" ry="2" fill="' + c + '" opacity="0.7" transform="rotate(-15 23.5 18)"/>' +
-        /* highlight/shine on dome */
-        '<ellipse cx="9" cy="10.5" rx="1.5" ry="2.5" fill="rgba(255,255,255,0.35)" transform="rotate(-15 9 10.5)"/>' +
+        /* main capsule body — rounded rectangle, slight tilt */
+        '<path d="M7 11 Q7 7 11 7 L19 9 Q22 10 22 14 Q22 18 19 19 L11 20 Q7 20 7 17 Z" fill="' + c + '" opacity="0.95"/>' +
+        /* circular base / rim — foil side facing viewer, right side */
+        '<ellipse cx="21" cy="14" rx="3.5" ry="5" fill="' + c + '" opacity="0.75"/>' +
+        /* inner foil circle — lighter */
+        '<ellipse cx="21" cy="14" rx="2.2" ry="3.4" fill="rgba(255,255,255,0.3)"/>' +
+        /* rim ring outline */
+        '<ellipse cx="21" cy="14" rx="3.5" ry="5" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="0.8"/>' +
+        /* dome top of body — left curved end */
+        '<ellipse cx="9" cy="13.5" rx="2.5" ry="4.5" fill="' + c + '" opacity="0.9"/>' +
+        /* highlight stripe on body */
+        '<path d="M8 10 Q10 8.5 14 9.5" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.2" stroke-linecap="round"/>' +
+        /* small shine on dome */
+        '<ellipse cx="8.5" cy="11" rx="1" ry="2" fill="rgba(255,255,255,0.35)"/>' +
       '</g></svg>';
   }
 }
@@ -168,8 +171,8 @@ const SEED_LOCATIONS = [
     address:'Alegro Montijo, R. da Azinheira 1, 2879-100 Montijo',
     verified:true, addedBy:'Delta Oficial', products:['Espresso','Descafeinado'] },
   { id:'de-10', name:'Delta Espresso — Alegro Sintra',
-    lat:38.7680, lng:-9.3320, country:'Portugal', city:'Rio de Mouro', type:'espresso',
-    address:'R. Alto do Forte IC19, 2635-018 Rio de Mouro',
+    lat:38.7619, lng:-9.3069, country:'Portugal', city:'Agualva-Cacém', type:'espresso',
+    address:'Alegro Sintra, Rua Particular ao Estádio, 2735-551 Agualva-Cacém',
     verified:true, addedBy:'Delta Oficial', products:['Espresso','Descafeinado'] },
 
   // ── CAFÉ / RESTAURANTE ────────────────────────────────────────
@@ -203,19 +206,20 @@ function getPanelIcon(type) {
       '<path d="M18 11 Q18.8 9 18 7" fill="none" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity="0.7"/>' +
     '</svg>';
   } else {
-    // Panel capsule — lying on side, flat white icon
+    // Panel capsule — icon-1 3/4 perspective, flat white
     return '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" width="28" height="28">' +
-      /* body ellipse tilted */
-      '<ellipse cx="16" cy="17" rx="9.5" ry="6" fill="white" opacity="0.95" transform="rotate(-15 16 17)"/>' +
-      /* dome — left rounded end */
-      '<ellipse cx="9.5" cy="13.5" rx="4" ry="5.5" fill="white" opacity="0.95" transform="rotate(-15 9.5 13.5)"/>' +
-      /* rim ring — right flat end */
-      '<ellipse cx="24" cy="20" rx="2.2" ry="4" fill="rgba(255,255,255,0.5)" transform="rotate(-15 24 20)"/>' +
-      '<ellipse cx="24" cy="20" rx="2.2" ry="4" fill="none" stroke="rgba(0,0,0,0.15)" stroke-width="1" transform="rotate(-15 24 20)"/>' +
-      /* nozzle tip */
-      '<ellipse cx="26.5" cy="21.5" rx="1.1" ry="2.2" fill="rgba(255,255,255,0.6)" transform="rotate(-15 26.5 21.5)"/>' +
-      /* shine */
-      '<ellipse cx="8.5" cy="12" rx="1.8" ry="3" fill="rgba(255,255,255,0.4)" transform="rotate(-15 8.5 12)"/>' +
+      /* capsule body */
+      '<path d="M5 12 Q5 7 10 7 L21 9.5 Q25 11 25 16 Q25 21 21 22 L10 23 Q5 23 5 18 Z" fill="white" opacity="0.95"/>' +
+      /* circular base — foil facing viewer */
+      '<ellipse cx="23.5" cy="15.5" rx="4" ry="6.5" fill="rgba(255,255,255,0.65)"/>' +
+      '<ellipse cx="23.5" cy="15.5" rx="2.5" ry="4.2" fill="rgba(255,255,255,0.4)"/>' +
+      '<ellipse cx="23.5" cy="15.5" rx="4" ry="6.5" fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>' +
+      /* dome left */
+      '<ellipse cx="7" cy="15" rx="3" ry="5.5" fill="white" opacity="0.85"/>' +
+      /* body highlight */
+      '<path d="M6 10.5 Q11 8 17 9.5" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/>' +
+      /* shine on dome */
+      '<ellipse cx="6.5" cy="12" rx="1.2" ry="2.5" fill="rgba(255,255,255,0.4)"/>' +
     '</svg>';
   }
 }
