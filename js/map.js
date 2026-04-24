@@ -105,7 +105,11 @@ const Map = (() => {
     const loc = App.locations.find(l => l.id === id); if (!loc) return;
     _selId = id;
     const cfg = TYPE_CONFIG[loc.type] || TYPE_CONFIG['cafe'];
-    document.getElementById('sp-icon').style.background = cfg.color;
+    // Icon: SVG inside coloured circle
+    const iconSVG = getMarkerSVG(loc.type, '#ffffff');
+    const iconEl  = document.getElementById('sp-icon');
+    iconEl.style.background = cfg.color;
+    iconEl.innerHTML = '<div style="width:26px;height:32px;display:flex;align-items:center;justify-content:center;">' + iconSVG + '</div>';
     document.getElementById('sp-name').textContent = loc.name;
     document.getElementById('sp-sub').textContent  = `${cfg.label} · ${loc.city}, ${loc.country}`;
     document.getElementById('sp-addr').textContent = loc.address || '';
@@ -122,21 +126,8 @@ const Map = (() => {
 
   function closePanel() { document.getElementById('spot-panel').classList.add('hidden'); _selId = null; }
 
-  function upvote() {
-    if (!App.currentUser) { Auth.showModal('login'); return; }
-    const loc = App.locations.find(l => l.id === _selId); if (!loc) return;
-    loc.upvotes = (loc.upvotes || 0) + 1;
-    App.saveUserLocations();
-    document.getElementById('sp-upv').textContent = loc.upvotes;
-    Gamification.addPoints(App.currentUser.email, 'UPVOTE_GIVEN');
-    if (loc.ownerEmail) Gamification.addPoints(loc.ownerEmail, 'UPVOTE_RECEIVED');
-    UI.toast('Voto registado.');
-  }
-
-  function report() {
-    if (!App.currentUser) { Auth.showModal('login'); return; }
-    UI.toast('Reporte enviado. Obrigado.');
-  }
+  function upvote() {} // removed
+  function report()  {} // removed
 
   function startAdd() {
     _addMode = true;
