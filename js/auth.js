@@ -86,13 +86,14 @@ const Auth = {
   submit() {
     UI.hideErr('auth-err');
     const email = document.getElementById('a-email').value.trim().toLowerCase();
-    const pass  = document.getElementById('a-pass').value;
+    const pass  = document.getElementById('a-pass').value.trim();
     if (!email || !pass) { UI.showErr('auth-err', 'Preenche email e palavra-passe.'); return; }
     const users = Store.getUsers();
 
     if (this.mode === 'login') {
       const u = users[email];
-      if (!u || u.password !== pass) { UI.showErr('auth-err', 'Email ou palavra-passe incorretos.'); return; }
+      if (!u) { UI.showErr('auth-err', 'Não existe nenhuma conta com este email.'); return; }
+      if (u.password !== pass) { UI.showErr('auth-err', 'Palavra-passe incorreta.'); return; }
       if (u.status === 'pending')   { UI.showErr('auth-err', 'A tua conta está a aguardar aprovação pelo administrador.'); return; }
       if (u.status === 'inactive')  { UI.showErr('auth-err', 'A tua conta foi desativada. Contacta o administrador.'); return; }
       if (u.status === 'rejected')  { UI.showErr('auth-err', 'O teu registo foi recusado. Contacta o administrador.'); return; }
