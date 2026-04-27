@@ -169,53 +169,66 @@ var Map = (function() {
       officialEl.innerHTML = '<p class="sidebar-empty">Sem locais disponíveis.</p>';
       return;
     }
-    var counts = {};
-    official.forEach(function(l) { counts[l.type] = (counts[l.type] || 0) + 1; });
 
-    // Type filter chips
-    var chips = '<div class="sidebar-type-filters">';
-    chips += '<div class="fitem on" data-filter="all">'+
-      '<span style="width:9px;display:inline-block;"></span>'+
-      '<span>Todos</span><span class="fitem-count">' + official.length + '</span></div>';
+    // Group by type
+    var groups = {};
     Object.keys(TYPE_CONFIG).forEach(function(k) {
-      if (k === 'cafe' || !counts[k]) return;
+      if (k !== 'cafe') groups[k] = [];
+    });
+    official.forEach(function(l) {
+      if (groups[l.type]) groups[l.type].push(l);
+    });
+
+    var html = '';
+    Object.keys(groups).forEach(function(k) {
+      var locs = groups[k];
+      if (!locs.length) return;
       var v = TYPE_CONFIG[k];
-      chips += '<div class="fitem" data-filter="' + k + '">'+
-        '<span class="fitem-dot" style="background:' + v.color + ';"></span>'+
-        '<span>' + v.label + '</span><span class="fitem-count">' + counts[k] + '</span></div>';
+      html += '<div class="sidebar-accordion">';
+      html += '<div class="sidebar-accordion-header" data-key="' + k + '">' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<span class="fitem-dot" style="background:' + v.color + ';flex-shrink:0;"></span>' +
+          '<span class="sidebar-acc-label">' + v.label + '</span>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:6px;">' +
+          '<span class="fitem-count">' + locs.length + '</span>' +
+          '<span class="sidebar-acc-arrow">›</span>' +
+        '</div>' +
+      '</div>';
+      html += '<div class="sidebar-accordion-body" id="acc-' + k + '" style="display:none;">';
+      locs.forEach(function(loc) {
+        html += '<div class="sidebar-loc-item" data-id="' + loc.id + '">' +
+          '<div class="sidebar-loc-info">' +
+            '<div class="sidebar-loc-name">' + loc.name + '</div>' +
+            '<div class="sidebar-loc-meta">' + (loc.city ? loc.city : '') + (loc.country ? ', ' + loc.country : '') + '</div>' +
+          '</div>' +
+        '</div>';
+      });
+      html += '</div></div>';
     });
-    chips += '</div>';
 
-    // Location rows
-    var rows = '<div id="official-items">';
-    official.forEach(function(loc) {
-      var cfg = TYPE_CONFIG[loc.type] || { label: loc.type, color: '#888' };
-      rows += '<div class="sidebar-loc-item" data-type="' + loc.type + '" data-id="' + loc.id + '">'+
-        '<span class="sidebar-loc-dot" style="background:' + cfg.color + ';"></span>'+
-        '<div class="sidebar-loc-info">'+
-          '<div class="sidebar-loc-name">' + loc.name + '</div>'+
-          '<div class="sidebar-loc-meta">' + cfg.label + (loc.city ? ' · ' + loc.city : '') + '</div>'+
-        '</div></div>';
-    });
-    rows += '</div>';
-    officialEl.innerHTML = chips + rows;
+    officialEl.innerHTML = html;
 
-    // Attach click handlers after DOM insertion
-    officialEl.querySelectorAll('.fitem').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var filter = btn.dataset.filter;
-        officialEl.querySelectorAll('.fitem').forEach(function(b){ b.classList.toggle('on', b.dataset.filter===filter); });
-        officialEl.querySelectorAll('.sidebar-loc-item').forEach(function(el){
-          el.style.display = (filter==='all' || el.dataset.type===filter) ? '' : 'none';
-        });
+    // Accordion click handlers
+    officialEl.querySelectorAll('.sidebar-accordion-header').forEach(function(header) {
+      header.addEventListener('click', function() {
+        var key   = header.dataset.key;
+        var body  = document.getElementById('acc-' + key);
+        var arrow = header.querySelector('.sidebar-acc-arrow');
+        var open  = body.style.display !== 'none';
+        body.style.display  = open ? 'none' : 'block';
+        arrow.style.transform = open ? '' : 'rotate(90deg)';
+        header.classList.toggle('sidebar-accordion-open', !open);
       });
     });
+
+    // Location item click
     officialEl.querySelectorAll('.sidebar-loc-item').forEach(function(el) {
-      el.addEventListener('click', function(){ Map.flyTo(el.dataset.id); });
+      el.addEventListener('click', function() { Map.flyTo(el.dataset.id); });
     });
   }
 
-  function setOfficialFilter() {} // handled via event delegation above
+  function setOfficialFilter() {}
 
   /* ── Sidebar: Nearby Cafés ── */
   /* ── Sidebar: Nearby Cafés ── */
