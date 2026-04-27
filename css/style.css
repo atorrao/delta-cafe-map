@@ -707,19 +707,21 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .nearest-alert-inner {
   background: var(--d-espresso);
   border-radius: var(--r-lg);
-  padding: 14px 16px;
+  padding: 14px 16px 14px 14px;
   display: flex; align-items: center; gap: 12px;
   box-shadow: var(--sh-lg);
   border: 1px solid rgba(200,168,75,.2);
   position: relative;
 }
 .nearest-close {
-  position: absolute; top: 8px; right: 10px;
-  background: rgba(255,255,255,.1); border: none;
-  color: rgba(245,238,216,.6); font-size: 14px;
-  width: 22px; height: 22px; border-radius: 50%;
+  position: absolute; top: -8px; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,.15); border: none;
+  color: rgba(245,238,216,.8); font-size: 12px; font-weight: 700;
+  width: 24px; height: 24px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; line-height: 1;
+  box-shadow: 0 1px 4px rgba(0,0,0,.3);
 }
 .nearest-close:hover { background: rgba(255,255,255,.2); color: var(--d-cream); }
 .nearest-icon {
