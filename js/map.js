@@ -158,34 +158,103 @@ var Map = (function() {
     }
   }
 
-  function buildTypeFilters() {
-    var counts = {};
-    App.locations.forEach(function(l) { counts[l.type] = (counts[l.type] || 0) + 1; });
-    var el = document.getElementById('type-filters');
-    if (!el) return;
-
-    var html = '<div class="fitem on" data-t="all" onclick="Map.setType(\'all\')">' +
-      '<span style="width:9px;display:inline-block;"></span>' +
-      '<span>Todos</span>' +
-      '<span class="fitem-count">' + App.locations.length + '</span>' +
-      '</div>';
-
-    Object.keys(TYPE_CONFIG).forEach(function(k) {
-      var v = TYPE_CONFIG[k];
-      html += '<div class="fitem" data-t="' + k + '" onclick="Map.setType(\'' + k + '\')">' +
-        '<span class="fitem-dot" style="background:' + v.color + ';"></span>' +
-        '<span>' + v.label + '</span>' +
-        '<span class="fitem-count">' + (counts[k] || 0) + '</span>' +
-        '</div>';
+  /* ── Sidebar: Official Points ── */
+  function renderSidebarStatic() {
+    var officialEl = document.getElementById('official-list');
+    if (!officialEl) return;
+    var official = App.locations.filter(function(l) {
+      return l.type !== 'cafe' && (l.verified || !l.ownerEmail);
     });
-    el.innerHTML = html;
+    if (!official.length) {
+      officialEl.innerHTML = '<p class="sidebar-empty">Sem locais disponíveis.</p>';
+      return;
+    }
+    var counts = {};
+    official.forEach(function(l) { counts[l.type] = (counts[l.type] || 0) + 1; });
+
+    // Type filter chips
+    var chips = '<div class="sidebar-type-filters">';
+    chips += '<div class="fitem on" data-filter="all">'+
+      '<span style="width:9px;display:inline-block;"></span>'+
+      '<span>Todos</span><span class="fitem-count">' + official.length + '</span></div>';
+    Object.keys(TYPE_CONFIG).forEach(function(k) {
+      if (k === 'cafe' || !counts[k]) return;
+      var v = TYPE_CONFIG[k];
+      chips += '<div class="fitem" data-filter="' + k + '">'+
+        '<span class="fitem-dot" style="background:' + v.color + ';"></span>'+
+        '<span>' + v.label + '</span><span class="fitem-count">' + counts[k] + '</span></div>';
+    });
+    chips += '</div>';
+
+    // Location rows
+    var rows = '<div id="official-items">';
+    official.forEach(function(loc) {
+      var cfg = TYPE_CONFIG[loc.type] || { label: loc.type, color: '#888' };
+      rows += '<div class="sidebar-loc-item" data-type="' + loc.type + '" data-id="' + loc.id + '">'+
+        '<span class="sidebar-loc-dot" style="background:' + cfg.color + ';"></span>'+
+        '<div class="sidebar-loc-info">'+
+          '<div class="sidebar-loc-name">' + loc.name + '</div>'+
+          '<div class="sidebar-loc-meta">' + cfg.label + (loc.city ? ' · ' + loc.city : '') + '</div>'+
+        '</div></div>';
+    });
+    rows += '</div>';
+    officialEl.innerHTML = chips + rows;
+
+    // Attach click handlers after DOM insertion
+    officialEl.querySelectorAll('.fitem').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var filter = btn.dataset.filter;
+        officialEl.querySelectorAll('.fitem').forEach(function(b){ b.classList.toggle('on', b.dataset.filter===filter); });
+        officialEl.querySelectorAll('.sidebar-loc-item').forEach(function(el){
+          el.style.display = (filter==='all' || el.dataset.type===filter) ? '' : 'none';
+        });
+      });
+    });
+    officialEl.querySelectorAll('.sidebar-loc-item').forEach(function(el) {
+      el.addEventListener('click', function(){ Map.flyTo(el.dataset.id); });
+    });
   }
+
+  function setOfficialFilter() {} // handled via event delegation above
+
+  /* ── Sidebar: Nearby Cafés ── */
+  /* ── Sidebar: Nearby Cafés ── */
+  function renderSidebarNearby(userLat, userLng) {
+    var nearbyEl = document.getElementById('nearby-list');
+    if (!nearbyEl) return;
+    var cafes = App.locations.filter(function(l) {
+      return l.type === 'cafe' && (l.verified || !l.ownerEmail);
+    });
+    var withDist = cafes.map(function(l) {
+      return { loc: l, dist: _haversine(userLat, userLng, l.lat, l.lng) };
+    }).filter(function(x) { return x.dist <= 5; });
+    withDist.sort(function(a, b) { return a.dist - b.dist; });
+    if (!withDist.length) {
+      nearbyEl.innerHTML = '<p class="sidebar-empty">Nenhum Local Encontrado</p>';
+      return;
+    }
+    var html = '';
+    withDist.forEach(function(x) {
+      var loc = x.loc;
+      var distStr = x.dist < 1 ? Math.round(x.dist*1000)+' m' : x.dist.toFixed(1)+' km';
+      html += '<div class="sidebar-loc-item" data-id="' + loc.id + '">' +
+        '<span class="sidebar-loc-dot" style="background:' + TYPE_CONFIG['cafe'].color + ';"></span>' +
+        '<div class="sidebar-loc-info">' +
+          '<div class="sidebar-loc-name">' + loc.name + '</div>' +
+          '<div class="sidebar-loc-meta">' + distStr + (loc.city ? ' · ' + loc.city : '') + '</div>' +
+        '</div>' +
+        '<span class="sidebar-loc-dist">' + distStr + '</span>' +
+      '</div>';
+    });
+    nearbyEl.innerHTML = html;
+    nearbyEl.querySelectorAll('.sidebar-loc-item').forEach(function(el) {
+      el.addEventListener('click', function(){ Map.flyTo(el.dataset.id); });
+    });
+  }
+
 
   function setType(t) {
     _activeType = t;
-    document.querySelectorAll('.fitem').forEach(function(el) {
-      el.classList.toggle('on', el.dataset.t === t);
-    });
     renderMarkers();
   }
 
