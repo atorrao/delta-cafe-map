@@ -83,12 +83,6 @@ var Admin = {
 
     var html = Admin._tabHeader();
 
-    /* localStorage warning */
-    html += '<div class="admin-warning">' +
-      '<strong>Atenção:</strong> Os dados de utilizadores estão guardados localmente neste browser. ' +
-      'Utilize "Exportar" e "Importar" para partilhar utilizadores entre dispositivos ou browsers.' +
-    '</div>';
-
     /* Stats */
     html += '<div class="admin-stats">' +
       '<div class="admin-stat-cell"><div class="admin-stat-num">' + allUsers.length + '</div><div class="admin-stat-lbl">Total</div></div>' +
