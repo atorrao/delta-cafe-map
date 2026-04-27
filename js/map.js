@@ -511,7 +511,6 @@ var Map = (function() {
     }).catch(function(e){ console.warn('updateUser failed:', e); });
 
     renderMarkers();
-    renderSidebarStatic(); // official points (no location needed)
     UI.renderTopbar();
     cancelAdd();
     UI.toast('Local submetido para aprovação! +' + earned + ' pontos.');
@@ -540,7 +539,9 @@ var Map = (function() {
   return {
     init: init, setLayer: setLayer, setType: setType,
     search: search, clearSearch: clearSearch, flyTo: flyTo,
-    renderMarkers: renderMarkers, buildTypeFilters: buildTypeFilters,
+    renderMarkers: renderMarkers,
+    renderSidebarStatic: renderSidebarStatic,
+    renderSidebarNearby: renderSidebarNearby,
     openPanel: openPanel, closePanel: closePanel,
     startAdd: startAdd, cancelAdd: cancelAdd, submitSpot: submitSpot,
     locateMe: locateMe, fitAll: fitAll
