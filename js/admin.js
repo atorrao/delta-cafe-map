@@ -83,13 +83,18 @@ var Admin = {
 
     var html = Admin._tabHeader();
 
-    /* Stats */
+    /* Clickable stats */
     html += '<div class="admin-stats">' +
-      '<div class="admin-stat-cell"><div class="admin-stat-num">' + allUsers.length + '</div><div class="admin-stat-lbl">Total</div></div>' +
-      '<div class="admin-stat-cell" style="border-color:#2e7d5e;"><div class="admin-stat-num" style="color:#1a6b3c;">' + approved.length + '</div><div class="admin-stat-lbl">Aprovados</div></div>' +
-      '<div class="admin-stat-cell" style="border-color:#b07d2e;"><div class="admin-stat-num" style="color:#92400e;">' + pending.length + '</div><div class="admin-stat-lbl">Pendentes</div></div>' +
-      '<div class="admin-stat-cell" style="border-color:#9ca3af;"><div class="admin-stat-num" style="color:#6b7280;">' + inactive.length + '</div><div class="admin-stat-lbl">Inativos</div></div>' +
+      '<div class="admin-stat-cell admin-stat-clickable" data-filter="all">' +
+        '<div class="admin-stat-num">' + allUsers.length + '</div><div class="admin-stat-lbl">Total</div></div>' +
+      '<div class="admin-stat-cell admin-stat-clickable" data-filter="approved" style="border-color:#2e7d5e;">' +
+        '<div class="admin-stat-num" style="color:#1a6b3c;">' + approved.length + '</div><div class="admin-stat-lbl">Aprovados</div></div>' +
+      '<div class="admin-stat-cell admin-stat-clickable" data-filter="pending" style="border-color:#b07d2e;">' +
+        '<div class="admin-stat-num" style="color:#92400e;">' + pending.length + '</div><div class="admin-stat-lbl">Pendentes</div></div>' +
+      '<div class="admin-stat-cell admin-stat-clickable" data-filter="inactive" style="border-color:#9ca3af;">' +
+        '<div class="admin-stat-num" style="color:#6b7280;">' + inactive.length + '</div><div class="admin-stat-lbl">Inativos</div></div>' +
     '</div>';
+    html += '<div id="admin-user-filter-list" style="margin-bottom:14px;"></div>';
 
     /* Pending users first */
     if (pending.length) {
@@ -143,6 +148,34 @@ var Admin = {
     html += '</div>';
 
     document.getElementById('admin-body').innerHTML = html;
+
+    // Clickable stat cells — filter user list
+    document.querySelectorAll('.admin-stat-clickable').forEach(function(cell) {
+      cell.addEventListener('click', function() {
+        document.querySelectorAll('.admin-stat-clickable').forEach(function(c){ c.classList.remove('admin-stat-active'); });
+        cell.classList.add('admin-stat-active');
+        var filter = cell.dataset.filter;
+        var listEl = document.getElementById('admin-user-filter-list');
+        if (!listEl) return;
+        var filtered = filter === 'all' ? allUsers : allUsers.filter(function(u){
+          if (filter === 'inactive') return u.status === 'inactive' || u.status === 'rejected';
+          return u.status === filter;
+        });
+        if (!filtered.length) {
+          listEl.innerHTML = '<div class="admin-card"><p class="no-spots-msg">Nenhum utilizador nesta categoria.</p></div>';
+          return;
+        }
+        var SL = { approved:'Aprovado', pending:'Pendente', inactive:'Inativo', rejected:'Recusado' };
+        var SC = { approved:'#1a6b3c', pending:'#92400e', inactive:'#6b7280', rejected:'#7a1524' };
+        var SB = { approved:'#e6f4ec', pending:'#fef3e2', inactive:'#f3f4f6', rejected:'#fde8eb' };
+        var h = '<div class="admin-card">';
+        h += '<div class="card-section-title">' + (filter === 'all' ? 'Todos' : cell.querySelector('.admin-stat-lbl').textContent) + ' (' + filtered.length + ')</div>';
+        filtered.forEach(function(u){ h += Admin._userRow(u); });
+        h += '</div>';
+        listEl.innerHTML = h;
+        listEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    });
   },
 
   _userRow: function(u) {
@@ -271,6 +304,34 @@ var Admin = {
     }
 
     document.getElementById('admin-body').innerHTML = html;
+
+    // Clickable stat cells — filter user list
+    document.querySelectorAll('.admin-stat-clickable').forEach(function(cell) {
+      cell.addEventListener('click', function() {
+        document.querySelectorAll('.admin-stat-clickable').forEach(function(c){ c.classList.remove('admin-stat-active'); });
+        cell.classList.add('admin-stat-active');
+        var filter = cell.dataset.filter;
+        var listEl = document.getElementById('admin-user-filter-list');
+        if (!listEl) return;
+        var filtered = filter === 'all' ? allUsers : allUsers.filter(function(u){
+          if (filter === 'inactive') return u.status === 'inactive' || u.status === 'rejected';
+          return u.status === filter;
+        });
+        if (!filtered.length) {
+          listEl.innerHTML = '<div class="admin-card"><p class="no-spots-msg">Nenhum utilizador nesta categoria.</p></div>';
+          return;
+        }
+        var SL = { approved:'Aprovado', pending:'Pendente', inactive:'Inativo', rejected:'Recusado' };
+        var SC = { approved:'#1a6b3c', pending:'#92400e', inactive:'#6b7280', rejected:'#7a1524' };
+        var SB = { approved:'#e6f4ec', pending:'#fef3e2', inactive:'#f3f4f6', rejected:'#fde8eb' };
+        var h = '<div class="admin-card">';
+        h += '<div class="card-section-title">' + (filter === 'all' ? 'Todos' : cell.querySelector('.admin-stat-lbl').textContent) + ' (' + filtered.length + ')</div>';
+        filtered.forEach(function(u){ h += Admin._userRow(u); });
+        h += '</div>';
+        listEl.innerHTML = h;
+        listEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    });
   },
 
   _locRow: function(loc, isPending) {

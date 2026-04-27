@@ -854,3 +854,17 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .sidebar-accordion-body .sidebar-loc-item:last-child { border-bottom: none; }
 .sidebar-accordion-body .sidebar-loc-name { font-size: 11.5px; }
 .sidebar-accordion-body .sidebar-loc-meta { font-size: 10px; }
+
+/* ── Admin stat cells clickable ── */
+.admin-stat-clickable {
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+}
+.admin-stat-clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sh-sm);
+}
+.admin-stat-active {
+  box-shadow: var(--sh-md) !important;
+  transform: translateY(-2px);
+}
