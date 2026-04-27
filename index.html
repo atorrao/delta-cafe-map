@@ -168,13 +168,13 @@
     <input class="finput" id="a-email" type="email" placeholder="email@exemplo.com" autocomplete="email">
     <label class="flabel">Palavra-passe</label>
     <div class="pass-wrap">
-      <input class="finput" id="a-pass" type="password" placeholder="••••••••"
+      <input class="finput" id="a-pass" type="password" 
              onkeydown="if(event.key==='Enter')Auth.submit()">
       <button class="pass-toggle" onclick="UI.togglePass('a-pass',this)">Mostrar</button>
     </div>
     <div id="auth-conf-row" class="hidden">
       <label class="flabel">Confirmar palavra-passe</label>
-      <input class="finput" id="a-conf" type="password" placeholder="••••••••">
+      <input class="finput" id="a-conf" type="password" >
     </div>
     <button class="mbtn mbtn-red mbtn-full" onclick="Auth.submit()" id="auth-btn">Entrar</button>
     <p class="auth-switch">
