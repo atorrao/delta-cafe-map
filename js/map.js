@@ -39,8 +39,8 @@ var Map = (function() {
       });
     });
 
-    buildTypeFilters();
     renderMarkers();
+    renderSidebarStatic(); // official points (no location needed)
 
     // Go to user location on startup
     _locateOnStart();
@@ -57,6 +57,8 @@ var Map = (function() {
         }).addTo(_map).bindPopup('<strong>A tua localização</strong>');
         // Show nearest Delta alert
         _showNearestAlert(lat, lng);
+        // Populate nearby cafés in sidebar
+        renderSidebarNearby(lat, lng);
       },
       function() {
         // Permission denied or unavailable — stay on default Portugal view
@@ -439,8 +441,8 @@ var Map = (function() {
       points: App.currentUser.points
     }).catch(function(e){ console.warn('updateUser failed:', e); });
 
-    buildTypeFilters();
     renderMarkers();
+    renderSidebarStatic(); // official points (no location needed)
     UI.renderTopbar();
     cancelAdd();
     UI.toast('Local submetido para aprovação! +' + earned + ' pontos.');

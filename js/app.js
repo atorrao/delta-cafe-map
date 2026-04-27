@@ -36,6 +36,8 @@ const App = {
 
     // Init map
     Map.init();
+    // Sidebar static points (no location needed)
+    if (typeof Map.renderSidebarStatic === 'function') Map.renderSidebarStatic();
   },
 
   async loadLocations() {

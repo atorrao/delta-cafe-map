@@ -812,3 +812,19 @@ a, button { -webkit-tap-highlight-color: transparent; }
   font-family: 'Poppins', 'DM Sans', sans-serif;
 }
 .modal-add h2 { font-family: 'Poppins', sans-serif; font-weight: 700; text-align: left; }
+
+/* ── Sidebar location items ── */
+.sidebar-loc-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 6px; border-radius: 8px;
+  cursor: pointer; transition: background .12s;
+  border-bottom: 1px solid var(--brd);
+}
+.sidebar-loc-item:last-child { border-bottom: none; }
+.sidebar-loc-item:hover { background: rgba(139,26,26,.05); }
+.sidebar-loc-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.sidebar-loc-info { flex: 1; min-width: 0; }
+.sidebar-loc-name { font-size: 12px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sidebar-loc-meta { font-size: 10px; color: var(--mut); margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sidebar-loc-dist { font-size: 10px; font-weight: 700; color: var(--d-red); flex-shrink: 0; }
+.sidebar-empty { font-size: 11px; color: var(--mut-lt); font-style: italic; padding: 4px 0; }
