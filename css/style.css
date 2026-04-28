@@ -871,10 +871,10 @@ a, button { -webkit-tap-highlight-color: transparent; }
 
 /* ── Delta logo image ── */
 .logo-img {
-  width: 36px; height: 36px;
+  width: 44px; height: 34px;
   object-fit: contain;
   flex-shrink: 0;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 /* ── Layer switcher — Mapa label ── */
