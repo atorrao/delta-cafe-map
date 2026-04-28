@@ -868,3 +868,10 @@ a, button { -webkit-tap-highlight-color: transparent; }
   box-shadow: var(--sh-md) !important;
   transform: translateY(-2px);
 }
+
+/* ── Delta logo image ── */
+.logo-img {
+  width: 36px; height: 36px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
