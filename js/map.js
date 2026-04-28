@@ -51,7 +51,7 @@ var Map = (function() {
     navigator.geolocation.getCurrentPosition(
       function(pos) {
         var lat = pos.coords.latitude, lng = pos.coords.longitude;
-        _map.setView([lat, lng], 14);
+        _map.setView([lat, lng], 17);
         L.circleMarker([lat, lng], {
           radius: 8, color: '#2C1810', fillColor: '#C8A84B', fillOpacity: 0.85, weight: 2.5
         }).addTo(_map).bindPopup('<strong>A tua localização</strong>');
