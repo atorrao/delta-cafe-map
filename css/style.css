@@ -27,7 +27,7 @@
   --sh-md:    0 4px 20px rgba(0,0,0,.12);
   --sh-lg:    0 8px 40px rgba(0,0,0,.17);
   --r-sm: 8px; --r-md: 12px; --r-lg: 18px; --r-xl: 24px;
-  --topbar-h: 68px; --sidebar-w: 244px; --bnav-h: 62px;
+  --topbar-h: 74px; --sidebar-w: 244px; --bnav-h: 62px;
 }
 
 *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
@@ -871,7 +871,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
 
 /* ── Delta logo image ── */
 .logo-img {
-  width: 44px; height: 34px;
+  width: 72px; height: 56px;
   object-fit: contain;
   flex-shrink: 0;
   border-radius: 3px;
