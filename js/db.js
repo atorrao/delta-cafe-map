@@ -3,8 +3,8 @@
    Substitui localStorage para dados persistentes
    ═══════════════════════════════════════════════════ */
 
-const SB_URL = 'https://kdvgcbbmcmlvtwenzicc.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkdmdjYmJtY21sdnR3ZW56aWNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNDA4MzIsImV4cCI6MjA5MjYxNjgzMn0.TmU2M0GfBPr6YEo0lCezSf0Lr_sI-uW8dMXmGPMc8Hs';
+const SB_URL = 'https://xthkddfckauskdmkwqce.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0aGtkZGZja2F1c2tkbWt3cWNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNTgyMDMsImV4cCI6MjA5MzczNDIwM30.Ck3gYXeqXgCj9QeXyaGbl8IzVBQfOQyc8y6vE3l3k6Y';
 
 const DB = {
 
