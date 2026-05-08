@@ -16,7 +16,6 @@ var Map = (function() {
     _tiles.terrain   = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, subdomains: 'abc' });
     _tiles.satellite.addTo(_map);
     _tiles.sat_lbl.addTo(_map);
-    // Mark satellite as default
     setTimeout(function(){
       var btns=document.querySelectorAll(".layer-btn");
       btns.forEach(function(b){b.classList.toggle("active",b.dataset.layer==="satellite");});
@@ -29,7 +28,6 @@ var Map = (function() {
       if (coordsLbl) coordsLbl.textContent = 'A obter morada...';
       UI.hideErr('add-err');
       UI.openModal('add-modal');
-      // Reverse geocode from map click
       _reverseGeocode(_pendingCoords.lat, _pendingCoords.lng, function(result) {
         var addrEl = document.getElementById('add-addr');
         if (addrEl) addrEl.value = result.address;
@@ -40,9 +38,7 @@ var Map = (function() {
     });
 
     renderMarkers();
-    renderSidebarStatic(); // official points (no location needed)
-
-    // Go to user location on startup
+    renderSidebarStatic();
     _locateOnStart();
   }
 
@@ -53,16 +49,12 @@ var Map = (function() {
         var lat = pos.coords.latitude, lng = pos.coords.longitude;
         _map.setView([lat, lng], 17);
         L.circleMarker([lat, lng], {
-          radius: 8, color: '#2C1810', fillColor: '#C8A84B', fillOpacity: 0.85, weight: 2.5
+          radius: 8, color: '#542916', fillColor: '#f1c166', fillOpacity: 0.85, weight: 2.5
         }).addTo(_map).bindPopup('<strong>A tua localização</strong>');
-        // Show nearest Delta alert
         _showNearestAlert(lat, lng);
-        // Populate nearby cafés in sidebar
         renderSidebarNearby(lat, lng);
       },
-      function() {
-        // Permission denied or unavailable — stay on default Portugal view
-      },
+      function() {},
       { timeout: 6000, enableHighAccuracy: true, maximumAge: 60000 }
     );
   }
@@ -71,13 +63,7 @@ var Map = (function() {
     Object.values(_tiles).forEach(function(l) { if (_map.hasLayer(l)) _map.removeLayer(l); });
     if (name === 'satellite') { _tiles.satellite.addTo(_map); _tiles.sat_lbl.addTo(_map); }
     else if (name === 'terrain') { _tiles.terrain.addTo(_map); }
-    else { _tiles.satellite.addTo(_map);
-    _tiles.sat_lbl.addTo(_map);
-    // Mark satellite as default
-    setTimeout(function(){
-      var btns=document.querySelectorAll(".layer-btn");
-      btns.forEach(function(b){b.classList.toggle("active",b.dataset.layer==="satellite");});
-    },100); }
+    else { _tiles.satellite.addTo(_map); _tiles.sat_lbl.addTo(_map); }
     document.querySelectorAll('.layer-btn').forEach(function(b) {
       b.classList.toggle('active', b.dataset.layer === name);
     });
@@ -94,12 +80,11 @@ var Map = (function() {
         var postcode = a.postcode || '';
         var city     = a.city || a.town || a.municipality || a.village || a.county || '';
         var country  = a.country || '';
-        // Build full address string
         var parts = [];
         if (road) parts.push(road + num);
         if (postcode) parts.push(postcode);
         if (city) parts.push(city);
-        var address = parts.slice(0,2).join(', '); // road + postcode
+        var address = parts.slice(0,2).join(', ');
         var display = d.display_name ? d.display_name.split(',').slice(0,3).join(',') : (address || lat.toFixed(4) + ', ' + lng.toFixed(4));
         callback({ address: address, city: city, country: country, display: display });
       })
@@ -153,7 +138,6 @@ var Map = (function() {
     var alert = document.getElementById('nearest-alert');
     if (alert) {
       alert.classList.remove('hidden');
-      // Auto-hide after 8 seconds
       setTimeout(function() { alert.classList.add('hidden'); }, 8000);
     }
   }
@@ -170,7 +154,6 @@ var Map = (function() {
       return;
     }
 
-    // Group by type
     var groups = {};
     Object.keys(TYPE_CONFIG).forEach(function(k) {
       if (k !== 'cafe') groups[k] = [];
@@ -209,7 +192,6 @@ var Map = (function() {
 
     officialEl.innerHTML = html;
 
-    // Accordion click handlers
     officialEl.querySelectorAll('.sidebar-accordion-header').forEach(function(header) {
       header.addEventListener('click', function() {
         var key   = header.dataset.key;
@@ -222,7 +204,6 @@ var Map = (function() {
       });
     });
 
-    // Location item click
     officialEl.querySelectorAll('.sidebar-loc-item').forEach(function(el) {
       el.addEventListener('click', function() { Map.flyTo(el.dataset.id); });
     });
@@ -230,7 +211,6 @@ var Map = (function() {
 
   function setOfficialFilter() {}
 
-  /* ── Sidebar: Nearby Cafés ── */
   /* ── Sidebar: Nearby Cafés ── */
   function renderSidebarNearby(userLat, userLng) {
     var nearbyEl = document.getElementById('nearby-list');
@@ -265,7 +245,6 @@ var Map = (function() {
     });
   }
 
-
   function setType(t) {
     _activeType = t;
     renderMarkers();
@@ -278,7 +257,6 @@ var Map = (function() {
     var filtered = App.locations.filter(function(l) {
       if (_activeType !== 'all' && l.type !== _activeType) return false;
       if (q && !_matchSearch(l, q)) return false;
-      // Hide user-submitted pending locations from public map
       if (l.ownerEmail && !l.verified && (l.status === 'pending' || !l.status)) return false;
       return true;
     });
@@ -304,27 +282,17 @@ var Map = (function() {
   function search(q) {
     var clearBtn = document.getElementById('search-clear');
     if (clearBtn) clearBtn.style.display = q ? 'flex' : 'none';
-
     renderMarkers();
-
     var resultsBox  = document.getElementById('search-results-box');
     var resultsList = document.getElementById('search-results-list');
     if (!resultsBox || !resultsList) return;
-
-    if (!q || q.length < 2) {
-      resultsBox.style.display = 'none';
-      return;
-    }
-
-    var matches = App.locations.filter(function(l) { return _matchSearch(l, q); })
-      .slice(0, 8);
-
+    if (!q || q.length < 2) { resultsBox.style.display = 'none'; return; }
+    var matches = App.locations.filter(function(l) { return _matchSearch(l, q); }).slice(0, 8);
     if (matches.length === 0) {
       resultsBox.style.display = 'block';
       resultsList.innerHTML = '<p class="no-results">Nenhum local encontrado.</p>';
       return;
     }
-
     var html = '';
     matches.forEach(function(loc) {
       var cfg = TYPE_CONFIG[loc.type] || TYPE_CONFIG['cafe'];
@@ -333,8 +301,7 @@ var Map = (function() {
         '<div class="sr-info">' +
           '<div class="sr-name">' + loc.name + '</div>' +
           '<div class="sr-meta">' + cfg.label + ' · ' + loc.city + ', ' + loc.country + '</div>' +
-        '</div>' +
-        '</div>';
+        '</div></div>';
     });
     resultsList.innerHTML = html;
     resultsBox.style.display = 'block';
@@ -355,7 +322,6 @@ var Map = (function() {
     if (!loc) return;
     _map.flyTo([loc.lat, loc.lng], 15, { duration: 1.2 });
     setTimeout(function() { openPanel(id); }, 1300);
-    // close search results
     var resultsBox = document.getElementById('search-results-box');
     if (resultsBox) resultsBox.style.display = 'none';
   }
@@ -366,7 +332,6 @@ var Map = (function() {
     _selId = id;
     var cfg = TYPE_CONFIG[loc.type] || TYPE_CONFIG['cafe'];
 
-    // Icon — flat icon only (no pin), white on brand color
     var iconEl = document.getElementById('sp-icon');
     if (iconEl) {
       iconEl.style.background = cfg.color;
@@ -391,16 +356,27 @@ var Map = (function() {
     }
 
     var prodsEl = document.getElementById('sp-prods');
-    if (prodsEl) prodsEl.innerHTML = ''; // products hidden from card
+    if (prodsEl) prodsEl.innerHTML = '';
 
     var byEl = document.getElementById('sp-by');
     if (byEl) {
       var byHtml = '';
-      // Only show submitter info when logged in
       if (App.currentUser) {
         byHtml = 'Adicionado por <strong>' + loc.addedBy + '</strong>';
       }
       if (loc.note) byHtml += '<div class="spot-note">"' + loc.note + '"</div>';
+
+      // Botão "Saber mais" para cafés com história (dddeltaUrl ou dddelta_url)
+      var dddUrl = loc.dddeltaUrl || loc.dddelta_url;
+      if (dddUrl) {
+        byHtml += '<a class="spot-saberMais" href="' + dddUrl + '" target="_blank" rel="noopener">' +
+          '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">' +
+            '<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />' +
+          '</svg>' +
+          'Saber mais — D de Delta' +
+        '</a>';
+      }
+
       byEl.innerHTML = byHtml;
     }
 
@@ -423,7 +399,6 @@ var Map = (function() {
     closePanel();
     UI.showTab('map');
 
-    // Reset form
     var nameEl = document.getElementById('add-name');
     if (nameEl) nameEl.value = '';
     var hoursEl = document.getElementById('add-hours');
@@ -433,7 +408,6 @@ var Map = (function() {
     document.querySelectorAll('.ptag.on').forEach(function(t){ t.classList.remove('on'); });
     UI.hideErr('add-err');
 
-    // Try to get user location and open modal
     var coordsLbl = document.getElementById('add-coords-lbl');
     if (coordsLbl) coordsLbl.textContent = 'A detectar a tua localização...';
 
@@ -445,7 +419,6 @@ var Map = (function() {
           _pendingCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
           if (coordsLbl) coordsLbl.textContent = 'Localização detectada. A obter morada...';
           _map.flyTo([_pendingCoords.lat, _pendingCoords.lng], 15, { duration: 1 });
-          // Reverse geocode via Nominatim
           _reverseGeocode(_pendingCoords.lat, _pendingCoords.lng, function(result) {
             var addrEl = document.getElementById('add-addr');
             if (addrEl) addrEl.value = result.address;
@@ -509,12 +482,11 @@ var Map = (function() {
       createdAt: new Date().toISOString()
     };
     App.locations.push(loc);
-    App.saveLocation(loc); // async — saves to Supabase
+    App.saveLocation(loc);
 
     var earned = Gamification.addPoints(App.currentUser.email, 'ADD_LOCATION');
     if (isFirst) earned += Gamification.addPoints(App.currentUser.email, 'FIRST_LOCATION');
 
-    // Update user points and contributions in Supabase
     App.currentUser.contributions = (App.currentUser.contributions || 0) + 1;
     App.currentUser.points = (App.currentUser.points || 0) + earned;
     DB.saveSession(App.currentUser);
@@ -539,7 +511,7 @@ var Map = (function() {
     navigator.geolocation.getCurrentPosition(function(pos) {
       _map.setView([pos.coords.latitude, pos.coords.longitude], 14);
       L.circleMarker([pos.coords.latitude, pos.coords.longitude], {
-        radius: 9, color: '#1a6eb5', fillColor: '#3b9ae1', fillOpacity: .35, weight: 2
+        radius: 9, color: '#542916', fillColor: '#f1c166', fillOpacity: .35, weight: 2
       }).addTo(_map).bindPopup('A tua localização').openPopup();
     }, function() { UI.toast('Não foi possível obter a localização.'); });
   }

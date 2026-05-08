@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════
-   UI — Interface rendering & helpers  v4
+   UI — Interface rendering & helpers  v5
    ═══════════════════════════════════════════════════ */
 
 const UI = {
@@ -7,18 +7,13 @@ const UI = {
   closeModal(id) { document.getElementById(id).classList.remove('open'); },
   showErr(id, msg) { const el=document.getElementById(id); el.textContent=msg; el.classList.add('show'); },
   hideErr(id) { document.getElementById(id).classList.remove('show'); },
-  togglePass(inputId, btn) {
-    const el = document.getElementById(inputId);
-    el.type  = el.type === 'password' ? 'text' : 'password';
-    btn.textContent = el.type === 'password' ? 'Mostrar' : 'Ocultar';
-  },
 
   _toastTimer: null,
   toast(msg, type) {
     type = type || 'info';
     const el = document.getElementById('toast');
     el.textContent = msg;
-    el.style.background = type==='error' ? '#9b2335' : type==='success' ? '#1e5c38' : '#2C1810';
+    el.style.background = type==='error' ? '#a13a1e' : type==='success' ? '#1e5c38' : '#542916';
     el.style.display = 'block';
     clearTimeout(this._toastTimer);
     this._toastTimer = setTimeout(function(){ el.style.display='none'; }, 3500);
@@ -57,11 +52,11 @@ const UI = {
       var lv  = Gamification.getLevel(App.currentUser.points || 0);
       var svg = Gamification.getAvatarSVG(App.currentUser.points||0, App.currentUser.selectedAvatar);
       var adminBtn = (App.currentUser.role === 'admin')
-        ? '<button class="tbtn tbtn-ghost tbtn-admin" onclick="UI.openAdminPanel()" style="font-size:11px;padding:6px 12px;margin-right:6px;border-color:rgba(200,168,75,.5);color:rgba(245,238,216,.85);">Admin</button>'
+        ? '<button class="tbtn tbtn-ghost tbtn-admin" onclick="UI.openAdminPanel()" style="font-size:11px;padding:6px 12px;margin-right:6px;border-color:rgba(241,193,102,.5);color:rgba(254,250,240,.85);">Admin</button>'
         : '';
       el.innerHTML =
         adminBtn +
-        '<div class="avatar-btn" onclick="UI.openProfileOverlay()" title="' + App.currentUser.name + '">' +
+        '<div class="avatar-btn" onclick="UI.openProfileOverlay()" title="' + App.currentUser.name + '" style="margin-left:auto;">' +
           '<div class="avatar-svg-wrap">' + svg + '</div>' +
           '<div class="avatar-level-badge" style="background:' + lv.color + ';">' + lv.level + '</div>' +
         '</div>';
@@ -81,6 +76,17 @@ const UI = {
 
   _editMode: false,
   _selectedAvatar: null,
+  _activeProfileTab: 'progresso',
+
+  switchProfileTab: function(tab) {
+    UI._activeProfileTab = tab;
+    document.querySelectorAll('.profile-tab').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.tab === tab);
+    });
+    document.querySelectorAll('.profile-tab-panel').forEach(function(p) {
+      p.classList.toggle('active', p.id === 'ptab-' + tab);
+    });
+  },
 
   toggleEditMode: function() {
     UI._editMode = !UI._editMode;
@@ -143,6 +149,21 @@ const UI = {
     UI.toast('Perfil atualizado com sucesso.');
   },
 
+  deleteAccount: async function() {
+    if (!confirm('Tens a certeza que queres apagar a tua conta? Esta ação é irreversível.')) return;
+    if (!confirm('Última confirmação: todos os teus dados serão removidos permanentemente.')) return;
+    try {
+      await DB.deleteUser(App.currentUser.email);
+      DB.clearSession();
+      App.setUser(null);
+      UI.closeAllOverlays();
+      UI.toast('Conta apagada com sucesso.');
+      setTimeout(function(){ location.reload(); }, 1500);
+    } catch(e) {
+      UI.toast('Erro ao apagar conta. Tenta mais tarde.', 'error');
+    }
+  },
+
   renderProfile: function() {
     if (!App.currentUser) return;
     var u   = App.currentUser;
@@ -151,21 +172,17 @@ const UI = {
     var nextLv   = Gamification.getNextLevel(pts);
     var progress = Gamification.calcProgress(pts);
     var mySpots  = App.locations.filter(function(l){ return l.ownerEmail === u.email; });
-    var totalUp  = mySpots.reduce(function(s,l){ return s+(l.upvotes||0); }, 0);
     var allPrize = Gamification.getAllPrizeLevels();
     var firstName = u.name.split(' ')[0];
 
-    // Group spots by type
     var spotsByType = {};
     mySpots.forEach(function(l){
       if (!spotsByType[l.type]) spotsByType[l.type] = [];
       spotsByType[l.type].push(l);
     });
 
-    var html = '';
-
-    // ── HERO ──────────────────────────────────────────────────
-    html += '<div class="profile-hero">';
+    // ── HERO
+    var html = '<div class="profile-hero">';
     html += '<div class="profile-user-row">';
     html += '<div class="profile-bigav" style="border-color:' + lv.color + '70;">';
     html += '<div class="profile-avatar-svg">' + Gamification.getAvatarSVG(pts, u.selectedAvatar) + '</div>';
@@ -180,54 +197,18 @@ const UI = {
     html += '<div class="profile-stat"><div class="profile-stat-num">' + (u.contributions||0) + '</div><div class="profile-stat-lbl">Locais</div></div>';
     html += '</div></div>';
 
-    // ── ACCOUNT CARD ──────────────────────────────────────────
-    // Build avatar options for view
-    var avatarViewHtml = '';
-    LEVEL_AVATARS.forEach(function(svg, i) {
-      var lvNum    = i + 1;
-      var unlocked = lv.level >= lvNum;
-      var selIdx   = (u.selectedAvatar !== undefined) ? u.selectedAvatar : lv.level - 1;
-      var isCur    = selIdx === i;
-      avatarViewHtml += '<div class="avatar-option ' + (unlocked?'unlocked':'locked') + ' ' + (isCur?'current':'') + '" title="Nível ' + lvNum + (unlocked?'':' — bloqueado') + '">';
-      avatarViewHtml += '<div style="width:32px;height:32px;opacity:' + (unlocked?1:0.3) + ';">' + svg + '</div></div>';
-    });
-
-    // Build avatar options for edit picker
-    var avatarPickHtml = '';
-    LEVEL_AVATARS.forEach(function(svg, i) {
-      var lvNum    = i + 1;
-      var unlocked = lv.level >= lvNum;
-      var selIdx   = (u.selectedAvatar !== undefined) ? u.selectedAvatar : lv.level - 1;
-      var isCur    = selIdx === i;
-      avatarPickHtml += '<div class="avatar-pick-option ' + (unlocked?'':'locked') + ' ' + (isCur?'selected':'') + '" onclick="UI.selectAvatar(' + i + ')" title="Nível ' + lvNum + '">' + svg + '</div>';
-    });
-
-    html += '<div class="profile-card" id="account-card">';
-    html += '<div style="display:flex;align-items:center;margin-bottom:14px;">';
-    html += '<div class="card-section-title" style="margin-bottom:0;">Os Meus Dados</div>';
-    html += '<button class="edit-toggle-btn" onclick="UI.toggleEditMode()">Editar</button>';
+    // ── TABS
+    html += '<div class="profile-tabs">';
+    html += '<button class="profile-tab active" data-tab="progresso" onclick="UI.switchProfileTab(\'progresso\')">Progressão & Prémios</button>';
+    html += '<button class="profile-tab" data-tab="dados" onclick="UI.switchProfileTab(\'dados\')">Os Meus Dados</button>';
     html += '</div>';
 
-    // View mode
-    html += '<div id="account-view">';
-    html += '<div class="account-field"><span class="account-label">Username</span><span class="account-value">' + u.email.split('@')[0] + '</span></div>';
-    html += '<div class="account-field"><span class="account-label">Nome</span><span class="account-value">' + u.name + '</span></div>';
-    html += '<div class="account-field"><span class="account-label">E-mail</span><span class="account-value">' + u.email + '</span></div>';
-    html += '<div class="account-field"><span class="account-label">Password</span><span class="account-value">••••••••</span></div>';
-    html += '</div>';
+    // ══════════════════════════════════
+    // TAB 1 — Progressão, Locais, Prémios
+    // ══════════════════════════════════
+    html += '<div class="profile-tab-panel active" id="ptab-progresso">';
 
-    // Edit mode
-    html += '<div id="account-edit" style="display:none;">';
-    html += '<div class="account-field-edit"><label class="account-label">Nome</label><input class="account-edit-input" id="edit-name" value="' + u.name + '" placeholder="O teu nome"></div>';
-    html += '<div class="account-field-edit"><label class="account-label">E-mail</label><input class="account-edit-input" id="edit-email" type="email" value="' + u.email + '"></div>';
-    html += '<div class="account-field-edit"><label class="account-label">Nova Password (deixa em branco para manter)</label><input class="account-edit-input" id="edit-pass" type="password" placeholder="••••••••"></div>';
-    html += '<div class="account-field-edit" style="border-bottom:none;"><label class="account-label">Escolher Avatar</label>';
-    html += '<div class="avatar-picker-grid">' + avatarPickHtml + '</div></div>';
-    html += '<div class="edit-actions">';
-    html += '<button class="btn-cancel-edit" onclick="UI.toggleEditMode()">Cancelar</button>';
-    html += '<button class="btn-save" onclick="UI.saveProfile()">Guardar</button>';
-    html += '</div></div></div>';
-    // ── LEVEL PROGRESS ────────────────────────────────────────
+    // Progressão
     html += '<div class="profile-card">';
     html += '<div class="card-section-title">Progressão</div>';
     html += '<div class="level-header-row">';
@@ -235,7 +216,7 @@ const UI = {
     if (nextLv) {
       html += '<div class="level-next-label">próximo: <span style="color:' + nextLv.color + ';font-weight:600;">' + nextLv.name + '</span></div>';
     } else {
-      html += '<div class="level-next-label" style="color:var(--car);">Nível máximo</div>';
+      html += '<div class="level-next-label">Nível máximo ✨</div>';
     }
     html += '</div>';
     html += '<p class="level-description">' + lv.description + '</p>';
@@ -245,9 +226,21 @@ const UI = {
       html += '<div class="level-bar-labels"><span>' + pts + ' pts</span><span>' + (nextLv.minPts - pts) + ' pts para ' + nextLv.name + '</span></div>';
       html += '</div>';
     }
+    // Como ganhar pontos
+    html += '<div style="margin-top:16px;">';
+    html += '<div class="card-section-title" style="margin-bottom:10px;">Como ganhar pontos</div>';
+    html += '<div class="earn-grid">';
+    var earns = [
+      ['Primeiro local adicionado', '+40 pts bónus'],
+      ['Adicionar um local', '+15 pts'],
+    ];
+    earns.forEach(function(e){
+      html += '<div class="earn-item"><div class="earn-dot" style="background:' + lv.color + ';"></div><div class="earn-label">' + e[0] + '</div><div class="earn-pts" style="color:' + lv.color + ';">' + e[1] + '</div></div>';
+    });
+    html += '</div></div>';
     html += '</div>';
 
-    // ── MY SPOTS ─────────────────────────────────────────────
+    // Os Meus Locais
     html += '<div class="profile-card">';
     html += '<div class="card-section-title">Os Meus Locais (' + mySpots.length + ')</div>';
     if (mySpots.length === 0) {
@@ -278,7 +271,7 @@ const UI = {
     }
     html += '</div>';
 
-    // ── PRIZES ───────────────────────────────────────────────
+    // Prémios
     html += '<div class="profile-card">';
     html += '<div class="card-section-title">Prémios</div>';
     html += '<div class="prizes-timeline">';
@@ -301,26 +294,83 @@ const UI = {
     });
     html += '</div></div>';
 
-    // ── EARN POINTS ───────────────────────────────────────────
-    html += '<div class="profile-card">';
-    html += '<div class="card-section-title">Como ganhar pontos</div>';
-    html += '<div class="earn-grid">';
-    var earns = [
-      ['Primeiro local adicionado', '+40 pts bónus'],
-      ['Adicionar um local',        '+15 pts'],
-    ];
-    earns.forEach(function(e){
-      html += '<div class="earn-item"><div class="earn-dot" style="background:' + lv.color + ';"></div><div class="earn-label">' + e[0] + '</div><div class="earn-pts" style="color:' + lv.color + ';">' + e[1] + '</div></div>';
-    });
-    html += '</div></div>';
+    html += '</div>'; // fim ptab-progresso
 
-    // ── LOGOUT ───────────────────────────────────────────────
+    // ══════════════════════════════════
+    // TAB 2 — Os Meus Dados
+    // ══════════════════════════════════
+    html += '<div class="profile-tab-panel" id="ptab-dados">';
+
+    // Avatar options
+    var avatarViewHtml = '';
+    LEVEL_AVATARS.forEach(function(svg, i) {
+      var lvNum    = i + 1;
+      var unlocked = lv.level >= lvNum;
+      var selIdx   = (u.selectedAvatar !== undefined) ? u.selectedAvatar : lv.level - 1;
+      var isCur    = selIdx === i;
+      avatarViewHtml += '<div class="avatar-option ' + (unlocked?'unlocked':'locked') + ' ' + (isCur?'current':'') + '" title="Nível ' + lvNum + (unlocked?'':' — bloqueado') + '">';
+      avatarViewHtml += '<div style="width:32px;height:32px;opacity:' + (unlocked?1:0.3) + ';">' + svg + '</div></div>';
+    });
+
+    var avatarPickHtml = '';
+    LEVEL_AVATARS.forEach(function(svg, i) {
+      var lvNum    = i + 1;
+      var unlocked = lv.level >= lvNum;
+      var selIdx   = (u.selectedAvatar !== undefined) ? u.selectedAvatar : lv.level - 1;
+      var isCur    = selIdx === i;
+      avatarPickHtml += '<div class="avatar-pick-option ' + (unlocked?'':'locked') + ' ' + (isCur?'selected':'') + '" onclick="UI.selectAvatar(' + i + ')" title="Nível ' + lvNum + '">' + svg + '</div>';
+    });
+
+    html += '<div class="profile-card" id="account-card">';
+    html += '<div style="display:flex;align-items:center;margin-bottom:14px;">';
+    html += '<div class="card-section-title" style="margin-bottom:0;">Os Meus Dados</div>';
+    html += '<button class="edit-toggle-btn" onclick="UI.toggleEditMode()">Editar</button>';
+    html += '</div>';
+
+    // View mode
+    html += '<div id="account-view">';
+    html += '<div class="account-field"><span class="account-label">Username</span><span class="account-value">' + u.email.split('@')[0] + '</span></div>';
+    html += '<div class="account-field"><span class="account-label">Nome</span><span class="account-value">' + u.name + '</span></div>';
+    html += '<div class="account-field"><span class="account-label">E-mail</span><span class="account-value">' + u.email + '</span></div>';
+    html += '<div class="account-field"><span class="account-label">Password</span><span class="account-value">••••••••</span></div>';
+    html += '</div>';
+
+    // Edit mode
+    html += '<div id="account-edit" style="display:none;">';
+    html += '<div class="account-field-edit"><label class="account-label">Nome</label><input class="account-edit-input" id="edit-name" value="' + u.name + '" placeholder="O teu nome"></div>';
+    html += '<div class="account-field-edit"><label class="account-label">E-mail</label><input class="account-edit-input" id="edit-email" type="email" value="' + u.email + '"></div>';
+    html += '<div class="account-field-edit"><label class="account-label">Nova Password</label>';
+    html += '<div class="pass-wrap">';
+    html += '<input class="account-edit-input" id="edit-pass" type="password" placeholder="Deixa em branco para manter" style="padding-right:44px;">';
+    html += '<button type="button" class="pass-toggle" tabindex="-1" onclick="togglePassEye(this)">';
+    html += '<svg class="eye-off" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>';
+    html += '<svg class="eye-on" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:18px;height:18px;display:none;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>';
+    html += '</button></div></div>';
+    html += '<div class="account-field-edit" style="border-bottom:none;"><label class="account-label">Escolher Avatar</label>';
+    html += '<div class="avatar-picker-grid">' + avatarPickHtml + '</div></div>';
+    html += '<div class="edit-actions">';
+    html += '<button class="btn-cancel-edit" onclick="UI.toggleEditMode()">Cancelar</button>';
+    html += '<button class="btn-save" onclick="UI.saveProfile()">Guardar</button>';
+    html += '</div></div></div>';
+
+    // Terminar sessão
     html += '<div class="profile-card" style="padding:0;">';
     html += '<button class="logout-btn" onclick="Auth.logout()">Terminar Sessão</button>';
     html += '</div>';
 
+    // Apagar conta
+    html += '<div class="profile-card" style="margin-top:4px;">';
+    html += '<div class="card-section-title" style="margin-bottom:8px;">Zona de Perigo</div>';
+    html += '<p style="font-size:12px;color:var(--mut);margin-bottom:12px;line-height:1.6;">Ao apagares a conta todos os teus dados são removidos permanentemente.</p>';
+    html += '<button class="btn-delete-account" onclick="UI.deleteAccount()">🗑 Apagar a minha conta</button>';
+    html += '</div>';
+
+    html += '</div>'; // fim ptab-dados
 
     document.getElementById('profile-body').innerHTML = html;
+
+    // Restaurar tab activa
+    UI.switchProfileTab(UI._activeProfileTab || 'progresso');
   },
 
   renderRanking: function() {
@@ -386,36 +436,27 @@ const UI = {
 
 function toast(msg, type) { UI.toast(msg, type); }
 
-/* ── Registration pending screen ── */
+/* ── Registration pending ── */
 UI.showRegistrationPending = function() {
   UI.closeAllOverlays();
   var el = document.getElementById('pending-overlay');
   if (el) { el.classList.remove('hidden'); return; }
-  // Create overlay dynamically
   var ov = document.createElement('div');
   ov.id = 'pending-overlay';
   ov.className = 'overlay';
-  ov.style.cssText = 'display:flex;align-items:center;justify-content:center;background:var(--d-foam);';
+  ov.style.cssText = 'display:flex;align-items:center;justify-content:center;background:var(--nuage);';
   ov.innerHTML =
     '<div style="text-align:center;padding:2rem;max-width:340px;">' +
       '<div style="font-size:48px;margin-bottom:16px;">☕</div>' +
-      '<h2 style="font-family:Poppins,sans-serif;font-size:1.3rem;color:var(--d-espresso);margin-bottom:10px;">Registo recebido!</h2>' +
-      '<p style="font-size:13px;color:var(--mut);line-height:1.7;margin-bottom:20px;">O teu pedido foi enviado e está a aguardar aprovação pelo administrador. Receberás acesso assim que for aprovado.</p>' +
-      '<button onclick="document.getElementById(&quot;pending-overlay&quot;).classList.add(&quot;hidden&quot;)" style="padding:10px 24px;background:var(--d-red);color:#fff;border:none;border-radius:8px;font-family:Poppins,sans-serif;font-size:13px;font-weight:600;cursor:pointer;">Voltar ao Mapa</button>' +
+      '<h2 style="font-family:var(--font-serif);font-size:1.3rem;color:var(--espresso);margin-bottom:10px;font-style:italic;">Registo recebido!</h2>' +
+      '<p style="font-size:13px;color:var(--mut);line-height:1.7;margin-bottom:20px;">O teu pedido foi enviado e está a aguardar aprovação pelo administrador.</p>' +
+      '<button onclick="document.getElementById(&quot;pending-overlay&quot;).classList.add(&quot;hidden&quot;)" style="padding:10px 24px;background:var(--terre-cuite);color:#fff;border:none;border-radius:8px;font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;">Voltar ao Mapa</button>' +
     '</div>';
   document.getElementById('app').appendChild(ov);
 };
 
 /* ── Admin Panel ── */
 UI.openAdminPanel = function() { Admin.open().catch(function(e){ console.error('Admin panel error:', e); UI.toast('Erro ao carregar painel admin.', 'error'); }); };
-
-
-
-
-
-
-
-
 
 /* ── Mobile search ── */
 UI.showMobileSearch = function() {
@@ -470,6 +511,3 @@ UI._mobileSelectResult = function(id) {
 };
 
 App.closeAllOverlays = function() { UI.closeAllOverlays(); };
-
-
-

@@ -7,7 +7,6 @@ const Store = {
   getSession()   { return DB.getSession(); },
   saveSession(s) { DB.saveSession(s); },
   clearSession() { DB.clearSession(); },
-  /* Legacy localStorage helpers — used during migration */
   getUsers()     { try { return JSON.parse(localStorage.getItem('dcm_users') || '{}'); } catch { return {}; } },
   saveUsers(u)   { try { localStorage.setItem('dcm_users', JSON.stringify(u)); } catch {} },
   getLocs()      { try { return JSON.parse(localStorage.getItem('dcm_locs') || '[]'); } catch { return []; } },
@@ -48,6 +47,13 @@ const Auth = {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
+    // Reset eye icons
+    ['a-pass','a-conf'].forEach(id => {
+      const inp = document.getElementById(id);
+      if (inp) inp.type = 'password';
+    });
+    document.querySelectorAll('.pass-toggle .eye-on').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.pass-toggle .eye-off').forEach(el => el.style.display = '');
     UI.openModal('auth-modal');
     setTimeout(() => document.getElementById('a-email').focus(), 250);
   },
@@ -60,8 +66,7 @@ const Auth = {
     const pass  = document.getElementById('a-pass').value.trim();
     if (!email || !pass) { UI.showErr('auth-err', 'Preenche email e palavra-passe.'); return; }
 
-    // Show loading
-    const btn = document.getElementById('auth-btn');
+    const btn  = document.getElementById('auth-btn');
     const orig = btn.textContent;
     btn.textContent = 'A aguardar...';
     btn.disabled = true;
@@ -70,7 +75,7 @@ const Auth = {
       if (this.mode === 'login') {
         let u = await DB.getUser(email);
         btn.textContent = orig; btn.disabled = false;
-        if (!u) { UI.showErr('auth-err', 'Não existe nenhuma conta com este email. As tabelas do Supabase podem ainda não ter sido criadas — consulta o administrador.'); return; }
+        if (!u) { UI.showErr('auth-err', 'Não existe nenhuma conta com este email.'); return; }
         if (u.password !== pass) { UI.showErr('auth-err', 'Palavra-passe incorreta.'); return; }
         if (u.status === 'pending')  { UI.showErr('auth-err', 'A tua conta aguarda aprovação pelo administrador.'); return; }
         if (u.status === 'inactive') { UI.showErr('auth-err', 'A tua conta foi desativada. Contacta o administrador.'); return; }
@@ -127,3 +132,20 @@ const Auth = {
     return App.currentUser && App.currentUser.role === 'admin';
   }
 };
+
+/* ── Ícone de olho — toggle password ── */
+function togglePassEye(btn) {
+  const wrap   = btn.closest('.pass-wrap');
+  const inp    = wrap.querySelector('input');
+  const eyeOff = btn.querySelector('.eye-off');
+  const eyeOn  = btn.querySelector('.eye-on');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    if (eyeOff) eyeOff.style.display = 'none';
+    if (eyeOn)  eyeOn.style.display  = '';
+  } else {
+    inp.type = 'password';
+    if (eyeOff) eyeOff.style.display = '';
+    if (eyeOn)  eyeOn.style.display  = 'none';
+  }
+}
