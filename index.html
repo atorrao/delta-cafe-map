@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="description" content="Descobre onde beber e comprar Café Delta em Portugal e no Mundo.">
-<meta name="theme-color" content="#2C1810">
+<meta name="theme-color" content="#542916">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Where's my Delta?">
@@ -13,6 +13,228 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="css/style.css"/>
+<style>
+/* ── Sidebar mobile toggle ── */
+#sidebar-toggle-btn {
+  display: none;
+  position: fixed;
+  bottom: calc(var(--bnav-h) + env(safe-area-inset-bottom,0px) + 80px);
+  left: 16px;
+  z-index: 900;
+  width: 48px; height: 48px;
+  background: var(--espresso);
+  color: var(--nuage);
+  border: none; border-radius: 50%;
+  font-size: 20px;
+  box-shadow: var(--sh-md);
+  align-items: center; justify-content: center;
+  cursor: pointer;
+}
+@media (max-width: 768px) {
+  #sidebar-toggle-btn { display: flex; }
+  #sidebar {
+    position: fixed;
+    top: calc(var(--topbar-h) + env(safe-area-inset-top,0px));
+    bottom: calc(var(--bnav-h) + env(safe-area-inset-bottom,0px));
+    left: 0; width: 280px;
+    transform: translateX(-100%);
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+    z-index: 850;
+    box-shadow: var(--sh-lg);
+  }
+  #sidebar.sidebar-open { transform: translateX(0); }
+  #sidebar-backdrop {
+    display: none; position: fixed; inset: 0; z-index: 840;
+    background: rgba(84,41,22,.4); backdrop-filter: blur(2px);
+  }
+  #sidebar-backdrop.open { display: block; }
+}
+
+/* ── Spot panel redesign ── */
+#spot-panel {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--nuage);
+  background-image: var(--grain);
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  padding: 0 0 env(safe-area-inset-bottom,0px);
+  box-shadow: 0 -4px 32px rgba(84,41,22,.18);
+  z-index: 850;
+  transition: transform .3s cubic-bezier(.4,0,.2,1), opacity .2s;
+  max-height: 65vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+#spot-panel.hidden {
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+.sp-drag-handle {
+  width: 40px; height: 4px;
+  background: rgba(84,41,22,.18);
+  border-radius: 2px;
+  margin: 12px auto 0;
+}
+.sp-header {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 16px 18px 12px;
+}
+.sp-icon-wrap {
+  width: 52px; height: 52px;
+  border-radius: 14px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--sh-sm);
+}
+.sp-header-info { flex: 1; min-width: 0; }
+.sp-badge-historia {
+  display: inline-block;
+  background: rgba(241,193,102,.2);
+  color: var(--espresso);
+  font-size: 10px; font-weight: 700;
+  padding: 3px 9px; border-radius: 20px;
+  margin-bottom: 5px;
+  border: 1px solid rgba(241,193,102,.4);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.sp-name {
+  font-family: var(--font-display);
+  font-size: 17px; font-weight: 700;
+  color: var(--text); line-height: 1.2;
+  margin-bottom: 3px;
+}
+.sp-sub { font-size: 12px; color: var(--mut); margin-bottom: 2px; }
+.sp-addr { font-size: 11px; color: var(--mut-lt); margin-top: 2px; }
+.sp-close-btn {
+  background: rgba(84,41,22,.08); border: none;
+  width: 32px; height: 32px; border-radius: 50%;
+  font-size: 18px; color: var(--mut);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0; line-height: 1;
+  transition: background .15s;
+}
+.sp-close-btn:hover { background: rgba(84,41,22,.15); }
+.sp-tags {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  padding: 0 18px 12px;
+}
+.sp-note {
+  margin: 0 18px 12px;
+  font-family: var(--font-serif); font-style: italic;
+  font-size: 12px; color: var(--mut);
+  line-height: 1.6;
+  padding: 10px 14px;
+  background: rgba(183,152,88,.08);
+  border-left: 3px solid var(--eau-trouble);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+}
+.sp-added {
+  padding: 8px 18px 14px;
+  font-size: 11px; color: var(--mut-lt);
+}
+.spot-saberMais {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--espresso); color: var(--nuage);
+  border: none; border-radius: var(--r-sm);
+  font-size: 12px; font-weight: 600; padding: 9px 16px;
+  cursor: pointer; text-decoration: none;
+  margin: 0 18px 14px; font-family: var(--font-body);
+  transition: background .15s;
+}
+.spot-saberMais:hover { background: var(--terre-cuite); color: #fff; }
+.spot-saberMais svg { width: 13px; height: 13px; }
+
+@media (min-width: 769px) {
+  #spot-panel {
+    position: absolute;
+    bottom: 24px; left: 50%;
+    transform: translateX(-50%);
+    width: min(440px, calc(100vw - 280px - 48px));
+    border-radius: var(--r-xl);
+    max-height: none;
+  }
+  #spot-panel.hidden {
+    transform: translateX(-50%) translateY(16px);
+  }
+}
+
+/* ── Admin redesign ── */
+.admin-profile-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--brd);
+  border-radius: var(--r-md);
+  transition: box-shadow .15s;
+}
+.admin-profile-row:hover { box-shadow: var(--sh-sm); }
+.admin-avatar-circle {
+  width: 46px; height: 46px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 700; color: #fff;
+  flex-shrink: 0; border: 2px solid rgba(255,255,255,.2);
+  overflow: hidden;
+}
+.admin-avatar-circle svg { width: 42px; height: 42px; }
+.admin-user-details { flex: 1; min-width: 0; }
+.admin-user-name-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 2px;
+}
+.admin-user-fullname { font-size: 14px; font-weight: 700; color: var(--text); }
+.admin-user-email-sm { font-size: 11px; color: var(--mut); }
+.admin-user-stats-sm { font-size: 10px; color: var(--mut-lt); margin-top: 3px; }
+.admin-row-right {
+  display: flex; flex-direction: column;
+  align-items: flex-end; gap: 8px; flex-shrink: 0;
+}
+.admin-loc-card {
+  background: var(--surface);
+  border: 1px solid var(--brd);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  transition: box-shadow .15s;
+}
+.admin-loc-card:hover { box-shadow: var(--sh-sm); }
+.admin-loc-header {
+  display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px;
+}
+.admin-loc-dot-lg {
+  width: 12px; height: 12px; border-radius: 50%;
+  flex-shrink: 0; margin-top: 3px;
+}
+.admin-loc-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.admin-loc-meta { font-size: 11px; color: var(--mut); margin-top: 2px; }
+.admin-loc-note { font-size: 11px; color: var(--mut-lt); font-style: italic; margin-top: 4px; }
+.admin-loc-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px;
+  padding-top: 10px; border-top: 1px solid var(--brd);
+}
+.admin-loc-submitter { font-size: 11px; color: var(--mut); }
+
+/* ── Map sidebar pill button (mobile) ── */
+.sidebar-pill-header {
+  display: none;
+  align-items: center; justify-content: space-between;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--brd);
+  background: var(--espresso);
+  color: var(--nuage);
+}
+@media (max-width: 768px) {
+  .sidebar-pill-header { display: flex; }
+}
+.sidebar-pill-title { font-size: 14px; font-weight: 700; letter-spacing: .02em; }
+.sidebar-close-btn {
+  background: rgba(255,255,255,.12); border: none;
+  color: var(--nuage); font-size: 18px;
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+</style>
 </head>
 <body>
 <div id="app">
@@ -43,11 +265,23 @@
   <!-- MAIN -->
   <main id="main">
 
+    <!-- Sidebar backdrop (mobile) -->
+    <div id="sidebar-backdrop" onclick="closeSidebar()"></div>
+
     <!-- Sidebar -->
     <aside id="sidebar">
-      <!-- Nearby cafés section -->
+      <!-- Mobile header -->
+      <div class="sidebar-pill-header">
+        <span class="sidebar-pill-title">Explorar Locais</span>
+        <button class="sidebar-close-btn" onclick="closeSidebar()">×</button>
+      </div>
+
+      <!-- Nearby cafés -->
       <div class="sidebar-section" id="nearby-box">
-        <div class="sidebar-label">Café / Restaurante</div>
+        <div class="sidebar-label" style="display:flex;align-items:center;gap:6px;">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#E8820C;flex-shrink:0;"></span>
+          Café / Restaurante
+        </div>
         <div id="nearby-list"><p class="sidebar-empty">A detectar localização...</p></div>
       </div>
 
@@ -57,7 +291,7 @@
         <div id="official-list"></div>
       </div>
 
-      <!-- Search results panel -->
+      <!-- Search results -->
       <div class="sidebar-section" id="search-results-box" style="display:none;">
         <div class="sidebar-label">Resultados</div>
         <div id="search-results-list"></div>
@@ -71,27 +305,12 @@
       <!-- Layer switcher -->
       <div class="layer-switcher">
         <span class="layer-label">Mapa</span>
-        <button class="layer-btn"        data-layer="satellite" onclick="Map.setLayer('satellite')">Satélite</button>
-        <button class="layer-btn"        data-layer="terrain"   onclick="Map.setLayer('terrain')">Relevo</button>
+        <button class="layer-btn" data-layer="satellite" onclick="Map.setLayer('satellite')">Satélite</button>
+        <button class="layer-btn" data-layer="terrain"   onclick="Map.setLayer('terrain')">Relevo</button>
       </div>
 
-      <!-- Spot panel -->
-      <div id="spot-panel" class="spot-panel hidden">
-        <div class="spot-panel-header">
-          <div class="spot-panel-icon" id="sp-icon"></div>
-          <div class="spot-panel-info">
-            <div class="spot-panel-name" id="sp-name"></div>
-            <div class="spot-panel-sub"  id="sp-sub"></div>
-            <div class="spot-panel-addr" id="sp-addr"></div>
-          </div>
-          <button class="spot-close" onclick="Map.closePanel()">×</button>
-        </div>
-        <div class="spot-tags"  id="sp-tags"></div>
-        <div class="spot-prods" id="sp-prods"></div>
-        <div class="spot-footer">
-          <div class="spot-added-by" id="sp-by"></div>
-        </div>
-      </div>
+      <!-- Spot panel (redesigned, injected by map.js) -->
+      <div id="spot-panel" class="hidden"></div>
 
       <!-- Map controls -->
       <div class="map-controls">
@@ -101,12 +320,23 @@
     </div>
   </main>
 
+  <!-- Sidebar toggle (mobile) -->
+  <button id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Explorar locais">☰</button>
+
   <!-- BOTTOM NAV (mobile) -->
   <nav id="bottom-nav">
-    <button class="bnav-btn active" data-view="map"     onclick="UI.showTab('map')"><span>Mapa</span></button>
-    <button class="bnav-btn"        data-view="search"  onclick="UI.showMobileSearch()"><span>Pesquisar</span></button>
-    <button class="bnav-btn"        data-view="ranking" onclick="UI.showTab('ranking')"><span>Ranking</span></button>
-    <button class="bnav-btn"        data-view="profile" onclick="UI.showTab('profile')"><span>Perfil</span></button>
+    <button class="bnav-btn active" data-view="map"     onclick="UI.showTab('map')">
+      <span style="font-size:20px;">🗺</span><span>Mapa</span>
+    </button>
+    <button class="bnav-btn" data-view="search"  onclick="UI.showMobileSearch()">
+      <span style="font-size:20px;">🔍</span><span>Pesquisar</span>
+    </button>
+    <button class="bnav-btn" data-view="ranking" onclick="UI.showTab('ranking')">
+      <span style="font-size:20px;">🏆</span><span>Ranking</span>
+    </button>
+    <button class="bnav-btn" data-view="profile" onclick="UI.showTab('profile')">
+      <span style="font-size:20px;">👤</span><span>Perfil</span>
+    </button>
   </nav>
 
   <!-- Mobile search overlay -->
@@ -150,7 +380,7 @@
   <div id="admin-overlay" class="overlay hidden">
     <div class="overlay-header">
       <button class="back-btn" onclick="UI.closeOverlay('admin-overlay')">← Voltar</button>
-      <h2 style="font-family:'Poppins',sans-serif;font-weight:700;">Painel de Administração</h2>
+      <h2>Painel de Administração</h2>
       <div></div>
     </div>
     <div id="admin-body" class="overlay-body"></div>
@@ -162,7 +392,9 @@
 <div class="modal-bg" id="auth-modal">
   <div class="modal modal-auth modal-poppins">
     <button class="modal-close" onclick="UI.closeModal('auth-modal')">×</button>
-    <div class="modal-logo"><img src="assets/delta-logo-white.png" alt="Delta Cafés" style="width:64px;height:64px;object-fit:contain;border-radius:8px;"></div>
+    <div class="modal-logo">
+      <img src="assets/delta-logo-white.png" alt="Delta Cafés" style="width:64px;height:64px;object-fit:contain;border-radius:8px;">
+    </div>
     <h2 id="auth-title">Iniciar Sessão</h2>
     <p class="modal-sub" id="auth-sub">Entra para explorar e contribuir</p>
     <div id="demo-hint" style="display:none;"></div>
@@ -175,13 +407,21 @@
     <input class="finput" id="a-email" type="email" placeholder="email@exemplo.com" autocomplete="email">
     <label class="flabel">Palavra-passe</label>
     <div class="pass-wrap">
-      <input class="finput" id="a-pass" type="password" 
-             onkeydown="if(event.key==='Enter')Auth.submit()">
-      <button class="pass-toggle" onclick="UI.togglePass('a-pass',this)">Mostrar</button>
+      <input class="finput" id="a-pass" type="password" onkeydown="if(event.key==='Enter')Auth.submit()">
+      <button type="button" class="pass-toggle" tabindex="-1" onclick="togglePassEye(this)">
+        <svg class="eye-off" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
+        <svg class="eye-on" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:18px;height:18px;display:none;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+      </button>
     </div>
     <div id="auth-conf-row" class="hidden">
       <label class="flabel">Confirmar palavra-passe</label>
-      <input class="finput" id="a-conf" type="password" >
+      <div class="pass-wrap">
+        <input class="finput" id="a-conf" type="password">
+        <button type="button" class="pass-toggle" tabindex="-1" onclick="togglePassEye(this)">
+          <svg class="eye-off" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
+          <svg class="eye-on" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:18px;height:18px;display:none;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+        </button>
+      </div>
     </div>
     <button class="mbtn mbtn-red mbtn-full" onclick="Auth.submit()" id="auth-btn">Entrar</button>
     <p class="auth-switch">
@@ -212,8 +452,8 @@
         <input class="finput" id="add-addr" placeholder="A detectar a tua morada...">
       </div>
       <div class="form-col-full">
-        <label class="flabel">Horário de Funcionamento <span class="optional-label">opcional</span></label>
-        <input class="finput" id="add-hours" placeholder="Ex: Seg-Sex 08h-20h, Sáb 09h-18h">
+        <label class="flabel">Horário <span class="optional-label">opcional</span></label>
+        <input class="finput" id="add-hours" placeholder="Ex: Seg-Sex 08h-20h">
       </div>
       <div class="form-col-full">
         <label class="flabel">Produtos Disponíveis</label>
@@ -263,5 +503,19 @@
 <script src="js/ui.js"></script>
 <script src="js/admin.js"></script>
 <script src="js/app.js"></script>
+<script>
+/* ── Sidebar mobile toggle ── */
+function toggleSidebar() {
+  var sb = document.getElementById('sidebar');
+  var bd = document.getElementById('sidebar-backdrop');
+  var open = sb.classList.contains('sidebar-open');
+  sb.classList.toggle('sidebar-open', !open);
+  bd.classList.toggle('open', !open);
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('sidebar-open');
+  document.getElementById('sidebar-backdrop').classList.remove('open');
+}
+</script>
 </body>
 </html>
