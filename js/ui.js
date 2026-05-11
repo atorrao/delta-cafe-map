@@ -219,7 +219,7 @@ const UI = {
       html += '<div class="level-next-label">Nível máximo ✨</div>';
     }
     html += '</div>';
-    html += '<p class="level-description">' + lv.description + '</p>';
+    html += '<p class="level-description">' + (lv.description||'').replace(/Já contribuíste para a comunidade\.?\s*/gi,'') + '</p>';
     if (nextLv) {
       html += '<div class="level-bar-wrap">';
       html += '<div class="level-bar"><div class="level-fill" style="width:' + progress + '%;background:' + lv.barColor + ';"></div></div>';
