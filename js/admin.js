@@ -1,9 +1,9 @@
 /* ═══════════════════════════════════════════════════
-   ADMIN PANEL — tabs: Utilizadores | Locais
+   ADMIN PANEL — tabs: Utilizadores | Locais  v2
    ═══════════════════════════════════════════════════ */
 
 var Admin = {
-  _tab: 'users', // 'users' | 'locations'
+  _tab: 'users',
 
   open: async function() {
     if (!App.currentUser || App.currentUser.role !== 'admin') {
@@ -13,7 +13,10 @@ var Admin = {
     UI.closeAllOverlays();
     Admin._tab = 'users';
     document.getElementById('admin-overlay').classList.remove('hidden');
-    document.getElementById('admin-body').innerHTML = '<div style="text-align:center;padding:40px;color:var(--mut);">A carregar...</div>';
+    document.getElementById('admin-body').innerHTML =
+      '<div style="display:flex;align-items:center;justify-content:center;padding:60px;gap:12px;color:var(--mut);">' +
+        '<div class="spinner"></div>' +
+      '</div>';
     await Admin._loadAndRender();
   },
 
@@ -21,30 +24,26 @@ var Admin = {
     Admin._tab === 'locations' ? Admin._renderLocations() : Admin._renderUsers();
   },
 
-  _sbUsers: [], // cached from Supabase
+  _sbUsers: [],
 
   _loadAndRender: async function() {
     try {
-      // Load users from Supabase
       const uRows = await DB.getAllUsers();
       Admin._sbUsers = uRows.filter(function(u){ return u.email !== 'admin@delta.pt' && u.email !== 'admin'; });
     } catch(e) { console.warn('load users:', e); Admin._sbUsers = []; }
-
     try {
-      // Refresh App.locations from Supabase before rendering
       const rows = await DB.getAllLocations();
       const seedIds = new Set(SEED_LOCATIONS.map(s => s.id));
-      // Remove old user locs and reload
       App.locations = [...SEED_LOCATIONS];
       rows.forEach(function(l) {
         if (!seedIds.has(l.id)) {
           App.locations.push({
-            id: l.id, name: l.name, type: l.type, lat: l.lat, lng: l.lng,
-            country: l.country||'', city: l.city||'', address: l.address||'',
-            hours: l.hours||null, note: l.note||null, products: l.products||[],
-            verified: l.verified||false, status: l.status||'pending',
-            addedBy: l.added_by||'', ownerEmail: l.owner_email||null,
-            upvotes: l.upvotes||0, createdAt: l.created_at
+            id:l.id, name:l.name, type:l.type, lat:l.lat, lng:l.lng,
+            country:l.country||'', city:l.city||'', address:l.address||'',
+            hours:l.hours||null, note:l.note||null, products:l.products||[],
+            verified:l.verified||false, status:l.status||'pending',
+            addedBy:l.added_by||'', ownerEmail:l.owner_email||null,
+            upvotes:l.upvotes||0, createdAt:l.created_at
           });
         }
       });
@@ -52,27 +51,85 @@ var Admin = {
     Admin.render();
   },
 
-  /* ── TAB HEADER ──────────────────────────────────────────── */
+  /* ── TAB HEADER ── */
   _tabHeader: function() {
-    var pendingUsers = Admin._sbUsers.filter(function(u){ return (u.status||'pending') === 'pending'; }).length;
-    var pendingLocs  = App.locations.filter(function(l){ return l.ownerEmail && !l.verified && (l.status === 'pending' || !l.status); }).length;
-
+    var pendingUsers = Admin._sbUsers.filter(function(u){ return (u.status||'pending')==='pending'; }).length;
+    var pendingLocs  = App.locations.filter(function(l){ return l.ownerEmail&&!l.verified&&(l.status==='pending'||!l.status); }).length;
     return '<div class="admin-tabs">' +
-      '<button class="admin-tab ' + (Admin._tab==='users'     ? 'active' : '') + '" onclick="Admin._switchTab(\'users\')">' +
-        'Utilizadores' + (pendingUsers ? ' <span class="admin-tab-badge">' + pendingUsers + '</span>' : '') +
+      '<button class="admin-tab '+(Admin._tab==='users'?'active':'')+'" onclick="Admin._switchTab(\'users\')">' +
+        'Utilizadores'+(pendingUsers?' <span class="admin-tab-badge">'+pendingUsers+'</span>':'')+
       '</button>' +
-      '<button class="admin-tab ' + (Admin._tab==='locations' ? 'active' : '') + '" onclick="Admin._switchTab(\'locations\')">' +
-        'Locais Submetidos' + (pendingLocs ? ' <span class="admin-tab-badge">' + pendingLocs + '</span>' : '') +
+      '<button class="admin-tab '+(Admin._tab==='locations'?'active':'')+'" onclick="Admin._switchTab(\'locations\')">' +
+        'Locais Submetidos'+(pendingLocs?' <span class="admin-tab-badge">'+pendingLocs+'</span>':'')+
       '</button>' +
     '</div>';
   },
 
-  _switchTab: function(tab) {
-    Admin._tab = tab;
-    Admin._loadAndRender();
+  _switchTab: function(tab) { Admin._tab = tab; Admin._loadAndRender(); },
+
+  /* ── AVATAR helper — usa SVG do Gamification ou inicial ── */
+  _avatarHtml: function(u, size) {
+    size = size || 46;
+    var pts = u.points || 0;
+    var lv  = (typeof Gamification !== 'undefined') ? Gamification.getLevel(pts) : { color: '#a13a1e', bg: '#a13a1e' };
+    var svg = '';
+    try { svg = Gamification.getAvatarSVG(pts, u.selected_avatar !== undefined ? u.selected_avatar : u.selectedAvatar); } catch(e) {}
+    if (svg) {
+      return '<div class="admin-avatar-circle" style="background:'+lv.color+';width:'+size+'px;height:'+size+'px;border:2px solid '+lv.color+'40;">'+svg+'</div>';
+    }
+    var initial = (u.name||'?')[0].toUpperCase();
+    return '<div class="admin-avatar-circle" style="background:'+lv.color+';width:'+size+'px;height:'+size+'px;font-size:'+(size/2.5)+'px;font-weight:700;color:#fff;">'+initial+'</div>';
   },
 
-  /* ── USERS TAB ───────────────────────────────────────────── */
+  /* ── USER ROW ── */
+  _userRow: function(u) {
+    var status   = u.status || 'pending';
+    var lv       = (typeof Gamification !== 'undefined') ? Gamification.getLevel(u.points||0) : { name:'—', color:'#888' };
+    var joinDate = '';
+    try { joinDate = new Date(u.joined).toLocaleDateString('pt-PT',{day:'numeric',month:'short',year:'numeric'}); } catch(e){}
+
+    var statusCfg = {
+      approved : { bg:'rgba(136,184,206,.18)', color:'#1a5068', label:'Aprovado'  },
+      pending  : { bg:'rgba(241,193,102,.2)',  color:'#7a4e10', label:'Pendente'  },
+      inactive : { bg:'rgba(0,0,0,.06)',       color:'#6b7280', label:'Inativo'   },
+      rejected : { bg:'rgba(161,58,30,.1)',    color:'#a13a1e', label:'Recusado'  },
+    };
+    var sc = statusCfg[status] || statusCfg.pending;
+
+    var actions = '';
+    if (status === 'pending') {
+      actions += '<button class="admin-btn admin-btn-approve" data-act="approve" data-em="'+u.email+'">Aprovar</button>';
+      actions += '<button class="admin-btn admin-btn-reject"  data-act="reject"  data-em="'+u.email+'">Recusar</button>';
+    } else if (status === 'approved') {
+      actions += '<button class="admin-btn admin-btn-inactive" data-act="inactive" data-em="'+u.email+'">Desativar</button>';
+      actions += '<button class="admin-btn admin-btn-reset"    data-act="reset"    data-em="'+u.email+'">Reset PW</button>';
+    } else {
+      actions += '<button class="admin-btn admin-btn-approve" data-act="approve" data-em="'+u.email+'">Reativar</button>';
+    }
+
+    return '<div class="admin-profile-row">' +
+      Admin._avatarHtml(u, 46) +
+      '<div class="admin-user-details">' +
+        '<div class="admin-user-name-row">' +
+          '<span class="admin-user-fullname">'+u.name+'</span>' +
+          '<span class="admin-status-badge" style="background:'+sc.bg+';color:'+sc.color+';">'+sc.label+'</span>' +
+          (u.role==='admin'?'<span class="admin-status-badge" style="background:rgba(84,41,22,.1);color:var(--espresso);">Admin</span>':'')+
+        '</div>' +
+        '<div class="admin-user-email-sm">'+u.email+'</div>' +
+        '<div class="admin-user-stats-sm">' +
+          '<span style="color:'+lv.color+';font-weight:600;">'+lv.name+'</span>' +
+          ' &middot; '+(u.points||0)+' pts' +
+          ' &middot; '+(u.contributions||0)+' locais' +
+          (joinDate?' &middot; desde '+joinDate:'') +
+        '</div>' +
+      '</div>' +
+      '<div class="admin-row-right">' +
+        '<div class="admin-actions">'+actions+'</div>' +
+      '</div>' +
+    '</div>';
+  },
+
+  /* ── USERS TAB ── */
   _renderUsers: function() {
     var allUsers = Admin._sbUsers.length ? Admin._sbUsers : [];
     allUsers.sort(function(a,b){ return new Date(b.joined)-new Date(a.joined); });
@@ -83,26 +140,22 @@ var Admin = {
 
     var html = Admin._tabHeader();
 
-    /* Clickable stats */
+    /* Stats */
     html += '<div class="admin-stats">' +
-      '<div class="admin-stat-cell admin-stat-clickable" data-filter="all">' +
-        '<div class="admin-stat-num">' + allUsers.length + '</div><div class="admin-stat-lbl">Total</div></div>' +
-      '<div class="admin-stat-cell admin-stat-clickable" data-filter="approved" style="border-color:#2e7d5e;">' +
-        '<div class="admin-stat-num" style="color:#1a6b3c;">' + approved.length + '</div><div class="admin-stat-lbl">Aprovados</div></div>' +
-      '<div class="admin-stat-cell admin-stat-clickable" data-filter="pending" style="border-color:#b07d2e;">' +
-        '<div class="admin-stat-num" style="color:#92400e;">' + pending.length + '</div><div class="admin-stat-lbl">Pendentes</div></div>' +
-      '<div class="admin-stat-cell admin-stat-clickable" data-filter="inactive" style="border-color:#9ca3af;">' +
-        '<div class="admin-stat-num" style="color:#6b7280;">' + inactive.length + '</div><div class="admin-stat-lbl">Inativos</div></div>' +
+      '<div class="admin-stat-cell admin-stat-clickable" data-filter="all"><div class="admin-stat-num">'+allUsers.length+'</div><div class="admin-stat-lbl">Total</div></div>' +
+      '<div class="admin-stat-cell admin-stat-clickable" data-filter="approved" style="border-color:rgba(136,184,206,.5);"><div class="admin-stat-num" style="color:#1a5068;">'+approved.length+'</div><div class="admin-stat-lbl">Aprovados</div></div>' +
+      '<div class="admin-stat-cell admin-stat-clickable" data-filter="pending"  style="border-color:rgba(241,193,102,.5);"><div class="admin-stat-num" style="color:#7a4e10;">'+pending.length+'</div><div class="admin-stat-lbl">Pendentes</div></div>' +
+      '<div class="admin-stat-cell admin-stat-clickable" data-filter="inactive" style="border-color:rgba(0,0,0,.12);"><div class="admin-stat-num" style="color:#6b7280;">'+inactive.length+'</div><div class="admin-stat-lbl">Inativos</div></div>' +
     '</div>';
     html += '<div id="admin-user-filter-list" style="margin-bottom:14px;"></div>';
 
-    /* Pending users first */
+    /* Pending first */
     if (pending.length) {
       html += '<div class="admin-card admin-card-pending">';
-      html += '<div class="card-section-title admin-pending-title">' +
-        '<span class="admin-badge-num">' + pending.length + '</span> Pendentes de Aprovação</div>';
+      html += '<div class="card-section-title admin-pending-title"><span class="admin-badge-num">'+pending.length+'</span> Pendentes de Aprovação</div>';
+      html += '<div class="admin-section">';
       pending.forEach(function(u){ html += Admin._userRow(u); });
-      html += '</div>';
+      html += '</div></div>';
     }
 
     /* Create user */
@@ -110,46 +163,39 @@ var Admin = {
       '<div class="card-section-title">Criar Novo Utilizador</div>' +
       '<div class="admin-create-form">' +
         '<div class="admin-form-row">' +
-          '<div><label class="flabel" style="margin-top:0;">Nome *</label>' +
-            '<input class="finput" id="new-u-name" placeholder="Nome completo" style="font-size:13px;"></div>' +
-          '<div><label class="flabel" style="margin-top:0;">Email *</label>' +
-            '<input class="finput" id="new-u-email" type="email" placeholder="email@exemplo.com" style="font-size:13px;"></div>' +
+          '<div><label class="flabel" style="margin-top:0;">Nome *</label><input class="finput admin-inp" id="new-u-name" placeholder="Nome completo"></div>' +
+          '<div><label class="flabel" style="margin-top:0;">Email *</label><input class="finput admin-inp" id="new-u-email" type="email" placeholder="email@exemplo.com"></div>' +
         '</div>' +
         '<div class="admin-form-row">' +
-          '<div><label class="flabel">Password *</label>' +
-            '<input class="finput" id="new-u-pass" type="text" placeholder="Mínimo 6 caracteres" style="font-size:13px;"></div>' +
+          '<div><label class="flabel">Password *</label><input class="finput admin-inp" id="new-u-pass" type="text" placeholder="Mínimo 6 caracteres"></div>' +
           '<div><label class="flabel">Estado inicial</label>' +
-            '<select class="finput" id="new-u-status" style="font-size:13px;">' +
-              '<option value="approved">Aprovado</option>' +
-              '<option value="pending">Pendente</option>' +
-            '</select></div>' +
+            '<select class="finput admin-inp" id="new-u-status"><option value="approved">Aprovado</option><option value="pending">Pendente</option></select>' +
+          '</div>' +
         '</div>' +
-        '<div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;">' +
-          '<button class="admin-btn admin-btn-approve" style="padding:9px 24px;font-size:12px;" onclick="Admin.createUser()">+ Criar Utilizador</button>' +
-          '<div class="admin-separator">|</div>' +
-          '<button class="admin-btn admin-btn-reset" style="padding:9px 16px;font-size:11px;" onclick="Admin.exportUsers()">Exportar Utilizadores</button>' +
-          '<label class="admin-btn admin-btn-reset" style="padding:9px 16px;font-size:11px;cursor:pointer;">' +
-            'Importar Utilizadores' +
-            '<input type="file" accept=".json" style="display:none;" onchange="Admin.importUsers(this)">' +
-          '</label>' +
+        '<div style="display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap;">' +
+          '<button class="admin-btn admin-btn-approve" style="padding:9px 20px;font-size:12px;" onclick="Admin.createUser()">+ Criar Utilizador</button>' +
+          '<button class="admin-btn admin-btn-reset" style="padding:9px 16px;font-size:11px;" onclick="Admin.exportUsers()">Exportar</button>' +
+          '<label class="admin-btn admin-btn-reset" style="padding:9px 16px;font-size:11px;cursor:pointer;">Importar<input type="file" accept=".json" style="display:none;" onchange="Admin.importUsers(this)"></label>' +
         '</div>' +
         '<div class="err-box" id="create-err" style="margin-top:10px;"></div>' +
       '</div>' +
     '</div>';
 
     /* All users */
-    html += '<div class="admin-card">' +
-      '<div class="card-section-title">Todos os Utilizadores (' + allUsers.length + ')</div>';
+    html += '<div class="admin-card">';
+    html += '<div class="card-section-title">Todos os Utilizadores ('+allUsers.length+')</div>';
     if (!allUsers.length) {
       html += '<p class="no-spots-msg">Nenhum utilizador registado ainda.</p>';
     } else {
+      html += '<div class="admin-section">';
       allUsers.forEach(function(u){ html += Admin._userRow(u); });
+      html += '</div>';
     }
     html += '</div>';
 
     document.getElementById('admin-body').innerHTML = html;
 
-    // Clickable stat cells — filter user list
+    /* Clickable stats */
     document.querySelectorAll('.admin-stat-clickable').forEach(function(cell) {
       cell.addEventListener('click', function() {
         document.querySelectorAll('.admin-stat-clickable').forEach(function(c){ c.classList.remove('admin-stat-active'); });
@@ -165,264 +211,169 @@ var Admin = {
           listEl.innerHTML = '<div class="admin-card"><p class="no-spots-msg">Nenhum utilizador nesta categoria.</p></div>';
           return;
         }
-        var SL = { approved:'Aprovado', pending:'Pendente', inactive:'Inativo', rejected:'Recusado' };
-        var SC = { approved:'#1a6b3c', pending:'#92400e', inactive:'#6b7280', rejected:'#7a1524' };
-        var SB = { approved:'#e6f4ec', pending:'#fef3e2', inactive:'#f3f4f6', rejected:'#fde8eb' };
-        var h = '<div class="admin-card">';
-        h += '<div class="card-section-title">' + (filter === 'all' ? 'Todos' : cell.querySelector('.admin-stat-lbl').textContent) + ' (' + filtered.length + ')</div>';
+        var h = '<div class="admin-card"><div class="card-section-title">' +
+          cell.querySelector('.admin-stat-lbl').textContent + ' (' + filtered.length + ')</div>' +
+          '<div class="admin-section">';
         filtered.forEach(function(u){ h += Admin._userRow(u); });
-        h += '</div>';
+        h += '</div></div>';
         listEl.innerHTML = h;
         listEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       });
     });
   },
 
-  _userRow: function(u) {
-    var st  = u.status || 'pending';
-    var pts = u.points || 0;
-    var lv  = Gamification.getLevel(pts);
-    var cnt = App.locations.filter(function(l){ return l.ownerEmail === u.email; }).length;
-    var SL  = { approved:'Aprovado', pending:'Pendente', inactive:'Inativo', rejected:'Recusado' };
-    var SC  = { approved:'#1a6b3c', pending:'#92400e', inactive:'#6b7280', rejected:'#7a1524' };
-    var SB  = { approved:'#e6f4ec', pending:'#fef3e2', inactive:'#f3f4f6', rejected:'#fde8eb' };
-    var joined = '';
-    try { joined = new Date(u.joined).toLocaleDateString('pt-PT',{day:'numeric',month:'short',year:'numeric'}); } catch(e){}
-
-    return '<div class="admin-user-row">' +
-      '<div class="admin-user-av" style="background:var(--d-red);">' + (u.avatar||u.name[0]) + '</div>' +
-      '<div class="admin-user-info">' +
-        '<div class="admin-user-name">' + u.name + '</div>' +
-        '<div class="admin-user-email">' + u.email + '</div>' +
-        '<div class="admin-user-meta">' + joined + ' &middot; ' + pts + ' pts &middot; ' + cnt + ' locais &middot; <span style="color:' + lv.color + ';font-weight:600;">' + lv.name + '</span></div>' +
-      '</div>' +
-      '<div class="admin-user-right">' +
-        '<span class="admin-status-badge" style="background:' + (SB[st]||'#f3f4f6') + ';color:' + (SC[st]||'#666') + ';">' + (SL[st]||st) + '</span>' +
-        '<div class="admin-actions">' +
-          (st==='pending'  ? '<button class="admin-btn admin-btn-approve" data-act="approve" data-em="' + u.email + '">Aprovar</button>' : '') +
-          (st==='pending'  ? '<button class="admin-btn admin-btn-reject"  data-act="reject"  data-em="' + u.email + '">Recusar</button>'  : '') +
-          (st==='approved' ? '<button class="admin-btn admin-btn-inactive" data-act="inactive" data-em="' + u.email + '">Desativar</button>' : '') +
-          (st==='inactive'||st==='rejected' ? '<button class="admin-btn admin-btn-approve" data-act="approve" data-em="' + u.email + '">Reativar</button>' : '') +
-          '<button class="admin-btn admin-btn-reset" data-act="reset" data-em="' + u.email + '">Reset Pass</button>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
-  },
-
+  /* ── CREATE / EXPORT / IMPORT ── */
   createUser: async function() {
-    var errEl = document.getElementById('create-err');
-    errEl.classList.remove('show');
-    var name   = (document.getElementById('new-u-name')  ||{value:''}).value.trim();
-    var email  = (document.getElementById('new-u-email') ||{value:''}).value.trim().toLowerCase();
-    var pass   = (document.getElementById('new-u-pass')  ||{value:''}).value.trim();
+    var name   = (document.getElementById('new-u-name')||{value:''}).value.trim();
+    var email  = (document.getElementById('new-u-email')||{value:''}).value.trim().toLowerCase();
+    var pass   = (document.getElementById('new-u-pass')||{value:''}).value.trim();
     var status = (document.getElementById('new-u-status')||{value:'approved'}).value;
-    if (!name)        { errEl.textContent='O nome é obrigatório.';        errEl.classList.add('show'); return; }
-    if (!email)       { errEl.textContent='O email é obrigatório.';       errEl.classList.add('show'); return; }
-    if (!pass)        { errEl.textContent='A password é obrigatória.';    errEl.classList.add('show'); return; }
-    if (pass.length<6){ errEl.textContent='Password precisa de 6+ chars.';errEl.classList.add('show'); return; }
-    var users = Store.getUsers();
-    if (users[email]) { errEl.textContent='Email já registado.';          errEl.classList.add('show'); return; }
+    var errEl  = document.getElementById('create-err');
+    var showErr = function(m){ if(errEl){errEl.textContent=m;errEl.classList.add('show');} };
+    if(errEl) errEl.classList.remove('show');
+    if (!name)          { showErr('Nome obrigatório.');         return; }
+    if (!email)         { showErr('Email obrigatório.');        return; }
+    if (pass.length<6)  { showErr('Password mínimo 6 chars.'); return; }
     try {
-      await DB.createUser({ email:email, name:name, avatar:name[0].toUpperCase(), password:pass, role:'user', status:status, joined:new Date().toISOString(), contributions:0, points:0 });
-      UI.toast('Utilizador ' + name + ' criado!', 'success');
+      const existing = await DB.getUser(email);
+      if (existing) { showErr('Este email já existe.'); return; }
+      await DB.createUser({ email, name, avatar:name[0].toUpperCase(), password:pass, role:'user', status, joined:new Date().toISOString(), contributions:0, points:0 });
+      UI.toast('Utilizador criado com sucesso!', 'success');
       await Admin._loadAndRender();
-    } catch(e) {
-      errEl.textContent = 'Erro ao criar utilizador: ' + (e.message || 'tenta novamente.');
-      errEl.classList.add('show');
-    }
+    } catch(e) { showErr('Erro ao criar utilizador.'); }
   },
 
   exportUsers: function() {
-    var users = {};
-    Admin._sbUsers.forEach(function(u){ users[u.email] = u; });
-    var data  = JSON.stringify(users, null, 2);
-    var blob  = new Blob([data], {type:'application/json'});
-    var url   = URL.createObjectURL(blob);
-    var a     = document.createElement('a');
-    a.href    = url;
-    a.download= 'delta-users-' + new Date().toISOString().slice(0,10) + '.json';
-    a.click();
+    var data = JSON.stringify(Admin._sbUsers, null, 2);
+    var blob = new Blob([data], {type:'application/json'});
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href = url; a.download = 'utilizadores-delta.json'; a.click();
     URL.revokeObjectURL(url);
-    UI.toast('Utilizadores exportados.');
   },
 
   importUsers: function(input) {
-    var file = input.files[0];
-    if (!file) return;
+    var file = input.files[0]; if (!file) return;
     var reader = new FileReader();
     reader.onload = function(e) {
       try {
-        var imported = JSON.parse(e.target.result);
+        var data = JSON.parse(e.target.result);
+        if (!Array.isArray(data)) { UI.toast('Formato inválido.', 'error'); return; }
         var existing = Store.getUsers();
-        // Merge — imported wins for new users, existing wins for admin
-        Object.keys(imported).forEach(function(email) {
-          if (email !== 'admin@delta.pt' && email !== 'admin') {
-            existing[email] = imported[email];
-          }
-        });
+        data.forEach(function(u){ if(u.email&&u.name&&u.password) existing[u.email]=u; });
         Store.saveUsers(existing);
         UI.toast('Utilizadores importados com sucesso!', 'success');
         Admin.render();
-      } catch(err) {
-        UI.toast('Erro ao importar ficheiro.', 'error');
-      }
+      } catch(err) { UI.toast('Erro ao importar ficheiro.', 'error'); }
     };
     reader.readAsText(file);
   },
 
-  /* ── LOCATIONS TAB ───────────────────────────────────────── */
-  _renderLocations: function() {
-    var pendingLocs = App.locations.filter(function(l){
-      return l.ownerEmail && !l.verified && (l.status === 'pending' || !l.status);
-    });
-    var approvedLocs = App.locations.filter(function(l){
-      return l.ownerEmail && (l.verified || l.status === 'approved');
-    });
-
-    var html = Admin._tabHeader();
-
-    /* Pending locations */
-    if (pendingLocs.length) {
-      html += '<div class="admin-card admin-card-pending">';
-      html += '<div class="card-section-title admin-pending-title">' +
-        '<span class="admin-badge-num">' + pendingLocs.length + '</span> Aguardam Aprovação</div>';
-      pendingLocs.forEach(function(loc){ html += Admin._locRow(loc, true); });
-      html += '</div>';
-    } else {
-      html += '<div class="admin-card">' +
-        '<div class="card-section-title">Locais Pendentes</div>' +
-        '<p class="no-spots-msg" style="padding:12px 0;">Nenhum local aguarda aprovação.</p>' +
-      '</div>';
-    }
-
-    /* Approved user locations */
-    if (approvedLocs.length) {
-      html += '<div class="admin-card">';
-      html += '<div class="card-section-title">Locais Aprovados por Utilizadores (' + approvedLocs.length + ')</div>';
-      approvedLocs.forEach(function(loc){ html += Admin._locRow(loc, false); });
-      html += '</div>';
-    }
-
-    document.getElementById('admin-body').innerHTML = html;
-
-    // Clickable stat cells — filter user list
-    document.querySelectorAll('.admin-stat-clickable').forEach(function(cell) {
-      cell.addEventListener('click', function() {
-        document.querySelectorAll('.admin-stat-clickable').forEach(function(c){ c.classList.remove('admin-stat-active'); });
-        cell.classList.add('admin-stat-active');
-        var filter = cell.dataset.filter;
-        var listEl = document.getElementById('admin-user-filter-list');
-        if (!listEl) return;
-        var filtered = filter === 'all' ? allUsers : allUsers.filter(function(u){
-          if (filter === 'inactive') return u.status === 'inactive' || u.status === 'rejected';
-          return u.status === filter;
-        });
-        if (!filtered.length) {
-          listEl.innerHTML = '<div class="admin-card"><p class="no-spots-msg">Nenhum utilizador nesta categoria.</p></div>';
-          return;
-        }
-        var SL = { approved:'Aprovado', pending:'Pendente', inactive:'Inativo', rejected:'Recusado' };
-        var SC = { approved:'#1a6b3c', pending:'#92400e', inactive:'#6b7280', rejected:'#7a1524' };
-        var SB = { approved:'#e6f4ec', pending:'#fef3e2', inactive:'#f3f4f6', rejected:'#fde8eb' };
-        var h = '<div class="admin-card">';
-        h += '<div class="card-section-title">' + (filter === 'all' ? 'Todos' : cell.querySelector('.admin-stat-lbl').textContent) + ' (' + filtered.length + ')</div>';
-        filtered.forEach(function(u){ h += Admin._userRow(u); });
-        h += '</div>';
-        listEl.innerHTML = h;
-        listEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      });
-    });
-  },
-
+  /* ── LOCATION ROW ── */
   _locRow: function(loc, isPending) {
-    var cfg = TYPE_CONFIG[loc.type] || { label: loc.type, color: '#888' };
+    var cfg  = TYPE_CONFIG[loc.type] || { label: loc.type, color: '#888' };
     var date = '';
     try { date = new Date(loc.createdAt||Date.now()).toLocaleDateString('pt-PT',{day:'numeric',month:'short',year:'numeric'}); } catch(e){}
 
-    return '<div class="admin-user-row" style="border-left:4px solid ' + cfg.color + ';">' +
-      '<div class="admin-user-av" style="background:' + cfg.color + ';font-size:18px;">📍</div>' +
-      '<div class="admin-user-info">' +
-        '<div class="admin-user-name">' + loc.name + '</div>' +
-        '<div class="admin-user-email">' +
-          (loc.address ? loc.address : '') +
-          (loc.city    ? (loc.address ? ' · ' : '') + loc.city : '') +
-          (loc.country ? ', ' + loc.country : '') +
+    return '<div class="admin-loc-card' + (isPending ? ' admin-card-pending' : '') + '">' +
+      '<div class="admin-loc-header">' +
+        '<div class="admin-loc-dot-lg" style="background:' + cfg.color + ';"></div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="admin-loc-name">' + loc.name + '</div>' +
+          '<div class="admin-loc-meta">' +
+            cfg.label +
+            (loc.city    ? ' &middot; ' + loc.city    : '') +
+            (loc.country ? ', ' + loc.country          : '') +
+            (loc.address ? '<br><span style="font-size:10px;color:var(--mut-lt);">📍 ' + loc.address + '</span>' : '') +
+          '</div>' +
+          (loc.note ? '<div class="admin-loc-note">"' + loc.note + '"</div>' : '') +
         '</div>' +
-        '<div class="admin-user-meta">' +
-          cfg.label + ' &middot; submetido por <strong>' + loc.addedBy + '</strong>' +
-          (date ? ' &middot; ' + date : '') +
-        '</div>' +
-      '</div>' +
-      '<div class="admin-user-right">' +
-        '<span class="admin-status-badge" style="' + (isPending ? 'background:#fef3e2;color:#92400e;' : 'background:#e6f4ec;color:#1a6b3c;') + '">' +
+        '<span class="admin-status-badge" style="' + (isPending ? 'background:rgba(241,193,102,.2);color:#7a4e10;' : 'background:rgba(136,184,206,.18);color:#1a5068;') + '">' +
           (isPending ? 'Pendente' : 'Aprovado') +
         '</span>' +
+      '</div>' +
+      '<div class="admin-loc-footer">' +
+        '<span class="admin-loc-submitter">Submetido por <strong>' + loc.addedBy + '</strong>' + (date ? ' &middot; ' + date : '') + '</span>' +
         '<div class="admin-actions">' +
-          (isPending ? '<button class="admin-btn admin-btn-approve" data-act="approve-loc" data-em="' + loc.id + '">Aprovar</button>' : '') +
-          (isPending ? '<button class="admin-btn admin-btn-reject"  data-act="reject-loc"  data-em="' + loc.id + '">Recusar</button>'  : '') +
-          (!isPending ? '<button class="admin-btn admin-btn-inactive" data-act="remove-loc" data-em="' + loc.id + '">Remover</button>' : '') +
+          (isPending  ? '<button class="admin-btn admin-btn-approve" data-act="approve-loc" data-em="'+loc.id+'">✓ Aprovar</button>' : '') +
+          (isPending  ? '<button class="admin-btn admin-btn-reject"  data-act="reject-loc"  data-em="'+loc.id+'">✕ Recusar</button>' : '') +
+          (!isPending ? '<button class="admin-btn admin-btn-inactive" data-act="remove-loc" data-em="'+loc.id+'">Remover</button>'   : '') +
         '</div>' +
       '</div>' +
     '</div>';
   },
 
-  /* ── ACTIONS ─────────────────────────────────────────────── */
+  /* ── LOCATIONS TAB ── */
+  _renderLocations: function() {
+    var pendingLocs  = App.locations.filter(function(l){ return l.ownerEmail&&!l.verified&&(l.status==='pending'||!l.status); });
+    var approvedLocs = App.locations.filter(function(l){ return l.ownerEmail&&(l.verified||l.status==='approved'); });
+
+    var html = Admin._tabHeader();
+
+    if (pendingLocs.length) {
+      html += '<div class="admin-card admin-card-pending">';
+      html += '<div class="card-section-title admin-pending-title"><span class="admin-badge-num">'+pendingLocs.length+'</span> Aguardam Aprovação</div>';
+      html += '<div style="display:flex;flex-direction:column;gap:10px;">';
+      pendingLocs.forEach(function(loc){ html += Admin._locRow(loc, true); });
+      html += '</div></div>';
+    } else {
+      html += '<div class="admin-card"><div class="card-section-title">Locais Pendentes</div><p class="no-spots-msg" style="padding:12px 0;">Nenhum local aguarda aprovação. ✓</p></div>';
+    }
+
+    if (approvedLocs.length) {
+      html += '<div class="admin-card"><div class="card-section-title">Aprovados por Utilizadores ('+approvedLocs.length+')</div>';
+      html += '<div style="display:flex;flex-direction:column;gap:10px;">';
+      approvedLocs.forEach(function(loc){ html += Admin._locRow(loc, false); });
+      html += '</div></div>';
+    }
+
+    document.getElementById('admin-body').innerHTML = html;
+  },
+
+  /* ── ACTIONS ── */
   handleAction: async function(act, id) {
-    /* Location actions */
     if (act === 'approve-loc') {
-      var loc = App.locations.find(function(l){ return l.id === id; });
+      var loc = App.locations.find(function(l){ return l.id===id; });
       if (loc) {
-        loc.verified = true; loc.status = 'approved';
-        await App.updateLocation(id, { verified: true, status: 'approved' });
+        loc.verified=true; loc.status='approved';
+        await App.updateLocation(id,{verified:true,status:'approved'});
         Map.renderMarkers();
-        UI.toast('Local aprovado e publicado!', 'success');
+        UI.toast('Local aprovado e publicado!','success');
         await Admin._loadAndRender();
       }
       return;
     }
-    if (act === 'reject-loc' || act === 'remove-loc') {
-      var idx = App.locations.findIndex(function(l){ return l.id === id; });
-      if (idx > -1) {
-        App.locations.splice(idx, 1);
+    if (act==='reject-loc'||act==='remove-loc') {
+      var idx = App.locations.findIndex(function(l){ return l.id===id; });
+      if (idx>-1) {
+        App.locations.splice(idx,1);
         await App.removeLocation(id);
         Map.renderMarkers();
-        UI.toast(act === 'reject-loc' ? 'Local recusado.' : 'Local removido.');
+        UI.toast(act==='reject-loc'?'Local recusado.':'Local removido.');
         await Admin._loadAndRender();
       }
       return;
     }
-    /* User actions — via Supabase */
-    var updateData = {};
-    var toastMsg = '';
-    if (act === 'approve') {
-      updateData = { status: 'approved' };
-      toastMsg = 'Utilizador aprovado.';
-    } else if (act === 'reject') {
-      updateData = { status: 'rejected' };
-      toastMsg = 'Registo recusado.';
-    } else if (act === 'inactive') {
-      updateData = { status: 'inactive' };
-      toastMsg = 'Conta desativada.';
-    } else if (act === 'reset') {
-      var np = 'Delta' + Math.floor(1000 + Math.random()*9000);
-      updateData = { password: np };
-      toastMsg = 'Nova password: ' + np;
+    var updateData={}, toastMsg='';
+    if      (act==='approve')  { updateData={status:'approved'};  toastMsg='Utilizador aprovado.'; }
+    else if (act==='reject')   { updateData={status:'rejected'};  toastMsg='Registo recusado.'; }
+    else if (act==='inactive') { updateData={status:'inactive'};  toastMsg='Conta desativada.'; }
+    else if (act==='reset') {
+      var np='Delta'+Math.floor(1000+Math.random()*9000);
+      updateData={password:np}; toastMsg='Nova password: '+np;
     }
     try {
-      await DB.updateUser(id, updateData);
-      UI.toast(toastMsg, act === 'approve' || act === 'reset' ? 'success' : 'info');
+      await DB.updateUser(id,updateData);
+      UI.toast(toastMsg,act==='approve'||act==='reset'?'success':'info');
       await Admin._loadAndRender();
-    } catch(e) {
-      UI.toast('Erro ao atualizar. Tenta novamente.', 'error');
-    }
+    } catch(e) { UI.toast('Erro ao atualizar. Tenta novamente.','error'); }
   }
 };
 
 /* Event delegation */
 document.addEventListener('click', function(e) {
-  var btn = e.target.closest('[data-act]');
+  var btn=e.target.closest('[data-act]');
   if (!btn) return;
-  var act = btn.getAttribute('data-act');
-  var em  = btn.getAttribute('data-em');
-  if (act && em) Admin.handleAction(act, em);
+  var act=btn.getAttribute('data-act'), em=btn.getAttribute('data-em');
+  if (act&&em) Admin.handleAction(act,em);
 });
