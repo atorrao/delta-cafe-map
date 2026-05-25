@@ -1052,3 +1052,29 @@ a, button { -webkit-tap-highlight-color:transparent; }
   flex-shrink: 0; overflow: hidden;
 }
 .rank-av svg { width: 36px; height: 36px; }
+
+/* ── Nota reduzida no modal adicionar ── */
+#add-note { min-height: 52px !important; height: 52px; resize: none; }
+
+/* ── Session card no fim do perfil ── */
+.profile-session-card {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-top: 8px !important;
+}
+.btn-full-w { width: 100%; text-align: center; }
+.btn-logout-sm.btn-full-w {
+  padding: 12px; font-size: 13px;
+}
+.btn-delete-sm.btn-full-w {
+  padding: 10px; font-size: 12px;
+}
+
+/* Avatar picker em modo leitura — sem hover */
+#account-view .avatar-picker-grid { pointer-events: none; }
+#account-view .avatar-pick-option:not(.locked) {
+  opacity: 1; cursor: default;
+}
+#account-view .avatar-pick-option.selected {
+  border-color: var(--miel);
+  box-shadow: 0 0 0 2px var(--miel)40;
+}
