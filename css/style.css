@@ -1261,3 +1261,46 @@ a, button { -webkit-tap-highlight-color:transparent; }
     width: min(380px, calc(100vw - var(--sidebar-w) - 48px)) !important;
   }
 }
+
+/* ── Map controls — lado esquerdo (oposto ao FAB) ── */
+.map-controls {
+  position: absolute;
+  bottom: 24px;
+  left: 12px;
+  right: auto;
+}
+@media (max-width: 768px) {
+  .map-controls {
+    position: fixed !important;
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 20px !important;
+    right: auto !important;
+  }
+}
+
+/* ── Sidebar search bar ── */
+.sidebar-search-wrap {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--nuage-dk);
+  border: 1.5px solid var(--brd);
+  border-radius: 30px; padding: 9px 14px;
+  transition: border-color .2s;
+}
+.sidebar-search-wrap:focus-within {
+  border-color: var(--eau-trouble);
+  background: var(--surface);
+}
+.sidebar-search-icon { font-size: 15px; color: var(--mut); flex-shrink: 0; }
+.sidebar-search-input {
+  flex: 1; border: none; background: transparent;
+  font-family: var(--font-body); font-size: 13px !important;
+  color: var(--text); outline: none;
+}
+.sidebar-search-input::placeholder { color: var(--mut-lt); font-style: italic; }
+.sidebar-search-clear {
+  background: rgba(0,0,0,.08); border: none; color: var(--mut);
+  width: 18px; height: 18px; border-radius: 50%; font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0; transition: background .15s;
+}
+.sidebar-search-clear:hover { background: rgba(0,0,0,.15); }
