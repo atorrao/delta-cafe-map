@@ -9,231 +9,156 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Where's my Delta?">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Where's my Delta? ☕</title>
+<title>Where's my Delta?</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="css/style.css"/>
 <style>
-/* ── Sidebar mobile toggle ── */
-#sidebar-toggle-btn {
-  display: none;
-  position: fixed;
-  bottom: calc(var(--bnav-h) + env(safe-area-inset-bottom,0px) + 80px);
-  left: 16px;
-  z-index: 900;
-  width: 48px; height: 48px;
-  background: var(--espresso);
-  color: var(--nuage);
-  border: none; border-radius: 50%;
-  font-size: 20px;
-  box-shadow: var(--sh-md);
-  align-items: center; justify-content: center;
-  cursor: pointer;
+/* ══════════════════════════════════════
+   MOBILE-FIRST OVERRIDES
+══════════════════════════════════════ */
+
+/* Topbar layout */
+#topbar { display:flex; align-items:center; justify-content:space-between; padding:0 14px; gap:10px; }
+.topbar-left  { display:flex; align-items:center; gap:10px; flex:1; min-width:0; }
+.topbar-right { display:flex; align-items:center; gap:8px; flex-shrink:0; margin-left:0; }
+
+/* Hamburger in topbar */
+#hamburger-btn {
+  width:38px; height:38px; border-radius:var(--r-sm);
+  background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2);
+  color:var(--nuage); font-size:18px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex-shrink:0; transition:background .15s;
 }
-@media (max-width: 768px) {
-  #sidebar-toggle-btn { display: flex; }
+#hamburger-btn:hover { background:rgba(255,255,255,.18); }
+
+/* Desktop sidebar */
+#sidebar {
+  width:var(--sidebar-w); background:var(--surface); background-image:var(--grain);
+  border-right:1px solid var(--brd); overflow-y:auto; flex-shrink:0; display:flex; flex-direction:column;
+}
+
+@media (max-width:768px) {
+  .topbar-center { display:none; }
+  #bottom-nav    { display:none !important; }
+
+  /* Sidebar drawer */
   #sidebar {
-    position: fixed;
-    top: calc(var(--topbar-h) + env(safe-area-inset-top,0px));
-    bottom: calc(var(--bnav-h) + env(safe-area-inset-bottom,0px));
-    left: 0; width: 280px;
-    transform: translateX(-100%);
-    transition: transform .3s cubic-bezier(.4,0,.2,1);
-    z-index: 850;
-    box-shadow: var(--sh-lg);
+    position:fixed;
+    top:calc(var(--topbar-h) + env(safe-area-inset-top,0px));
+    bottom:0; left:0;
+    width:min(300px,82vw);
+    transform:translateX(-100%);
+    transition:transform .3s cubic-bezier(.4,0,.2,1);
+    z-index:1100; box-shadow:var(--sh-lg);
   }
-  #sidebar.sidebar-open { transform: translateX(0); }
+  #sidebar.sidebar-open { transform:translateX(0); }
   #sidebar-backdrop {
-    display: none; position: fixed; inset: 0; z-index: 840;
-    background: rgba(84,41,22,.4); backdrop-filter: blur(2px);
+    display:none; position:fixed; inset:0; z-index:1090;
+    background:rgba(84,41,22,.45); backdrop-filter:blur(2px);
   }
-  #sidebar-backdrop.open { display: block; }
+  #sidebar-backdrop.open { display:block; }
+
+  /* Overlays full screen */
+  .overlay { position:fixed; inset:0 !important; z-index:2000; overflow-y:auto; }
+
+  /* Map controls bottom-right near FAB */
+  .map-controls {
+    position:fixed;
+    bottom:calc(env(safe-area-inset-bottom,0px) + 96px);
+    right:20px; left:auto;
+    flex-direction:column; gap:8px;
+  }
+  .map-ctrl-btn { width:48px; height:48px; border-radius:50%; padding:0; flex-direction:column; min-width:unset; }
+  .map-ctrl-label { display:none; }
+
+  /* FAB */
+  .fab-add { position:fixed; bottom:calc(env(safe-area-inset-bottom,0px)+24px); right:20px; }
+  .layer-switcher { top:10px; right:10px; }
+  .layer-btn { font-size:11px; padding:6px 10px; }
 }
 
-/* ── Spot panel redesign ── */
+/* Spot panel */
 #spot-panel {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  background: var(--nuage);
-  background-image: var(--grain);
-  border-radius: var(--r-xl) var(--r-xl) 0 0;
-  padding: 0 0 env(safe-area-inset-bottom,0px);
-  box-shadow: 0 -4px 32px rgba(84,41,22,.18);
-  z-index: 850;
-  transition: transform .3s cubic-bezier(.4,0,.2,1), opacity .2s;
-  max-height: 65vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  position:absolute; bottom:0; left:0; right:0;
+  background:var(--nuage); background-image:var(--grain);
+  border-radius:var(--r-xl) var(--r-xl) 0 0;
+  padding:0 0 env(safe-area-inset-bottom,0px);
+  box-shadow:0 -4px 32px rgba(84,41,22,.18);
+  z-index:850; transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .2s;
+  max-height:60vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
 }
-#spot-panel.hidden {
-  transform: translateY(100%);
-  opacity: 0;
-  pointer-events: none;
+#spot-panel.hidden { transform:translateY(100%); opacity:0; pointer-events:none; }
+@media (min-width:769px) {
+  #spot-panel { position:absolute; bottom:24px; left:50%; transform:translateX(-50%); width:min(440px,calc(100vw - var(--sidebar-w) - 48px)); border-radius:var(--r-xl); max-height:none; }
+  #spot-panel.hidden { transform:translateX(-50%) translateY(16px); opacity:0; pointer-events:none; }
 }
-.sp-drag-handle {
-  width: 40px; height: 4px;
-  background: rgba(84,41,22,.18);
-  border-radius: 2px;
-  margin: 12px auto 0;
-}
-.sp-header {
-  display: flex; align-items: flex-start; gap: 14px;
-  padding: 16px 18px 12px;
-}
-.sp-icon-wrap {
-  width: 52px; height: 52px;
-  border-radius: 14px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: var(--sh-sm);
-}
-.sp-header-info { flex: 1; min-width: 0; }
-.sp-badge-historia {
-  display: inline-block;
-  background: rgba(241,193,102,.2);
-  color: var(--espresso);
-  font-size: 10px; font-weight: 700;
-  padding: 3px 9px; border-radius: 20px;
-  margin-bottom: 5px;
-  border: 1px solid rgba(241,193,102,.4);
-  letter-spacing: .04em;
-  text-transform: uppercase;
-}
-.sp-name {
-  font-family: var(--font-display);
-  font-size: 17px; font-weight: 700;
-  color: var(--text); line-height: 1.2;
-  margin-bottom: 3px;
-}
-.sp-sub { font-size: 12px; color: var(--mut); margin-bottom: 2px; }
-.sp-addr { font-size: 11px; color: var(--mut-lt); margin-top: 2px; }
-.sp-close-btn {
-  background: rgba(84,41,22,.08); border: none;
-  width: 32px; height: 32px; border-radius: 50%;
-  font-size: 18px; color: var(--mut);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; flex-shrink: 0; line-height: 1;
-  transition: background .15s;
-}
-.sp-close-btn:hover { background: rgba(84,41,22,.15); }
-.sp-tags {
-  display: flex; gap: 6px; flex-wrap: wrap;
-  padding: 0 18px 12px;
-}
-.sp-note {
-  margin: 0 18px 12px;
-  font-family: var(--font-serif); font-style: italic;
-  font-size: 12px; color: var(--mut);
-  line-height: 1.6;
-  padding: 10px 14px;
-  background: rgba(183,152,88,.08);
-  border-left: 3px solid var(--eau-trouble);
-  border-radius: 0 var(--r-sm) var(--r-sm) 0;
-}
-.sp-added {
-  padding: 8px 18px 14px;
-  font-size: 11px; color: var(--mut-lt);
-}
-.spot-saberMais {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: var(--espresso); color: var(--nuage);
-  border: none; border-radius: var(--r-sm);
-  font-size: 12px; font-weight: 600; padding: 9px 16px;
-  cursor: pointer; text-decoration: none;
-  margin: 0 18px 14px; font-family: var(--font-body);
-  transition: background .15s;
-}
-.spot-saberMais:hover { background: var(--terre-cuite); color: #fff; }
-.spot-saberMais svg { width: 13px; height: 13px; }
+.sp-drag-handle{width:40px;height:4px;background:rgba(84,41,22,.18);border-radius:2px;margin:12px auto 0;}
+.sp-header{display:flex;align-items:flex-start;gap:14px;padding:16px 18px 12px;}
+.sp-icon-wrap{width:52px;height:52px;border-radius:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh-sm);}
+.sp-header-info{flex:1;min-width:0;}
+.sp-badge-historia{display:inline-block;background:rgba(241,193,102,.2);color:var(--espresso);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;margin-bottom:5px;border:1px solid rgba(241,193,102,.4);letter-spacing:.04em;text-transform:uppercase;}
+.sp-name{font-family:var(--font-display);font-size:17px;font-weight:700;color:var(--text);line-height:1.2;margin-bottom:3px;}
+.sp-sub{font-size:12px;color:var(--mut);margin-bottom:2px;}
+.sp-addr{font-size:11px;color:var(--mut-lt);margin-top:2px;}
+.sp-close-btn{background:rgba(84,41,22,.08);border:none;width:36px;height:36px;border-radius:50%;font-size:20px;color:var(--mut);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;line-height:1;transition:background .15s;}
+.sp-close-btn:hover{background:rgba(84,41,22,.15);}
+.sp-tags{display:flex;gap:6px;flex-wrap:wrap;padding:0 18px 12px;}
+.sp-note{margin:0 18px 12px;font-family:var(--font-serif);font-style:italic;font-size:12px;color:var(--mut);line-height:1.6;padding:10px 14px;background:rgba(183,152,88,.08);border-left:3px solid var(--eau-trouble);border-radius:0 var(--r-sm) var(--r-sm) 0;}
+.sp-added{padding:8px 18px 14px;font-size:11px;color:var(--mut-lt);}
+.spot-saberMais{display:inline-flex;align-items:center;gap:6px;background:var(--espresso);color:var(--nuage);border:none;border-radius:var(--r-sm);font-size:12px;font-weight:600;padding:9px 16px;cursor:pointer;text-decoration:none;margin:0 18px 14px;font-family:var(--font-body);transition:background .15s;}
+.spot-saberMais:hover{background:var(--terre-cuite);color:#fff;}
+.spot-saberMais svg{width:13px;height:13px;}
 
-@media (min-width: 769px) {
-  #spot-panel {
-    position: absolute;
-    bottom: 24px; left: 50%;
-    transform: translateX(-50%);
-    width: min(440px, calc(100vw - 280px - 48px));
-    border-radius: var(--r-xl);
-    max-height: none;
-  }
-  #spot-panel.hidden {
-    transform: translateX(-50%) translateY(16px);
-  }
+/* Admin */
+.admin-profile-row{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface);border:1px solid var(--brd);border-radius:var(--r-md);transition:box-shadow .15s;}
+.admin-profile-row:hover{box-shadow:var(--sh-sm);}
+.admin-avatar-circle{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,.2);overflow:hidden;}
+.admin-avatar-circle svg{width:42px;height:42px;}
+.admin-user-details{flex:1;min-width:0;}
+.admin-user-name-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px;}
+.admin-user-fullname{font-size:14px;font-weight:700;color:var(--text);}
+.admin-user-email-sm{font-size:11px;color:var(--mut);}
+.admin-user-stats-sm{font-size:10px;color:var(--mut-lt);margin-top:3px;}
+.admin-row-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;}
+.admin-loc-card{background:var(--surface);border:1px solid var(--brd);border-radius:var(--r-md);padding:14px 16px;transition:box-shadow .15s;}
+.admin-loc-card:hover{box-shadow:var(--sh-sm);}
+.admin-loc-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;}
+.admin-loc-dot-lg{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.admin-loc-name{font-size:14px;font-weight:700;color:var(--text);}
+.admin-loc-meta{font-size:11px;color:var(--mut);margin-top:2px;}
+.admin-loc-note{font-size:11px;color:var(--mut-lt);font-style:italic;margin-top:4px;}
+.admin-loc-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-top:10px;border-top:1px solid var(--brd);}
+.admin-loc-submitter{font-size:11px;color:var(--mut);}
+.sidebar-pill-header{display:none;align-items:center;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid var(--brd);background:var(--espresso);color:var(--nuage);}
+@media (max-width:768px){.sidebar-pill-header{display:flex;}}
+.sidebar-pill-title{font-size:14px;font-weight:700;letter-spacing:.02em;}
+.sidebar-close-btn{background:rgba(255,255,255,.12);border:none;color:var(--nuage);font-size:18px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+
+/* Profile overlay — title font */
+#profile-overlay .overlay-header h2 {
+  font-family: var(--font-display); font-weight:700; font-size:1.1rem; font-style:normal; color:var(--espresso);
 }
 
-/* ── Admin redesign ── */
-.admin-profile-row {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 16px;
-  background: var(--surface);
-  border: 1px solid var(--brd);
-  border-radius: var(--r-md);
-  transition: box-shadow .15s;
+/* Profile tabs — segmented control pill */
+.profile-tabs {
+  display:flex; background:var(--nuage-dk);
+  border-bottom:1px solid var(--brd);
+  padding:8px 12px; gap:6px;
+  position:sticky; top:0; z-index:5;
 }
-.admin-profile-row:hover { box-shadow: var(--sh-sm); }
-.admin-avatar-circle {
-  width: 46px; height: 46px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; font-weight: 700; color: #fff;
-  flex-shrink: 0; border: 2px solid rgba(255,255,255,.2);
-  overflow: hidden;
+.profile-tab {
+  flex:1; padding:9px 4px;
+  border:1.5px solid var(--brd); border-radius:var(--r-sm);
+  background:var(--surface); font-family:var(--font-body);
+  font-size:12px; font-weight:600; color:var(--mut);
+  cursor:pointer; transition:all .18s; text-align:center;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
-.admin-avatar-circle svg { width: 42px; height: 42px; }
-.admin-user-details { flex: 1; min-width: 0; }
-.admin-user-name-row {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  margin-bottom: 2px;
-}
-.admin-user-fullname { font-size: 14px; font-weight: 700; color: var(--text); }
-.admin-user-email-sm { font-size: 11px; color: var(--mut); }
-.admin-user-stats-sm { font-size: 10px; color: var(--mut-lt); margin-top: 3px; }
-.admin-row-right {
-  display: flex; flex-direction: column;
-  align-items: flex-end; gap: 8px; flex-shrink: 0;
-}
-.admin-loc-card {
-  background: var(--surface);
-  border: 1px solid var(--brd);
-  border-radius: var(--r-md);
-  padding: 14px 16px;
-  transition: box-shadow .15s;
-}
-.admin-loc-card:hover { box-shadow: var(--sh-sm); }
-.admin-loc-header {
-  display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px;
-}
-.admin-loc-dot-lg {
-  width: 12px; height: 12px; border-radius: 50%;
-  flex-shrink: 0; margin-top: 3px;
-}
-.admin-loc-name { font-size: 14px; font-weight: 700; color: var(--text); }
-.admin-loc-meta { font-size: 11px; color: var(--mut); margin-top: 2px; }
-.admin-loc-note { font-size: 11px; color: var(--mut-lt); font-style: italic; margin-top: 4px; }
-.admin-loc-footer {
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 8px;
-  padding-top: 10px; border-top: 1px solid var(--brd);
-}
-.admin-loc-submitter { font-size: 11px; color: var(--mut); }
-
-/* ── Map sidebar pill button (mobile) ── */
-.sidebar-pill-header {
-  display: none;
-  align-items: center; justify-content: space-between;
-  padding: 14px 16px 10px;
-  border-bottom: 1px solid var(--brd);
-  background: var(--espresso);
-  color: var(--nuage);
-}
-@media (max-width: 768px) {
-  .sidebar-pill-header { display: flex; }
-}
-.sidebar-pill-title { font-size: 14px; font-weight: 700; letter-spacing: .02em; }
-.sidebar-close-btn {
-  background: rgba(255,255,255,.12); border: none;
-  color: var(--nuage); font-size: 18px;
-  width: 32px; height: 32px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-}
+.profile-tab.active { background:var(--espresso); border-color:var(--espresso); color:var(--nuage); }
+.profile-tab-panel { display:none; }
+.profile-tab-panel.active { display:block; }
 </style>
 </head>
 <body>
@@ -241,8 +166,13 @@
 
   <!-- TOPBAR -->
   <header id="topbar">
-    <div class="logo" onclick="App.closeAllOverlays()">
-      <div class="logo-text">
+    <div class="topbar-left">
+      <button id="hamburger-btn" onclick="toggleSidebar()" title="Explorar locais" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+        </svg>
+      </button>
+      <div class="logo" onclick="App.closeAllOverlays()">
         <span class="logo-app-name">Where's my Delta?</span>
       </div>
     </div>
@@ -264,19 +194,13 @@
 
   <!-- MAIN -->
   <main id="main">
-
-    <!-- Sidebar backdrop (mobile) -->
     <div id="sidebar-backdrop" onclick="closeSidebar()"></div>
 
-    <!-- Sidebar -->
     <aside id="sidebar">
-      <!-- Mobile header -->
       <div class="sidebar-pill-header">
         <span class="sidebar-pill-title">Explorar Locais</span>
         <button class="sidebar-close-btn" onclick="closeSidebar()">×</button>
       </div>
-
-      <!-- Nearby cafés -->
       <div class="sidebar-section" id="nearby-box">
         <div class="sidebar-label sidebar-label-destaque">
           <span class="sidebar-label-dot" style="background:#E8820C;"></span>
@@ -284,14 +208,10 @@
         </div>
         <div id="nearby-list"><p class="sidebar-empty">A detectar localização...</p></div>
       </div>
-
-      <!-- Official Delta points -->
       <div class="sidebar-section" id="official-box">
         <div class="sidebar-label">Pontos Oficiais Delta</div>
         <div id="official-list"></div>
       </div>
-
-      <!-- Cafés com História -->
       <div class="sidebar-section" id="historia-box">
         <div class="sidebar-accordion">
           <div class="sidebar-accordion-header" id="historia-acc-header">
@@ -306,83 +226,40 @@
           <div class="sidebar-accordion-body" id="historia-list" style="display:none;"></div>
         </div>
       </div>
-
-      <!-- Search results -->
       <div class="sidebar-section" id="search-results-box" style="display:none;">
         <div class="sidebar-label">Resultados</div>
         <div id="search-results-list"></div>
       </div>
     </aside>
 
-    <!-- Map -->
     <div id="map-container">
       <div id="map"></div>
-
-      <!-- Layer switcher -->
       <div class="layer-switcher">
         <button class="layer-btn" data-layer="streets"   onclick="Map.setLayer('streets')">Mapa</button>
         <button class="layer-btn active" data-layer="satellite" onclick="Map.setLayer('satellite')">Satélite</button>
         <button class="layer-btn" data-layer="terrain"   onclick="Map.setLayer('terrain')">Relevo</button>
       </div>
-
-      <!-- Spot panel (redesigned, injected by map.js) -->
       <div id="spot-panel" class="hidden"></div>
-
-      <!-- Map controls -->
       <div class="map-controls">
-        <button class="map-ctrl-btn" onclick="Map.locateMe()" title="Centrar na minha localização">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M2 12h2m16 0h2m-4.222-7.778-1.414 1.414M7.636 16.364l-1.414 1.414M16.364 16.364l1.414 1.414M7.636 7.636 6.222 6.222M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/>
-          </svg>
+        <button class="map-ctrl-btn" onclick="Map.locateMe()" title="A minha localização">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M2 12h2m16 0h2m-4.222-7.778-1.414 1.414M7.636 16.364l-1.414 1.414M16.364 16.364l1.414 1.414M7.636 7.636 6.222 6.222M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
           <span class="map-ctrl-label">Localização</span>
         </button>
-        <button class="map-ctrl-btn" onclick="Map.fitAll()" title="Ver todos os locais no mapa">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/>
-          </svg>
+        <button class="map-ctrl-btn" onclick="Map.fitAll()" title="Ver todos">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/></svg>
           <span class="map-ctrl-label">Ver todos</span>
         </button>
       </div>
     </div>
   </main>
 
-  <!-- Sidebar toggle (mobile) -->
-  <button id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Explorar locais">☰</button>
-
-  <!-- BOTTOM NAV (mobile) -->
-  <nav id="bottom-nav">
-    <button class="bnav-btn active" data-view="map" onclick="UI.showTab('map')">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z"/></svg>
-      <span>Mapa</span>
-    </button>
-    <button class="bnav-btn" data-view="search" onclick="UI.showMobileSearch()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
-      <span>Pesquisar</span>
-    </button>
-    <button class="bnav-btn" data-view="ranking" onclick="UI.showTab('ranking')">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.395 4.972m0 0a6.726 6.726 0 0 1-2.749 1.35m0 0a6.772 6.772 0 0 1-3.044 0"/></svg>
-      <span>Ranking</span>
-    </button>
-    <button class="bnav-btn" data-view="profile" onclick="UI.showTab('profile')">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
-      <span>Perfil</span>
-    </button>
-  </nav>
-
-  <!-- Mobile search overlay -->
-  <div id="mobile-search-overlay" class="overlay hidden">
-    <div class="mobile-search-header">
-      <div class="mobile-search-bar">
-        <span class="search-icon">⌕</span>
-        <input id="mobile-search-input" placeholder="Where's my Delta?" oninput="UI.mobileSearch(this.value)" autocomplete="off">
-        <button class="search-clear" onclick="UI.clearMobileSearch()">×</button>
-      </div>
-      <button class="mobile-search-cancel" onclick="UI.closeMobileSearch()">Cancelar</button>
-    </div>
-    <div class="overlay-body" id="mobile-search-results">
-      <p class="no-results" style="padding:20px 0;">Pesquisa por cidade, país ou nome do local.</p>
-    </div>
-  </div>
+  <!-- FAB -->
+  <button class="fab-add" onclick="Auth.requireLogin(function(){Map.startAdd();})" title="Adicionar local">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="12" y1="4" x2="12" y2="20" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="4"  y1="12" x2="20" y2="12" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+  </button>
 
   <!-- NEAREST DELTA ALERT -->
   <div id="nearest-alert" class="nearest-alert hidden">
@@ -398,15 +275,7 @@
     </div>
   </div>
 
-  <!-- FAB -->
-  <button class="fab-add" onclick="Auth.requireLogin(function(){Map.startAdd();})" title="Adicionar local">
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <line x1="12" y1="4" x2="12" y2="20" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-      <line x1="4"  y1="12" x2="20" y2="12" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-    </svg>
-  </button>
-
-  <!-- ADMIN OVERLAY -->
+  <!-- OVERLAYS -->
   <div id="admin-overlay" class="overlay hidden">
     <div class="overlay-header">
       <button class="back-btn" onclick="UI.closeOverlay('admin-overlay')">← Voltar</button>
@@ -416,15 +285,48 @@
     <div id="admin-body" class="overlay-body"></div>
   </div>
 
-</div><!-- /app -->
+  <div id="profile-overlay" class="overlay hidden">
+    <div class="overlay-header">
+      <button class="back-btn" onclick="UI.closeOverlay('profile-overlay')">← Voltar</button>
+      <h2>O Meu Perfil</h2>
+      <div></div>
+    </div>
+    <div id="profile-body" class="overlay-body" style="padding:0;"></div>
+  </div>
+
+  <div id="ranking-overlay" class="overlay hidden">
+    <div class="overlay-header">
+      <button class="back-btn" onclick="UI.closeOverlay('ranking-overlay')">← Voltar</button>
+      <h2>Ranking</h2>
+      <div></div>
+    </div>
+    <div id="ranking-body" class="overlay-body"></div>
+  </div>
+
+  <div id="mobile-search-overlay" class="overlay hidden">
+    <div class="mobile-search-header">
+      <div class="mobile-search-bar">
+        <span class="search-icon">⌕</span>
+        <input id="mobile-search-input" placeholder="Where's my Delta?" oninput="UI.mobileSearch(this.value)" autocomplete="off">
+        <button class="search-clear" onclick="UI.clearMobileSearch()">×</button>
+      </div>
+      <button class="mobile-search-cancel" onclick="UI.closeMobileSearch()">Cancelar</button>
+    </div>
+    <div class="overlay-body" id="mobile-search-results">
+      <p class="no-results" style="padding:20px 0;">Pesquisa por cidade, país ou nome do local.</p>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+  <!-- bottom-nav kept in DOM for JS compat but hidden -->
+  <nav id="bottom-nav" style="display:none!important;"></nav>
+</div>
 
 <!-- AUTH MODAL -->
 <div class="modal-bg" id="auth-modal">
   <div class="modal modal-auth modal-poppins">
     <button class="modal-close" onclick="UI.closeModal('auth-modal')">×</button>
-    <div class="modal-logo">
-      <img src="assets/delta-logo-white.png" alt="Delta Cafés" style="width:64px;height:64px;object-fit:contain;border-radius:8px;">
-    </div>
+    <div class="modal-logo"><img src="assets/delta-logo-white.png" alt="Delta Cafés" style="width:64px;height:64px;object-fit:contain;border-radius:8px;"></div>
     <h2 id="auth-title">Iniciar Sessão</h2>
     <p class="modal-sub" id="auth-sub">Entra para explorar e contribuir</p>
     <div id="demo-hint" style="display:none;"></div>
@@ -454,10 +356,7 @@
       </div>
     </div>
     <button class="mbtn mbtn-red mbtn-full" onclick="Auth.submit()" id="auth-btn">Entrar</button>
-    <p class="auth-switch">
-      <span id="auth-sw-txt">Não tens conta? </span>
-      <a onclick="Auth.toggleMode()" id="auth-sw-lnk">Registar</a>
-    </p>
+    <p class="auth-switch"><span id="auth-sw-txt">Não tens conta? </span><a onclick="Auth.toggleMode()" id="auth-sw-lnk">Registar</a></p>
   </div>
 </div>
 
@@ -471,7 +370,7 @@
     <div class="form-grid">
       <div class="form-col-full">
         <label class="flabel">Nome do Local *</label>
-        <input class="finput" id="add-name" placeholder="Ex: Delta Espresso Colombo">
+        <input class="finput" id="add-name" placeholder="Ex: Café Central">
       </div>
       <div class="form-col-full">
         <label class="flabel">Tipo *</label>
@@ -479,50 +378,27 @@
       </div>
       <div class="form-col-full">
         <label class="flabel">Morada <span class="optional-label">preenchida automaticamente</span></label>
-        <input class="finput" id="add-addr" placeholder="A detectar a tua morada...">
+        <input class="finput" id="add-addr" placeholder="A detectar...">
       </div>
       <div class="form-col-full">
         <label class="flabel">Horário <span class="optional-label">opcional</span></label>
         <input class="finput" id="add-hours" placeholder="Ex: Seg-Sex 08h-20h">
       </div>
       <div class="form-col-full">
-        <label class="flabel">Produtos Disponíveis</label>
+        <label class="flabel">Produtos</label>
         <div class="ptags-wrap" id="prod-tags"></div>
       </div>
       <div class="form-col-full">
         <label class="flabel">Nota <span class="optional-label">opcional</span></label>
-        <textarea class="finput" id="add-note" rows="2" placeholder="Informação útil para outros exploradores..."></textarea>
+        <textarea class="finput" id="add-note" rows="1" placeholder="Informação útil..."></textarea>
       </div>
     </div>
     <div class="modal-actions">
       <button class="mbtn mbtn-ghost" onclick="Map.cancelAdd()">Cancelar</button>
-      <button class="mbtn mbtn-red"   onclick="Map.submitSpot()">Guardar Local</button>
+      <button class="mbtn mbtn-red"   onclick="Map.submitSpot()">Guardar</button>
     </div>
   </div>
 </div>
-
-<!-- PROFILE OVERLAY -->
-<div id="profile-overlay" class="overlay hidden">
-  <div class="overlay-header">
-    <button class="back-btn" onclick="UI.closeOverlay('profile-overlay')">← Voltar</button>
-    <h2>O Meu Perfil</h2>
-    <div></div>
-  </div>
-  <div id="profile-body" class="overlay-body"></div>
-</div>
-
-<!-- RANKING OVERLAY -->
-<div id="ranking-overlay" class="overlay hidden">
-  <div class="overlay-header">
-    <button class="back-btn" onclick="UI.closeOverlay('ranking-overlay')">← Voltar</button>
-    <h2>Ranking</h2>
-    <div></div>
-  </div>
-  <div id="ranking-body" class="overlay-body"></div>
-</div>
-
-<!-- TOAST -->
-<div id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="js/db.js"></script>
@@ -534,7 +410,6 @@
 <script src="js/admin.js"></script>
 <script src="js/app.js"></script>
 <script>
-/* ── Sidebar mobile toggle ── */
 function toggleSidebar() {
   var sb = document.getElementById('sidebar');
   var bd = document.getElementById('sidebar-backdrop');
@@ -547,10 +422,9 @@ function closeSidebar() {
   document.getElementById('sidebar-backdrop').classList.remove('open');
 }
 
-/* ── Cafés com História sidebar accordion ── */
 function renderHistoriaSidebar() {
   var historiaLocs = (App.locations || []).filter(function(l){ return l.dddeltaUrl || l.dddelta_url; });
-  var listEl = document.getElementById('historia-list');
+  var listEl  = document.getElementById('historia-list');
   var countEl = document.getElementById('historia-count');
   if (!listEl) return;
   if (countEl) countEl.textContent = historiaLocs.length;
@@ -558,13 +432,13 @@ function renderHistoriaSidebar() {
   var html = '';
   historiaLocs.forEach(function(loc) {
     var dddUrl = loc.dddeltaUrl || loc.dddelta_url;
-    html += '<div class="sidebar-loc-item historia-item" data-id="' + loc.id + '" data-url="' + dddUrl + '">' +
+    html += '<div class="sidebar-loc-item historia-item" data-id="' + loc.id + '">' +
       '<span class="sidebar-loc-dot" style="background:var(--eau-trouble);"></span>' +
       '<div class="sidebar-loc-info">' +
         '<div class="sidebar-loc-name">' + loc.name + '</div>' +
         '<div class="sidebar-loc-meta">' + (loc.city||'') + (loc.country?', '+loc.country:'') + '</div>' +
       '</div>' +
-      '<a href="' + dddUrl + '" target="_blank" rel="noopener" class="historia-link-btn" onclick="event.stopPropagation();" title="Saber mais">↗</a>' +
+      '<a href="' + dddUrl + '" target="_blank" rel="noopener" class="historia-link-btn" onclick="event.stopPropagation();">↗</a>' +
     '</div>';
   });
   listEl.innerHTML = html;
@@ -574,14 +448,13 @@ function renderHistoriaSidebar() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  /* Accordion toggle for Cafés com História */
   var header = document.getElementById('historia-acc-header');
   var body   = document.getElementById('historia-list');
   var arrow  = document.getElementById('historia-arrow');
   if (header) {
     header.addEventListener('click', function() {
       var open = body.style.display !== 'none';
-      body.style.display = open ? 'none' : 'block';
+      body.style.display  = open ? 'none' : 'block';
       arrow.style.transform = open ? '' : 'rotate(90deg)';
       header.classList.toggle('sidebar-accordion-open', !open);
       if (!open) renderHistoriaSidebar();
