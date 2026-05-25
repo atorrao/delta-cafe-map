@@ -70,6 +70,10 @@ const DB = {
     return this._patch('users', 'email=eq.' + encodeURIComponent(email), data);
   },
 
+  async deleteUser(email) {
+    return this._delete('users', 'email=eq.' + encodeURIComponent(email));
+  },
+
   /* ── LOCATIONS ── */
   async getAllLocations() {
     return this._get('locations', 'order=created_at.desc');
