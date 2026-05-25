@@ -365,15 +365,7 @@ const UI = {
     html += '    <button class="edit-toggle-btn" onclick="UI.toggleEditMode()">Editar</button>';
     html += '  </div>';
 
-    html += '  <div id="account-view">';
-    html += '    <div class="account-field"><span class="account-label">Username</span><span class="account-value">' + u.email.split('@')[0] + '</span></div>';
-    html += '    <div class="account-field"><span class="account-label">Nome</span><span class="account-value">' + u.name + '</span></div>';
-    html += '    <div class="account-field"><span class="account-label">E-mail</span><span class="account-value">' + u.email + '</span></div>';
-    html += '    <div class="account-field"><span class="account-label">Password</span><span class="account-value">••••••••</span></div>';
-    html += '  </div>';
-
-    /* Edit mode */
-    /* Avatar picker */
+    /* Avatar picker html — usado em view e edit */
     var avatarPickHtml = '';
     LEVEL_AVATARS.forEach(function(svg, i) {
       var lvNum    = i + 1;
@@ -386,6 +378,19 @@ const UI = {
       if (!unlocked) avatarPickHtml += '<div class="avatar-lock-icon">🔒</div>';
       avatarPickHtml += '</div>';
     });
+
+    html += '  <div id="account-view">';
+    html += '    <div class="account-field"><span class="account-label">Username</span><span class="account-value">' + u.email.split('@')[0] + '</span></div>';
+    html += '    <div class="account-field"><span class="account-label">Nome</span><span class="account-value">' + u.name + '</span></div>';
+    html += '    <div class="account-field"><span class="account-label">E-mail</span><span class="account-value">' + u.email + '</span></div>';
+    html += '    <div class="account-field" style="border-bottom:none;"><span class="account-label">Password</span><span class="account-value">••••••••</span></div>';
+    /* Avatares visíveis em modo leitura */
+    html += '    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--brd);">';
+    html += '      <div class="account-label" style="margin-bottom:8px;">Avatares</div>';
+    html += '      <div class="avatar-picker-grid" style="pointer-events:none;">' + avatarPickHtml + '</div>';
+    html += '      <p style="font-size:10px;color:var(--mut-lt);margin-top:6px;">Os avatares com 🔒 desbloqueiam com mais pontos</p>';
+    html += '    </div>';
+    html += '  </div>';
 
     html += '  <div id="account-edit" style="display:none;">';
     html += '    <div class="account-field-edit"><label class="account-label">Nome</label><input class="account-edit-input" id="edit-name" value="' + u.name + '" placeholder="O teu nome"></div>';
@@ -403,17 +408,23 @@ const UI = {
     html += '        </div>';
     html += '      </div>';
     html += '    </div>';
-    /* Avatar picker */
+    /* Avatar picker em edição */
     html += '    <div class="account-field-edit" style="border-bottom:none;padding-top:14px;">';
-    html += '      <label class="account-label">Avatar</label>';
+    html += '      <label class="account-label">Escolher avatar</label>';
     html += '      <div class="avatar-picker-grid">' + avatarPickHtml + '</div>';
-    html += '      <p style="font-size:10px;color:var(--mut-lt);margin-top:6px;">Os avatares bloqueados desbloqueiam com pontos 🔒</p>';
+    html += '      <p style="font-size:10px;color:var(--mut-lt);margin-top:6px;">Os avatares com 🔒 desbloqueiam com mais pontos</p>';
     html += '    </div>';
     html += '    <div class="edit-actions">';
     html += '      <button class="btn-cancel-edit" onclick="UI.toggleEditMode()">Cancelar</button>';
     html += '      <button class="btn-save" onclick="UI.saveProfile()">Guardar</button>';
     html += '    </div>';
     html += '  </div>';
+    html += '</div>'; /* fim account-card */
+
+    /* Terminar sessão + Apagar conta — no fim, sem destaque */
+    html += '<div class="profile-card profile-session-card">';
+    html += '  <button class="btn-logout-sm btn-full-w" onclick="Auth.logout()">Terminar sessão</button>';
+    html += '  <button class="btn-delete-sm btn-full-w" onclick="UI.deleteAccount()">Apagar conta</button>';
     html += '</div>';
 
     html += '</div>'; /* fim ptab-dados */

@@ -10,15 +10,18 @@ const App = {
     // Load seed locations immediately (always available)
     this.locations = [...SEED_LOCATIONS];
 
-    // Init type select & product tags
+    // Init type select — apenas 3 opções
     const sel = document.getElementById('add-type');
     if (sel) {
-      sel.innerHTML = Object.entries(TYPE_CONFIG)
-        .map(([k, v]) => `<option value="${k}">${v.label}</option>`).join('');
+      sel.innerHTML = [
+        '<option value="cafe">Café / Restaurante</option>',
+        '<option value="espresso">Outro Estabelecimento</option>',
+      ].join('');
     }
+    // Produtos — apenas 2 opções
     const ptWrap = document.getElementById('prod-tags');
     if (ptWrap) {
-      ptWrap.innerHTML = PRODUCTS
+      ptWrap.innerHTML = ['Café','Café Cápsula']
         .map(p => `<span class="ptag" data-p="${p}" onclick="this.classList.toggle('on')">${p}</span>`).join('');
     }
 
