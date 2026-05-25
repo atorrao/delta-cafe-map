@@ -201,6 +201,21 @@
         <span class="sidebar-pill-title">Explorar Locais</span>
         <button class="sidebar-close-btn" onclick="closeSidebar()">×</button>
       </div>
+
+      <!-- Pesquisa na sidebar -->
+      <div class="sidebar-section" style="padding-bottom:10px;">
+        <div class="sidebar-search-wrap">
+          <span class="sidebar-search-icon">⌕</span>
+          <input
+            id="sidebar-search-input"
+            class="sidebar-search-input"
+            placeholder="Pesquisar local, cidade..."
+            autocomplete="off"
+          oninput="Map.search(this.value); document.getElementById('global-search').value=this.value; document.getElementById('sidebar-search-clear').style.display=this.value?'flex':'none';"
+          >
+          <button class="sidebar-search-clear" id="sidebar-search-clear" onclick="Map.clearSearch();this.style.display='none';document.getElementById('sidebar-search-input').value='';document.getElementById('global-search').value='';" style="display:none;">×</button>
+        </div>
+      </div>
       <div class="sidebar-section" id="nearby-box">
         <div class="sidebar-label sidebar-label-destaque">
           <span class="sidebar-label-dot" style="background:#E8820C;"></span>
