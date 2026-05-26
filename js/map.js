@@ -166,24 +166,41 @@ var Map = (function() {
   function _matchSearch(loc,q){return(loc.name+' '+loc.city+' '+loc.country+' '+(loc.address||'')).toLowerCase().indexOf(q.toLowerCase())!==-1;}
 
   function search(q){
+    /* sync both inputs */
+    var gi=document.getElementById('global-search'); if(gi&&gi.value!==q)gi.value=q;
+    var si=document.getElementById('sidebar-search-input'); if(si&&si.value!==q)si.value=q;
     var clearBtn=document.getElementById('search-clear'); if(clearBtn)clearBtn.style.display=q?'flex':'none';
+    var sbClear=document.getElementById('sidebar-search-clear'); if(sbClear)sbClear.style.display=q?'flex':'none';
     renderMarkers();
     var resultsBox=document.getElementById('search-results-box'),resultsList=document.getElementById('search-results-list');
     if(!resultsBox||!resultsList)return;
     if(!q||q.length<2){resultsBox.style.display='none';return;}
-    var matches=App.locations.filter(function(l){return _matchSearch(l,q);}).slice(0,8);
+    var matches=App.locations.filter(function(l){return _matchSearch(l,q);}).slice(0,10);
     if(!matches.length){resultsBox.style.display='block';resultsList.innerHTML='<p class="no-results">Nenhum local encontrado.</p>';return;}
     var html='';
     matches.forEach(function(loc){
       var cfg=TYPE_CONFIG[loc.type]||TYPE_CONFIG['cafe'];
-      html+='<div class="search-result-item" onclick="Map.flyTo(\''+loc.id+'\')"><div class="sr-dot" style="background:'+cfg.color+';"></div><div class="sr-info"><div class="sr-name">'+loc.name+'</div><div class="sr-meta">'+cfg.label+' · '+loc.city+', '+loc.country+'</div></div></div>';
+      html+='<div class="search-result-item" onclick="Map.flyTo(\''+loc.id+'\')" style="cursor:pointer;"><div class="sr-dot" style="background:'+cfg.color+';"></div><div class="sr-info"><div class="sr-name">'+loc.name+'</div><div class="sr-meta">'+cfg.label+' · '+loc.city+', '+loc.country+'</div></div></div>';
     });
     resultsList.innerHTML=html; resultsBox.style.display='block';
+    /* on mobile ensure sidebar is open to show results */
+    if(window.innerWidth<=768){
+      var sb=document.getElementById('sidebar');
+      var bd=document.getElementById('sidebar-backdrop');
+      if(sb&&!sb.classList.contains('sidebar-open')){
+        sb.classList.add('sidebar-open');
+        if(bd)bd.classList.add('open');
+      }
+      /* scroll sidebar to results */
+      if(resultsBox)setTimeout(function(){resultsBox.scrollIntoView({behavior:'smooth',block:'nearest'});},100);
+    }
   }
 
   function clearSearch(){
-    var input=document.getElementById('global-search'); if(input)input.value='';
+    var gi=document.getElementById('global-search'); if(gi)gi.value='';
+    var si=document.getElementById('sidebar-search-input'); if(si)si.value='';
     var clearBtn=document.getElementById('search-clear'); if(clearBtn)clearBtn.style.display='none';
+    var sbClear=document.getElementById('sidebar-search-clear'); if(sbClear)sbClear.style.display='none';
     var resultsBox=document.getElementById('search-results-box'); if(resultsBox)resultsBox.style.display='none';
     renderMarkers();
   }
@@ -193,7 +210,15 @@ var Map = (function() {
     _map.flyTo([loc.lat,loc.lng],15,{duration:1.2});
     setTimeout(function(){openPanel(id);},1300);
     var resultsBox=document.getElementById('search-results-box'); if(resultsBox)resultsBox.style.display='none';
-    if(window.innerWidth<=768){var sb=document.getElementById('sidebar');if(sb)sb.classList.remove('sidebar-open');}
+    /* close sidebar on mobile only after selecting */
+    if(window.innerWidth<=768){
+      setTimeout(function(){
+        var sb=document.getElementById('sidebar');
+        var bd=document.getElementById('sidebar-backdrop');
+        if(sb)sb.classList.remove('sidebar-open');
+        if(bd)bd.classList.remove('open');
+      },400);
+    }
   }
 
   function openPanel(id){

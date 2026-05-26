@@ -48,7 +48,6 @@ const UI = {
 
   renderTopbar: function() {
     var el = document.getElementById('tb-right');
-    var searchBtn = '<button id="mobile-search-btn" onclick="UI.showMobileSearch()" aria-label="Pesquisar" style="width:38px;height:38px;border-radius:var(--r-sm);background:rgba(86,65,48,.08);border:1px solid rgba(86,65,48,.2);color:var(--ink-new);display:none;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;"><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'20\' height=\'20\' fill=\'none\' viewBox=\'0 0 24 24\' stroke-width=\'2\' stroke=\'currentColor\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' d=\'m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z\'/></svg></button>';
     if (App.currentUser) {
       var lv  = Gamification.getLevel(App.currentUser.points || 0);
       var svg = Gamification.getAvatarSVG(App.currentUser.points||0, App.currentUser.selectedAvatar);
@@ -56,20 +55,16 @@ const UI = {
         ? '<button class="tbtn tbtn-ghost tbtn-admin" onclick="UI.openAdminPanel()" style="font-size:11px;padding:6px 12px;margin-right:6px;">Admin</button>'
         : '';
       el.innerHTML =
-        searchBtn + adminBtn +
+        adminBtn +
         '<div class="avatar-btn" onclick="UI.openProfileOverlay()" title="' + App.currentUser.name + '">' +
           '<div class="avatar-svg-wrap">' + svg + '</div>' +
           '<div class="avatar-level-badge" style="background:var(--laranja);">' + lv.level + '</div>' +
         '</div>';
     } else {
       el.innerHTML =
-        searchBtn +
         '<button class="tbtn tbtn-ghost" onclick="Auth.showModal(\'login\')">Entrar</button>' +
         '<button class="tbtn tbtn-red" onclick="Auth.showModal(\'register\')">Registar</button>';
     }
-    /* Show search btn on mobile */
-    var sb = document.getElementById('mobile-search-btn');
-    if (sb) sb.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
   },
 
   openProfileOverlay: function() {
