@@ -59,7 +59,7 @@ const UI = {
         searchBtn + adminBtn +
         '<div class="avatar-btn" onclick="UI.openProfileOverlay()" title="' + App.currentUser.name + '">' +
           '<div class="avatar-svg-wrap">' + svg + '</div>' +
-          '<div class="avatar-level-badge" style="background:' + lv.color + ';">' + lv.level + '</div>' +
+          '<div class="avatar-level-badge" style="background:var(--laranja);">' + lv.level + '</div>' +
         '</div>';
     } else {
       el.innerHTML =
@@ -226,12 +226,10 @@ const UI = {
     var allPrize = Gamification.getAllPrizeLevels();
     var firstName = u.name.split(' ')[0];
 
-    /* Cor dominante do nível para o hero */
-    var c  = lv.color;
-    var r  = parseInt(c.slice(1,3),16);
-    var g  = parseInt(c.slice(3,5),16);
-    var b  = parseInt(c.slice(5,7),16);
-    var heroStyle = 'background:linear-gradient(160deg,rgba('+r+','+g+','+b+',.92) 0%,rgba('+Math.max(0,r-50)+','+Math.max(0,g-40)+','+Math.max(0,b-30)+',.98) 100%);';
+    /* Cor fixa do hero — não muda com o nível */
+    var heroStyle = 'background:linear-gradient(160deg,#6b5040 0%,#564130 100%);';
+    var accentColor = '#ec7e1c';
+    var accentLight = 'rgba(236,126,28,.15)';
 
     var spotsByType = {};
     mySpots.forEach(function(l){
@@ -314,18 +312,18 @@ const UI = {
     html += '<div class="profile-tab-panel" id="ptab-pontos">';
 
     html += '<div class="profile-card">';
-    html += '  <div class="pts-big" style="color:' + lv.color + ';">' + pts + '<span class="pts-big-lbl">pts</span></div>';
+    html += '  <div class="pts-big" style="color:var(--laranja);">' + pts + '<span class="pts-big-lbl">pts</span></div>';
     html += '  <div class="level-header-row" style="margin-top:12px;">';
-    html += '    <div class="level-name-badge" style="background:' + lv.bg + ';color:' + lv.fg + ';border:1px solid ' + lv.color + '40;">Nível ' + lv.level + ' — ' + lv.name + '</div>';
+    html += '    <div class="level-name-badge" style="background:rgba(236,126,28,.12);color:var(--ink-new);border:1px solid rgba(236,126,28,.3);">Nível ' + lv.level + ' — ' + lv.name + '</div>';
     if (nextLv) {
-      html += '    <div class="level-next-label">Próximo: <span style="color:' + nextLv.color + ';font-weight:700;">' + nextLv.name + '</span></div>';
+      html += '    <div class="level-next-label">Próximo: <span style="color:var(--laranja);font-weight:700;">' + nextLv.name + '</span></div>';
     } else {
-      html += '    <div class="level-next-label" style="color:' + lv.color + ';">Nível máximo ✨</div>';
+      html += '    <div class="level-next-label" style="color:var(--verde);">Nível máximo ✨</div>';
     }
     html += '  </div>';
     if (nextLv) {
       html += '  <div class="level-bar-wrap" style="margin-top:10px;">';
-      html += '    <div class="level-bar"><div class="level-fill" style="width:' + progress + '%;background:' + lv.barColor + ';"></div></div>';
+      html += '    <div class="level-bar"><div class="level-fill" style="width:' + progress + '%;background:linear-gradient(90deg,var(--amarelo),var(--laranja));"></div></div>';
       html += '    <div class="level-bar-labels"><span>' + pts + ' pts</span><span>faltam ' + (nextLv.minPts - pts) + ' pts</span></div>';
       html += '  </div>';
     }
@@ -335,7 +333,7 @@ const UI = {
     html += '  <div class="card-section-title">Como ganhar pontos</div>';
     html += '  <div class="earn-grid">';
     [['Primeiro local adicionado','+40 pts bónus'],['Adicionar um local','+15 pts']].forEach(function(e){
-      html += '<div class="earn-item"><div class="earn-dot" style="background:' + lv.color + ';"></div><div class="earn-label">' + e[0] + '</div><div class="earn-pts" style="color:' + lv.color + ';">' + e[1] + '</div></div>';
+      html += '<div class="earn-item"><div class="earn-dot" style="background:var(--laranja);"></div><div class="earn-label">' + e[0] + '</div><div class="earn-pts" style="color:var(--laranja);">' + e[1] + '</div></div>';
     });
     html += '  </div>';
     html += '</div>';
@@ -346,9 +344,9 @@ const UI = {
     allPrize.forEach(function(lev){
       var unlocked = pts >= lev.minPts;
       html += '<div class="prize-row">';
-      html += '  <div class="prize-indicator"><div class="prize-dot" style="background:' + (unlocked?lev.color:'#ddd') + ';' + (unlocked?'box-shadow:0 0 0 3px '+lev.color+'25;':'') + '"></div><div class="prize-line"></div></div>';
+      html += '  <div class="prize-indicator"><div class="prize-dot" style="background:' + (unlocked?'var(--laranja)':'#ddd') + ';' + (unlocked?'box-shadow:0 0 0 3px rgba(236,126,28,.2);':'') + '"></div><div class="prize-line"></div></div>';
       html += '  <div class="prize-body">';
-      html += '    <div class="prize-level-label" style="color:' + (unlocked?lev.color:'#bbb') + ';">Nível ' + lev.level + ' — ' + lev.name + '</div>';
+      html += '    <div class="prize-level-label" style="color:' + (unlocked?'var(--laranja)':'#bbb') + ';">Nível ' + lev.level + ' — ' + lev.name + '</div>';
       html += '    <div class="prize-title' + (unlocked?'':' prize-blurred') + '">' + lev.prize.name + '</div>';
       if (unlocked) {
         html += '    <div class="prize-desc-text">' + lev.prize.desc + '</div>';
@@ -515,10 +513,10 @@ const UI = {
         var avSvg = Gamification.getAvatarSVG(u.pts, u.selectedAvatar);
         return '<div class="ranking-row ' + (isMe?'me':'') + '">' +
           '<div class="rank-pos" style="color:' + rc + ';font-weight:700;font-size:' + sz + '">' + (i+1) + '</div>' +
-          '<div class="rank-av" style="background:' + lv.color + '20;border:2px solid ' + lv.color + '40;">' + avSvg + '</div>' +
+          '<div class="rank-av" style="background:rgba(236,126,28,.15);border:2px solid rgba(236,126,28,.3);">' + avSvg + '</div>' +
           '<div class="rank-info">' +
             '<div class="rank-name">' + u.name + (isMe?' <span class="rank-you">tu</span>':'') + '</div>' +
-            '<div class="rank-level" style="color:' + lv.color + ';">' + lv.name + '</div>' +
+            '<div class="rank-level" style="color:var(--laranja);">' + lv.name + '</div>' +
             '<div class="rank-country">' + u.country + '</div>' +
           '</div>' +
           '<div class="rank-score">' +
@@ -530,7 +528,7 @@ const UI = {
 
     var levelsTableHtml = LEVELS.map(function(lv){
       return '<div class="levels-table-row">' +
-        '<div class="levels-table-dot" style="background:' + lv.color + ';"></div>' +
+        '<div class="levels-table-dot" style="background:var(--laranja);"></div>' +
         '<div class="levels-table-info">' +
           '<div class="levels-table-name">' + lv.name + '</div>' +
           '<div class="levels-table-range">' + lv.minPts + (lv.maxPts===Infinity?'+ pts':'–'+lv.maxPts+' pts') + '</div>' +
