@@ -410,6 +410,16 @@
         <label class="flabel">Nota <span class="optional-label">opcional</span></label>
         <textarea class="finput" id="add-note" rows="1" placeholder="Informação útil..."></textarea>
       </div>
+      <div class="form-col-full">
+        <label class="flabel">Fotografia <span class="optional-label">opcional · +3 pontos bónus</span></label>
+        <label class="photo-upload-area" id="add-photo-label">
+          <input type="file" id="add-photo-file" accept="image/*" style="display:none;">
+          <div class="photo-upload-preview" id="add-photo-preview">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" /></svg>
+            <span>Adicionar foto</span>
+          </div>
+        </label>
+      </div>
     </div>
     <div class="modal-actions">
       <button class="mbtn mbtn-ghost" onclick="Map.cancelAdd()">Cancelar</button>
@@ -466,7 +476,47 @@ function renderHistoriaSidebar() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  var header = document.getElementById('historia-acc-header');
+  /* Photo upload in add-modal */
+  document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'add-photo-file') {
+      var file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) { UI.toast('Foto demasiado grande. Máximo 5MB.', 'error'); return; }
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        var img = new Image();
+        img.onload = function() {
+          var canvas = document.createElement('canvas');
+          var MAX = 800;
+          var scale = Math.min(MAX/img.width, MAX/img.height, 1);
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          var compressed = canvas.toDataURL('image/jpeg', 0.75);
+          e.target._compressedData = compressed;
+          /* Show preview */
+          var preview = document.getElementById('add-photo-preview');
+          if (preview) {
+            preview.innerHTML = '<img src="' + compressed + '" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r-sm);">' +
+              '<button type="button" class="photo-remove-btn" onclick="event.preventDefault();event.stopPropagation();document.getElementById(\'add-photo-file\')._compressedData=\'\';document.getElementById(\'add-photo-preview\').innerHTML=\'<svg xmlns=\\\"http://www.w3.org/2000/svg\\\" width=\\\"24\\\" height=\\\"24\\\" fill=\\\"none\\\" viewBox=\\\"0 0 24 24\\\" stroke-width=\\\"1.5\\\" stroke=\\\"currentColor\\\"><path stroke-linecap=\\\"round\\\" stroke-linejoin=\\\"round\\\" d=\\\"M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z\\\"/><path stroke-linecap=\\\"round\\\" stroke-linejoin=\\\"round\\\" d=\\\"M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z\\\"/></svg><span>Adicionar foto</span>\';">×</button>';
+          }
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  /* Reset photo on modal close */
+  document.querySelector('.modal-bg#add-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      var input = document.getElementById('add-photo-file');
+      if (input) { input._compressedData = ''; input.value = ''; }
+      var preview = document.getElementById('add-photo-preview');
+      if (preview) preview.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"/></svg><span>Adicionar foto</span>';
+    }
+  });
+});
   var body   = document.getElementById('historia-list');
   var arrow  = document.getElementById('historia-arrow');
   if (header) {
