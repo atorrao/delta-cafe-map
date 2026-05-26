@@ -1932,3 +1932,30 @@ input, select, textarea { font-size: 16px !important; }
 
 /* Search results — hidden by default, JS sets display via style attribute */
 #search-results-box { display: none; }
+
+/* ═══════════════════════════════
+   TOPBAR AVATAR — círculo limpo
+═══════════════════════════════ */
+.avatar-btn {
+  width: 36px !important; height: 36px !important;
+  border-radius: 50% !important; overflow: hidden !important;
+  padding: 0 !important; border: 2px solid rgba(236,126,28,.4) !important;
+  background: var(--nuage-dk) !important;
+  display: flex !important; align-items: center !important;
+  justify-content: center !important; cursor: pointer !important;
+  flex-shrink: 0 !important; position: relative !important;
+}
+/* Hide ALL child wrappers and badges — just show the content */
+.avatar-btn > * { pointer-events: none; }
+.avatar-svg-wrap {
+  width: 100% !important; height: 100% !important;
+  display: flex !important; align-items: center !important;
+  justify-content: center !important;
+}
+.avatar-svg-wrap svg { width: 100% !important; height: 100% !important; display: block !important; }
+.avatar-level-badge { display: none !important; }
+.avatar-btn img {
+  width: 100% !important; height: 100% !important;
+  object-fit: cover !important; border-radius: 50% !important;
+  display: block !important;
+}
