@@ -471,12 +471,38 @@ const UI = {
   _uploadPhoto: function(input) {
     var file = input.files[0];
     if (!file) return;
+    /* Limit to 2MB */
+    if (file.size > 2 * 1024 * 1024) {
+      UI.toast('Foto demasiado grande. Máximo 2MB.', 'error');
+      return;
+    }
     var reader = new FileReader();
     reader.onload = function(e) {
-      var key = 'profile_photo_' + App.currentUser.email;
-      try { localStorage.setItem(key, e.target.result); } catch(err) {}
-      UI.renderProfile();
-      UI.renderTopbar();
+      var dataUrl = e.target.result;
+      /* Compress via canvas if image */
+      var img = new Image();
+      img.onload = function() {
+        var canvas = document.createElement('canvas');
+        var MAX = 400;
+        var scale = Math.min(MAX/img.width, MAX/img.height, 1);
+        canvas.width  = Math.round(img.width  * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        var compressed = canvas.toDataURL('image/jpeg', 0.7);
+        var key = 'profile_photo_' + App.currentUser.email;
+        try {
+          localStorage.setItem(key, compressed);
+          UI.renderProfile();
+          UI.renderTopbar();
+          UI.toast('Foto actualizada!', 'success');
+        } catch(err) {
+          UI.toast('Não foi possível guardar a foto. Tenta uma imagem mais pequena.', 'error');
+        }
+      };
+      img.src = dataUrl;
+    };
+    reader.onerror = function() {
+      UI.toast('Erro ao ler a imagem.', 'error');
     };
     reader.readAsDataURL(file);
   },

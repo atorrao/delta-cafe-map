@@ -2,72 +2,68 @@
    GAMIFICATION — Níveis, prémios, avatares temáticos
    ═══════════════════════════════════════════════════ */
 
-// Coffee-themed SVG avatars, one per level
-// All 40x40 viewBox, progressively more detailed/premium
+// Coffee-themed SVG avatars — inspired by flat coffee icon set
+// All 40x40 viewBox, clean flat style with #ec7e1c amber accent
 const LEVEL_AVATARS = [
 
-  // Nível 1 — Grão de café simples
+  // Nível 1 — Chávena espresso com pires
   '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">' +
-    '<circle cx="20" cy="20" r="19" fill="#e8e2da" stroke="#b0a090" stroke-width="1.5"/>' +
-    '<ellipse cx="20" cy="20" rx="10" ry="14" fill="#8B6347" opacity="0.9"/>' +
-    '<path d="M20 8 Q20 20 20 32" fill="none" stroke="#6b4a2a" stroke-width="1.5" stroke-linecap="round"/>' +
-    '<ellipse cx="20" cy="20" rx="10" ry="14" fill="none" stroke="#6b4a2a" stroke-width="1"/>' +
+    '<rect x="9" y="20" width="18" height="11" rx="3" fill="#f0ebe4" stroke="#564130" stroke-width="1.4"/>' +
+    '<path d="M27 22.5 Q32 22.5 32 25.5 Q32 28.5 27 28.5" fill="none" stroke="#564130" stroke-width="1.4" stroke-linecap="round"/>' +
+    '<line x1="8" y1="31.5" x2="28" y2="31.5" stroke="#564130" stroke-width="1.4" stroke-linecap="round"/>' +
+    '<path d="M16 18.5 Q16.6 16.5 16 14.5" fill="none" stroke="#564130" stroke-width="1.3" stroke-linecap="round"/>' +
+    '<path d="M20 17.5 Q20.6 15.5 20 13.5" fill="none" stroke="#564130" stroke-width="1.3" stroke-linecap="round"/>' +
   '</svg>',
 
-  // Nível 2 — Chávena de café
+  // Nível 2 — Takeaway cup laranja
   '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">' +
-    '<circle cx="20" cy="20" r="19" fill="#e8f4ef" stroke="#2e7d5e" stroke-width="1.5"/>' +
-    '<rect x="10" y="17" width="16" height="11" rx="2.5" fill="#2e7d5e" opacity="0.9"/>' +
-    '<path d="M26 19 Q31 19 31 22 Q31 25 26 25" fill="none" stroke="#2e7d5e" stroke-width="2" stroke-linecap="round"/>' +
-    '<line x1="9" y1="28.5" x2="27" y2="28.5" stroke="#2e7d5e" stroke-width="1.2" opacity="0.5"/>' +
-    '<path d="M15 15 Q15.7 12.5 15 10.5" fill="none" stroke="#2e7d5e" stroke-width="1.3" stroke-linecap="round" opacity="0.7"/>' +
-    '<path d="M20 14.5 Q20.7 12 20 10" fill="none" stroke="#2e7d5e" stroke-width="1.3" stroke-linecap="round" opacity="0.7"/>' +
+    '<path d="M14 14 L12 33 Q12 35 20 35 Q28 35 28 33 L26 14 Z" fill="#ec7e1c"/>' +
+    '<rect x="13" y="10" width="14" height="5" rx="2.5" fill="#f0ebe4" stroke="#564130" stroke-width="1.3"/>' +
+    '<line x1="14.5" y1="14" x2="25.5" y2="14" stroke="#564130" stroke-width="1"/>' +
+    '<rect x="15.5" y="10" width="9" height="2.5" rx="1.2" fill="#564130" opacity="0.15"/>' +
+    '<path d="M15 20 Q20 22 25 20" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.2" stroke-linecap="round"/>' +
   '</svg>',
 
-  // Nível 3 — Cápsula Delta Q
+  // Nível 3 — Grãos de café
   '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">' +
-    '<circle cx="20" cy="20" r="19" fill="#fdf5e6" stroke="#b07d2e" stroke-width="1.5"/>' +
-    '<ellipse cx="20" cy="22" rx="9" ry="12" fill="#b07d2e" opacity="0.9"/>' +
-    '<rect x="16.5" y="9" width="7" height="4" rx="2" fill="#b07d2e" opacity="0.9"/>' +
-    '<ellipse cx="17" cy="19" rx="3" ry="5" fill="rgba(255,255,255,0.15)"/>' +
-    '<path d="M13 31.5 Q20 35 27 31.5" fill="#b07d2e" opacity="0.5"/>' +
-    '<circle cx="30" cy="11" r="4" fill="#e8c46a" opacity="0.8"/>' +
-    '<path d="M29 11 L30 9.5 L31 11 L30 12.5Z" fill="#fff" opacity="0.8"/>' +
+    '<ellipse cx="15" cy="22" rx="7" ry="10" fill="#8B5E3C" stroke="#564130" stroke-width="1.3" transform="rotate(-20 15 22)"/>' +
+    '<path d="M11.5 16 Q15 22 11.5 28" fill="none" stroke="#564130" stroke-width="1.2" stroke-linecap="round" transform="rotate(-20 15 22)"/>' +
+    '<ellipse cx="25" cy="21" rx="6.5" ry="9.5" fill="#a0713d" stroke="#564130" stroke-width="1.3" transform="rotate(15 25 21)"/>' +
+    '<path d="M22 15.5 Q25 21 22 26.5" fill="none" stroke="#564130" stroke-width="1.2" stroke-linecap="round" transform="rotate(15 25 21)"/>' +
   '</svg>',
 
-  // Nível 4 — Máquina de café espresso
+  // Nível 4 — Moka pot
   '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">' +
-    '<circle cx="20" cy="20" r="19" fill="#fdf0ea" stroke="#c0571e" stroke-width="1.5"/>' +
-    '<rect x="9" y="13" width="22" height="16" rx="3" fill="#c0571e" opacity="0.9"/>' +
-    '<rect x="12" y="16" width="8" height="7" rx="1.5" fill="rgba(255,255,255,0.2)"/>' +
-    '<circle cx="27" cy="19" r="3.5" fill="rgba(255,255,255,0.3)"/>' +
-    '<circle cx="27" cy="19" r="1.8" fill="rgba(255,255,255,0.6)"/>' +
-    '<rect x="17" y="28" width="6" height="4" rx="1" fill="#c0571e" opacity="0.7"/>' +
-    '<rect x="16" y="31" width="8" height="1.5" rx=".5" fill="#c0571e" opacity="0.5"/>' +
-    '<line x1="20" y1="28" x2="20" y2="32" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>' +
+    '<rect x="13" y="20" width="14" height="13" rx="2" fill="#f0ebe4" stroke="#564130" stroke-width="1.4"/>' +
+    '<path d="M14 20 Q10 16 12 12 Q14 9 20 9 Q26 9 28 12 Q30 16 26 20 Z" fill="#f0ebe4" stroke="#564130" stroke-width="1.4"/>' +
+    '<rect x="18" y="6" width="4" height="4" rx="1" fill="#564130"/>' +
+    '<line x1="13" y1="20" x2="27" y2="20" stroke="#564130" stroke-width="1.4"/>' +
+    '<line x1="12.5" y1="28" x2="27.5" y2="28" stroke="#ec7e1c" stroke-width="1.5" stroke-linecap="round"/>' +
+    '<path d="M15 24 Q20 26 25 24" fill="none" stroke="rgba(86,65,48,.2)" stroke-width="1"/>' +
   '</svg>',
 
-  // Nível 5 — Barista / latte art (folha em leite)
+  // Nível 5 — Caneca grande
   '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">' +
-    '<circle cx="20" cy="20" r="19" fill="#faeaec" stroke="#9b2335" stroke-width="2"/>' +
-    '<ellipse cx="20" cy="22" rx="12" ry="10" fill="#9b2335" opacity="0.15"/>' +
-    '<ellipse cx="20" cy="22" rx="11" ry="9" fill="#fff" opacity="0.95"/>' +
-    '<path d="M20 14 Q24 18 20 30 Q16 18 20 14Z" fill="#9b2335" opacity="0.35"/>' +
-    '<path d="M14 20 Q17 17 20 14 Q23 17 26 20" fill="none" stroke="#9b2335" stroke-width="1.2" opacity="0.3"/>' +
-    '<path d="M13 23 Q16.5 20 20 22 Q23.5 20 27 23" fill="none" stroke="#9b2335" stroke-width="1" opacity="0.25"/>' +
-    '<rect x="9" y="30" width="22" height="3" rx="1.5" fill="#9b2335" opacity="0.5"/>' +
-    '<path d="M30" fill="none"/>' +
+    '<rect x="9" y="18" width="19" height="16" rx="3" fill="#f0ebe4" stroke="#564130" stroke-width="1.4"/>' +
+    '<path d="M28 20.5 Q34 20.5 34 25 Q34 29.5 28 29.5" fill="none" stroke="#564130" stroke-width="1.5" stroke-linecap="round"/>' +
+    '<rect x="9" y="18" width="19" height="4" rx="3" fill="#ec7e1c" opacity="0.85"/>' +
+    '<path d="M15 16 Q15.7 14 15 12" fill="none" stroke="#564130" stroke-width="1.3" stroke-linecap="round"/>' +
+    '<path d="M20 15 Q20.7 13 20 11" fill="none" stroke="#564130" stroke-width="1.3" stroke-linecap="round"/>' +
+    '<path d="M11 26 Q18 29 27 26" fill="none" stroke="rgba(86,65,48,.15)" stroke-width="1"/>' +
   '</svg>',
 
-  // Nível 6 — Coroa / troféu espresso (lenda)
+  // Nível 6 — French press (lenda)
   '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">' +
-    '<circle cx="20" cy="20" r="19" fill="#1a0a00" stroke="#C8A84B" stroke-width="2"/>' +
-    '<path d="M9 27 L9 16 L14 22 L20 11 L26 22 L31 16 L31 27 Z" fill="#C8A84B" opacity="0.9"/>' +
-    '<rect x="8" y="27" width="24" height="3.5" rx="1.5" fill="#C8A84B" opacity="0.8"/>' +
-    '<circle cx="20" cy="11" r="2.5" fill="#E0C278"/>' +
-    '<circle cx="9"  cy="16" r="2"   fill="#E0C278"/>' +
-    '<circle cx="31" cy="16" r="2"   fill="#E0C278"/>' +
-    '<ellipse cx="20" cy="20" rx="5" ry="4" fill="rgba(200,168,75,0.15)"/>' +
+    '<rect x="12" y="12" width="16" height="22" rx="2" fill="#f0ebe4" stroke="#564130" stroke-width="1.4"/>' +
+    '<rect x="12" y="28" width="16" height="6" rx="2" fill="#564130" opacity="0.85"/>' +
+    '<line x1="14" y1="28" x2="26" y2="28" stroke="#564130" stroke-width="1.4"/>' +
+    '<rect x="18" y="8" width="4" height="5" rx="1" fill="#ec7e1c"/>' +
+    '<rect x="11" y="11" width="18" height="3" rx="1.5" fill="#ec7e1c" opacity="0.9"/>' +
+    '<line x1="20" y1="13" x2="20" y2="28" stroke="#564130" stroke-width="1.3"/>' +
+    '<rect x="16" y="19" width="8" height="1.5" rx=".75" fill="#564130" opacity="0.25"/>' +
+    '<rect x="16" y="23" width="8" height="1.5" rx=".75" fill="#564130" opacity="0.25"/>' +
+    '<path d="M10 12 Q8 18 10 26" fill="none" stroke="#ec7e1c" stroke-width="1.3" stroke-linecap="round"/>' +
+    '<path d="M30 12 Q32 18 30 26" fill="none" stroke="#ec7e1c" stroke-width="1.3" stroke-linecap="round"/>' +
   '</svg>',
 ];
 
