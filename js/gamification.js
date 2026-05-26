@@ -66,37 +66,45 @@ const LEVEL_AVATARS = [
 ];
 
 const LEVELS = [
-  { level:1, name:'Descobridor', minPts:0,    maxPts:29,
+  { level:1, name:'Explorador',  minPts:0,    maxPts:29,
     color:'#8c9aaa', bg:'#f0f3f6', fg:'#3d4f5c', barColor:'#8c9aaa',
     description:'Estás a dar os primeiros passos.', prize:null },
-  { level:2, name:'Explorador',  minPts:30,   maxPts:99,
+  { level:2, name:'Entusiasta',  minPts:30,   maxPts:99,
     color:'#2e7d5e', bg:'#eaf4ef', fg:'#1a4a38', barColor:'#2e7d5e',
-    description:'Já contribuíste para a comunidade.',
-    prize:{ name:'Desconto 10% Online', desc:'10% de desconto em qualquer compra na loja delta-cafes.pt', code:'DELTA-EXPLORER10' } },
+    description:'O entusiasmo pelo café Delta cresce.',
+    prize:{ name:'Desconto 10% Online', desc:'10% de desconto em qualquer compra na loja delta-cafes.pt', code:'DELTA-ENTUSIASTA10' } },
   { level:3, name:'Conhecedor',  minPts:100,  maxPts:299,
     color:'#b07d2e', bg:'#fdf5e6', fg:'#6b4a0e', barColor:'#c49a3a',
     description:'O teu conhecimento do café Delta impressiona.',
     prize:{ name:'Pack Degustação Delta', desc:'Pack com 4 variedades de café Delta entregue em casa', code:'DELTA-DEGUSTATION' } },
-  { level:4, name:'Especialista', minPts:300,  maxPts:999,
+  { level:4, name:'Degustador',  minPts:300,  maxPts:999,
     color:'#c0571e', bg:'#fdf0ea', fg:'#7a2e0a', barColor:'#d4622a',
     description:'A tua contribuição tem impacto real.',
-    prize:{ name:'Máquina Delta Q Compact', desc:'Uma máquina Delta Q Compact completamente gratuita', code:'DELTA-SPECIALIST' } },
-  { level:5, name:'Embaixador',  minPts:1000, maxPts:2499,
+    prize:{ name:'Máquina Delta Q Compact', desc:'Uma máquina Delta Q Compact completamente gratuita', code:'DELTA-DEGUSTADOR' } },
+  { level:5, name:'Especialista', minPts:1000, maxPts:2499,
     color:'#9b2335', bg:'#faeaec', fg:'#5c1020', barColor:'#b02a3e',
     description:'És uma referência da comunidade Delta Map.',
-    prize:{ name:'Visita VIP Campo Maior', desc:'Visita exclusiva à fábrica com tour guiado, almoço e brunch', code:'DELTA-AMBASSADOR' } },
-  { level:6, name:'Lenda Delta', minPts:2500, maxPts:Infinity,
+    prize:{ name:'Visita VIP Campo Maior', desc:'Visita exclusiva à fábrica com tour guiado, almoço e brunch', code:'DELTA-ESPECIALISTA' } },
+  { level:6, name:'Barista',     minPts:2500, maxPts:4999,
     color:'#1a0a00', bg:'#f5eed8', fg:'#1a0a00', barColor:'#c47f2e',
+    description:'Dominaste a arte do café Delta.',
+    prize:{ name:'Subscrição Anual Ilimitada', desc:'Cápsulas Delta Q ilimitadas durante 1 ano + kit exclusivo de coleção', code:'DELTA-BARISTA' } },
+  { level:7, name:'Embaixador',  minPts:5000, maxPts:9999,
+    color:'#4a2878', bg:'#f3eefa', fg:'#2a1048', barColor:'#7a4ab8',
+    description:'Um verdadeiro embaixador da cultura Delta.',
+    prize:{ name:'Experiência VIP Delta', desc:'Experiência exclusiva nas instalações Delta com tour e brunch premium', code:'DELTA-EMBAIXADOR' } },
+  { level:8, name:'Mestre',      minPts:10000, maxPts:Infinity,
+    color:'#8b5a28', bg:'#fdf5e6', fg:'#4a2a08', barColor:'#c47f2e',
     description:'O nível mais alto. O Delta reconhece a tua dedicação.',
-    prize:{ name:'Subscrição Anual Ilimitada', desc:'Cápsulas Delta Q ilimitadas durante 1 ano + kit exclusivo de coleção', code:'DELTA-LEGEND' } },
+    prize:{ name:'Lenda Vitalícia Delta', desc:'Acesso vitalício a todos os benefícios Delta + reconhecimento oficial', code:'DELTA-MESTRE' } },
 ];
 
 const POINT_RULES = {
-  ADD_LOCATION:   15,
+  ADD_LOCATION:    5,
+  FIRST_LOCATION: 20,
   UPVOTE_RECEIVED: 8,
   UPVOTE_GIVEN:    1,
   VERIFIED:       30,
-  FIRST_LOCATION: 40,
 };
 
 const Gamification = {
@@ -110,8 +118,8 @@ const Gamification = {
   getAvatarSVG(pts, selectedAvatar) {
     var idx = (selectedAvatar !== undefined && selectedAvatar !== null)
       ? selectedAvatar
-      : this.getLevel(pts).level - 1;
-    return LEVEL_AVATARS[idx] || LEVEL_AVATARS[0];
+      : Math.min(this.getLevel(pts).level - 1, LEVEL_AVATARS.length - 1);
+    return LEVEL_AVATARS[Math.min(idx, LEVEL_AVATARS.length - 1)] || LEVEL_AVATARS[0];
   },
   getAllPrizeLevels() { return LEVELS.filter(l => l.prize); },
   addPoints(userEmail, reason) {

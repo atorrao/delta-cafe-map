@@ -336,7 +336,7 @@ const UI = {
     html += '<div class="profile-card">';
     html += '  <div class="card-section-title">Como ganhar pontos</div>';
     html += '  <div class="earn-grid">';
-    [['Primeiro local adicionado','+40 pts bónus'],['Adicionar um local','+15 pts']].forEach(function(e){
+    [['Primeiro local adicionado','+20 pts bónus'],['Adicionar um local','+5 pts']].forEach(function(e){
       html += '<div class="earn-item"><div class="earn-dot" style="background:var(--laranja);"></div><div class="earn-label">' + e[0] + '</div><div class="earn-pts" style="color:var(--laranja);">' + e[1] + '</div></div>';
     });
     html += '  </div>';
