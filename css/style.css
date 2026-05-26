@@ -2009,3 +2009,54 @@ input, select, textarea { font-size: 16px !important; }
   align-items: center; justify-content: center;
   font-weight: 700;
 }
+
+/* ════════════════════════════════════════
+   FIXES — nearest alert, map controls,
+   white bar, profile tabs
+════════════════════════════════════════ */
+
+/* ── Nearest alert — more centred vertically ── */
+.nearest-alert {
+  top: 50% !important;
+  transform: translate(-50%, -60%) !important;
+}
+@media (max-width: 768px) {
+  .nearest-alert {
+    top: 40% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+}
+
+/* ── Map controls — align bottom with FAB ── */
+.map-controls {
+  bottom: 24px !important;
+  left: 12px !important;
+}
+@media (max-width: 768px) {
+  .map-controls {
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 20px !important;
+  }
+  .map-ctrl-btn {
+    width: 46px !important;
+    height: 46px !important;
+  }
+}
+
+/* ── Remove white bar below map — fill full height ── */
+#app { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
+#main { flex: 1; min-height: 0; overflow: hidden; }
+#map-container { height: 100%; }
+#map { height: 100% !important; }
+
+/* ── Profile tabs — only one active at a time ── */
+.profile-tab { cursor: pointer; }
+.profile-tab-panel { display: none !important; }
+.profile-tab-panel.active { display: block !important; }
+
+/* ── Historia accordion — clean header ── */
+.sidebar-accordion-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
