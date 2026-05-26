@@ -183,12 +183,7 @@
         <button class="search-clear" id="search-clear" onclick="Map.clearSearch()" style="display:none;">×</button>
       </div>
     </div>
-    <nav class="topbar-right" id="tb-right">
-      <!-- Search icon (mobile only) -->
-      <button id="mobile-search-btn" onclick="UI.showMobileSearch()" style="display:none;" aria-label="Pesquisar">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
-      </button>
-    </nav>
+    <nav class="topbar-right" id="tb-right"></nav>
   </header>
 
   <!-- ADD BANNER -->
@@ -216,17 +211,7 @@
             class="sidebar-search-input"
             placeholder="Pesquisar local, cidade..."
             autocomplete="off"
-          oninput="
-            var q=this.value;
-            document.getElementById('global-search').value=q;
-            document.getElementById('sidebar-search-clear').style.display=q?'flex':'none';
-            Map.search(q);
-            if(q&&q.length>=2){
-              document.getElementById('search-results-box').style.display='block';
-            } else {
-              document.getElementById('search-results-box').style.display='none';
-            }
-          "
+          oninput="Map.search(this.value);"
           >
           <button class="sidebar-search-clear" id="sidebar-search-clear" onclick="Map.clearSearch();this.style.display='none';document.getElementById('sidebar-search-input').value='';document.getElementById('global-search').value='';" style="display:none;">×</button>
         </div>
