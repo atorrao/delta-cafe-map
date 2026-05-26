@@ -2,107 +2,104 @@
    GAMIFICATION — Níveis, prémios, avatares temáticos
    ═══════════════════════════════════════════════════ */
 
-// 9 coffee SVG avatars — flat style, #f0ebe4 body, #564130 outline, #ec7e1c accent
+// 9 coffee SVG avatars — precise faithful recreation
 const LEVEL_AVATARS = [
 
-  // 1 — Espresso cup + saucer (row 1, col 1)
+  // 1 — Tall rectangular mug, grey, right handle, shadow strip, one steam
   '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">' +
-    '<ellipse cx="19" cy="28" rx="11" ry="2.5" fill="#f0ebe4" stroke="#564130" stroke-width="1.3"/>' +
-    '<rect x="11" y="19" width="16" height="10" rx="3" fill="#f0ebe4" stroke="#564130" stroke-width="1.3"/>' +
-    '<path d="M27 21.5 Q32 21.5 32 24.5 Q32 27.5 27 27.5" fill="none" stroke="#564130" stroke-width="1.3" stroke-linecap="round"/>' +
-    '<path d="M16 17.5 Q16.5 15.5 16 14" fill="none" stroke="#564130" stroke-width="1.2" stroke-linecap="round"/>' +
-    '<path d="M20.5 16.5 Q21 14.5 20.5 13" fill="none" stroke="#564130" stroke-width="1.2" stroke-linecap="round"/>' +
+    '<rect x="9" y="15" width="20" height="19" rx="1.5" fill="#e6e0da" stroke="#6b3028" stroke-width="1.6"/>' +
+    '<rect x="26" y="15" width="3" height="19" rx="0" fill="#d0c9c2" stroke="none"/>' +
+    '<line x1="26" y1="15" x2="26" y2="34" stroke="#6b3028" stroke-width="1"/>' +
+    '<path d="M29 20 Q34 20 34 24.5 Q34 29 29 29" fill="none" stroke="#6b3028" stroke-width="1.6" stroke-linecap="round"/>' +
+    '<path d="M18 12.5 Q19 10.5 18 9" fill="none" stroke="#6b3028" stroke-width="1.3" stroke-linecap="round"/>' +
   '</svg>',
 
-  // 2 — Tea cup with teabag (row 1, col 2)
+  // 2 — Espresso cup + saucer, light grey, right handle, one steam
   '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">' +
-    '<ellipse cx="19" cy="28" rx="11" ry="2.5" fill="#f0ebe4" stroke="#564130" stroke-width="1.3"/>' +
-    '<rect x="11" y="19" width="16" height="10" rx="3" fill="#f0ebe4" stroke="#564130" stroke-width="1.3"/>' +
-    '<path d="M27 21.5 Q32 21.5 32 24.5 Q32 27.5 27 27.5" fill="none" stroke="#564130" stroke-width="1.3" stroke-linecap="round"/>' +
-    '<line x1="20" y1="15" x2="20" y2="22" stroke="#564130" stroke-width="1.1"/>' +
-    '<rect x="17" y="11" width="6" height="5" rx="1.2" fill="#ec7e1c" stroke="#564130" stroke-width="1"/>' +
-    '<line x1="23" y1="12" x2="25" y2="10" stroke="#564130" stroke-width="1" stroke-linecap="round"/>' +
+    '<ellipse cx="19.5" cy="30" rx="12" ry="2" fill="#e6e0da" stroke="#6b3028" stroke-width="1.4"/>' +
+    '<path d="M11 21.5 Q10 27 19.5 27 Q29 27 28 21.5 Z" fill="#e6e0da" stroke="#6b3028" stroke-width="1.4" stroke-linejoin="round"/>' +
+    '<rect x="11" y="17.5" width="17" height="4.5" rx="2.2" fill="#e6e0da" stroke="#6b3028" stroke-width="1.4"/>' +
+    '<path d="M28 18.5 Q32 18.5 32 21 Q32 23.5 28 23.5" fill="none" stroke="#6b3028" stroke-width="1.4" stroke-linecap="round"/>' +
+    '<path d="M18 15 Q18.8 13 18 11.5" fill="none" stroke="#6b3028" stroke-width="1.2" stroke-linecap="round"/>' +
   '</svg>',
 
-  // 3 — Tall mug no saucer (row 1, col 3)
+  // 3 — Dark tea cup + saucer + teabag (orange) + steam
   '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">' +
-    '<rect x="9" y="13" width="20" height="20" rx="3.5" fill="#f0ebe4" stroke="#564130" stroke-width="1.3"/>' +
-    '<path d="M29 16 Q36 16 36 23 Q36 30 29 30" fill="none" stroke="#564130" stroke-width="1.5" stroke-linecap="round"/>' +
-    '<path d="M16 11 Q16.6 9 16 7" fill="none" stroke="#564130" stroke-width="1.2" stroke-linecap="round"/>' +
-    '<path d="M21 10 Q21.6 8 21 6" fill="none" stroke="#564130" stroke-width="1.2" stroke-linecap="round"/>' +
+    '<ellipse cx="19.5" cy="30" rx="12" ry="2" fill="#e6e0da" stroke="#6b3028" stroke-width="1.4"/>' +
+    '<path d="M11 21.5 Q10 27 19.5 27 Q29 27 28 21.5 Z" fill="#4a2818" stroke="#6b3028" stroke-width="1.4" stroke-linejoin="round"/>' +
+    '<rect x="11" y="17.5" width="17" height="4.5" rx="2.2" fill="#4a2818" stroke="#6b3028" stroke-width="1.4"/>' +
+    '<path d="M28 18.5 Q32 18.5 32 21 Q32 23.5 28 23.5" fill="none" stroke="#6b3028" stroke-width="1.4" stroke-linecap="round"/>' +
+    '<line x1="20.5" y1="13.5" x2="19.5" y2="20" stroke="#6b3028" stroke-width="1.2"/>' +
+    '<rect x="18" y="10" width="5" height="4" rx="1" fill="#ec7e1c" stroke="#6b3028" stroke-width="1"/>' +
+    '<line x1="23" y1="11" x2="25" y2="9" stroke="#6b3028" stroke-width="1.1" stroke-linecap="round"/>' +
+    '<path d="M16.5 15 Q17.2 13 16.5 11.5" fill="none" stroke="#6b3028" stroke-width="1.2" stroke-linecap="round"/>' +
   '</svg>',
 
-  // 4 — Takeaway orange cup (row 2, col 1)
+  // 4 — Two coffee beans, warm brown, overlapping, centre crease each
   '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">' +
-    /* body: trapezoid narrower at top, wider at bottom */
-    '<path d="M14 16 L12 35 Q12 37 20 37 Q28 37 28 35 L26 16 Z" fill="#ec7e1c" stroke="#564130" stroke-width="1.3" stroke-linejoin="round"/>' +
-    /* white bottom stripe */
-    '<path d="M12.6 31 L12 35 Q12 37 20 37 Q28 37 28 35 L27.4 31 Z" fill="#f0ebe4" stroke="none"/>' +
-    '<path d="M12.6 31 Q20 33 27.4 31" fill="none" stroke="#564130" stroke-width="1.1"/>' +
-    /* lid base */
-    '<rect x="12.5" y="12.5" width="15" height="4.5" rx="1" fill="#f0ebe4" stroke="#564130" stroke-width="1.3"/>' +
-    /* lid top/cap - slightly narrower */
-    '<rect x="14" y="10" width="12" height="3.5" rx="1.8" fill="#f0ebe4" stroke="#564130" stroke-width="1.2"/>' +
-    /* drinking hole indent on lid top */
-    '<path d="M18 11.8 Q20 11 22 11.8" fill="none" stroke="#564130" stroke-width="1" stroke-linecap="round"/>' +
+    '<ellipse cx="18" cy="23" rx="7.5" ry="10" fill="#c87838" stroke="#6b3028" stroke-width="1.5" transform="rotate(-35 18 23)"/>' +
+    '<path d="M14 17.5 Q18 23 14 28.5" fill="none" stroke="#6b3028" stroke-width="1.4" stroke-linecap="round" transform="rotate(-35 18 23)"/>' +
+    '<ellipse cx="24" cy="21" rx="7" ry="9.5" fill="#b86828" stroke="#6b3028" stroke-width="1.5" transform="rotate(20 24 21)"/>' +
+    '<path d="M20.5 15.5 Q24 21 20.5 26.5" fill="none" stroke="#6b3028" stroke-width="1.4" stroke-linecap="round" transform="rotate(20 24 21)"/>' +
   '</svg>',
 
-  // 5 — Steaming angled mug (row 2, col 2)
+  // 5 — Takeaway: orange cylinder, grey bottom band, double grey lid with slit
   '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">' +
-    '<rect x="8" y="16" width="22" height="18" rx="3.5" fill="#f0ebe4" stroke="#564130" stroke-width="1.3"/>' +
-    '<path d="M30 19 Q37 19 37 25 Q37 31 30 31" fill="none" stroke="#564130" stroke-width="1.5" stroke-linecap="round"/>' +
-    '<path d="M15 14 Q15.6 12 15 10" fill="none" stroke="#564130" stroke-width="1.2" stroke-linecap="round"/>' +
-    '<path d="M19.5 13 Q20.1 11 19.5 9" fill="none" stroke="#564130" stroke-width="1.2" stroke-linecap="round"/>' +
-    '<path d="M24 14 Q24.6 12 24 10" fill="none" stroke="#564130" stroke-width="1.2" stroke-linecap="round"/>' +
+    '<path d="M14.5 16.5 L13.5 34 Q13.5 36 20 36 Q26.5 36 26.5 34 L25.5 16.5 Z" fill="#ec7e1c" stroke="#6b3028" stroke-width="1.5" stroke-linejoin="round"/>' +
+    '<path d="M13.8 29.5 L13.5 34 Q13.5 36 20 36 Q26.5 36 26.5 34 L26.2 29.5 Z" fill="#d0c9c2" stroke="none"/>' +
+    '<line x1="13.8" y1="29.5" x2="26.2" y2="29.5" stroke="#6b3028" stroke-width="1.3"/>' +
+    '<rect x="13" y="12.5" width="14" height="4.5" rx="0.5" fill="#e6e0da" stroke="#6b3028" stroke-width="1.4"/>' +
+    '<rect x="14" y="9.5" width="12" height="3.5" rx="1.8" fill="#e6e0da" stroke="#6b3028" stroke-width="1.3"/>' +
+    '<line x1="16.5" y1="11.2" x2="23.5" y2="11.2" stroke="#6b3028" stroke-width="0.9" opacity="0.6"/>' +
   '</svg>',
 
-  // 6 — Coffee beans (row 3, col 1)
+  // 6 — Trapezoid mug: wider top, narrower base, right shadow, handle, one steam
   '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">' +
-    '<ellipse cx="16" cy="24" rx="8" ry="11" fill="#8B5E3C" stroke="#564130" stroke-width="1.3" transform="rotate(-28 16 24)"/>' +
-    '<path d="M12 17 Q16 24 12 31" fill="none" stroke="#564130" stroke-width="1.3" stroke-linecap="round" transform="rotate(-28 16 24)"/>' +
-    '<ellipse cx="26" cy="20" rx="7" ry="10" fill="#a07040" stroke="#564130" stroke-width="1.3" transform="rotate(18 26 20)"/>' +
-    '<path d="M22.5 14 Q26 20 22.5 26" fill="none" stroke="#564130" stroke-width="1.3" stroke-linecap="round" transform="rotate(18 26 20)"/>' +
+    '<path d="M9.5 15 L11.5 32 Q12 34 20 34 Q28 34 28.5 32 L30.5 15 Z" fill="#e6e0da" stroke="#6b3028" stroke-width="1.5" stroke-linejoin="round"/>' +
+    '<path d="M26.5 15.5 L28 31.5 Q28.3 33.5 28.5 32 L30.5 15 Z" fill="#d0c9c2" stroke="none"/>' +
+    '<line x1="26.5" y1="15.5" x2="28" y2="32" stroke="#6b3028" stroke-width="0.9" opacity="0.6"/>' +
+    '<path d="M28.5 20 Q34 20 34 25 Q34 30 28.5 30" fill="none" stroke="#6b3028" stroke-width="1.5" stroke-linecap="round"/>' +
+    '<path d="M19 12 Q20 10 19 8.5" fill="none" stroke="#6b3028" stroke-width="1.3" stroke-linecap="round"/>' +
   '</svg>',
 
-  // 7 — Kettle with orange handle + spout curl (row 4, col 1)
+  // 7 — Round kettle: big dome, thin curved spout left, orange C-handle right, brown knob
   '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">' +
-    '<ellipse cx="20" cy="26" rx="13" ry="9.5" fill="#f0ebe4" stroke="#564130" stroke-width="1.3"/>' +
-    '<rect x="18" y="13" width="4" height="4.5" rx="1" fill="#564130"/>' +
-    '<ellipse cx="20" cy="17" rx="5" ry="1.5" fill="#f0ebe4" stroke="#564130" stroke-width="1.2"/>' +
-    '<path d="M7 24 Q4 18 7 14 Q10 11 13 13" fill="none" stroke="#564130" stroke-width="1.3" stroke-linecap="round"/>' +
-    '<path d="M33 22 Q38 19 37 26" fill="none" stroke="#ec7e1c" stroke-width="2" stroke-linecap="round"/>' +
+    '<path d="M7 27 Q7 13 20 13 Q33 13 33 27 Q33 35 20 35 Q7 35 7 27 Z" fill="#e6e0da" stroke="#6b3028" stroke-width="1.5"/>' +
+    '<path d="M28 14 Q33 18 33 27 Q33 32 28.5 34.5" fill="none" stroke="#d0c9c2" stroke-width="5" stroke-linecap="round" opacity="0.55"/>' +
+    '<rect x="15" y="10.5" width="10" height="3.5" rx="1.8" fill="#e6e0da" stroke="#6b3028" stroke-width="1.3"/>' +
+    '<rect x="18.5" y="7.5" width="3" height="3.5" rx="1" fill="#8b5a28" stroke="#6b3028" stroke-width="1"/>' +
+    '<path d="M7 24 Q3.5 23 3.5 20 Q3.5 17 6.5 17" fill="none" stroke="#6b3028" stroke-width="1.5" stroke-linecap="round"/>' +
+    '<path d="M33 21 Q39 21 39 27 Q39 33 33 33" fill="none" stroke="#ec7e1c" stroke-width="2.5" stroke-linecap="round"/>' +
   '</svg>',
 
-  // 8 — Moka pot (row 4, col 2) — waisted shape with vertical ribs
+  // 8 — Moka pot: narrow upper trapezoid, wider lower with 6 ribs, small brown handle, brown knob
   '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">' +
-    /* top chamber — narrower trapezoid */
-    '<path d="M15 20 L16 11 Q16 8 20 8 Q24 8 24 11 L25 20 Z" fill="#f0ebe4" stroke="#564130" stroke-width="1.3" stroke-linejoin="round"/>' +
-    /* small nozzle/spout top */
-    '<rect x="18.5" y="5.5" width="3" height="3" rx="1" fill="#564130"/>' +
-    /* waist ring */
-    '<rect x="13.5" y="19.5" width="13" height="2.5" rx="1.2" fill="#ec7e1c" stroke="#564130" stroke-width="1.1"/>' +
-    /* bottom chamber — wider trapezoid with vertical ribs */
-    '<path d="M12.5 22 L11.5 35 Q11.5 37 20 37 Q28.5 37 28.5 35 L27.5 22 Z" fill="#f0ebe4" stroke="#564130" stroke-width="1.3" stroke-linejoin="round"/>' +
-    /* vertical ribs on bottom */
-    '<line x1="16" y1="22.5" x2="15.2" y2="35" stroke="#564130" stroke-width="0.9" opacity="0.4"/>' +
-    '<line x1="20" y1="22.5" x2="20" y2="35" stroke="#564130" stroke-width="0.9" opacity="0.4"/>' +
-    '<line x1="24" y1="22.5" x2="24.8" y2="35" stroke="#564130" stroke-width="0.9" opacity="0.4"/>' +
-    /* handles */
-    '<path d="M12.5 25 Q9 25 9 28 Q9 31 12.5 31" fill="none" stroke="#564130" stroke-width="1.2" stroke-linecap="round"/>' +
-    '<path d="M27.5 25 Q31 25 31 28 Q31 31 27.5 31" fill="none" stroke="#564130" stroke-width="1.2" stroke-linecap="round"/>' +
+    '<path d="M16 21 L17 12 Q17.5 9 20 9 Q22.5 9 23 12 L24 21 Z" fill="#e6e0da" stroke="#6b3028" stroke-width="1.4" stroke-linejoin="round"/>' +
+    '<rect x="18.5" y="6.5" width="3" height="3" rx="1" fill="#8b5a28" stroke="#6b3028" stroke-width="1"/>' +
+    '<line x1="15" y1="21" x2="25" y2="21" stroke="#6b3028" stroke-width="1.5"/>' +
+    '<path d="M15 21 L14 37 Q14 38.5 20 38.5 Q26 38.5 26 37 L25 21 Z" fill="#e6e0da" stroke="#6b3028" stroke-width="1.4" stroke-linejoin="round"/>' +
+    '<line x1="16.5" y1="22" x2="16" y2="37" stroke="#6b3028" stroke-width="1" opacity="0.5"/>' +
+    '<line x1="17.8" y1="21.5" x2="17.5" y2="37.5" stroke="#6b3028" stroke-width="1" opacity="0.5"/>' +
+    '<line x1="19.2" y1="21.5" x2="19.2" y2="38" stroke="#6b3028" stroke-width="1" opacity="0.5"/>' +
+    '<line x1="20.8" y1="21.5" x2="20.8" y2="38" stroke="#6b3028" stroke-width="1" opacity="0.5"/>' +
+    '<line x1="22.2" y1="21.5" x2="22.5" y2="37.5" stroke="#6b3028" stroke-width="1" opacity="0.5"/>' +
+    '<line x1="23.5" y1="22" x2="24" y2="37" stroke="#6b3028" stroke-width="1" opacity="0.5"/>' +
+    '<path d="M25 24 Q29 24 29 28.5 Q29 33 25 33" fill="none" stroke="#8b5a28" stroke-width="2" stroke-linecap="round"/>' +
   '</svg>',
 
-  // 9 — Glass coffee jug with dark coffee + orange handle (row 4, col 3)
+  // 9 — Round carafe: oval body, dark coffee bottom half, orange collar+spout, large orange handle right, grey shadow left
   '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">' +
-    '<path d="M11 13 L10 35 Q10 37 20 37 Q30 37 30 35 L29 13 Z" fill="#f0ebe4" stroke="#564130" stroke-width="1.3" stroke-linejoin="round"/>' +
-    '<path d="M11 26 L10 35 Q10 37 20 37 Q30 37 30 35 L29 26 Z" fill="#564130" opacity="0.8"/>' +
-    '<rect x="10" y="11" width="20" height="4" rx="2" fill="#f0ebe4" stroke="#564130" stroke-width="1.3"/>' +
-    '<path d="M30 14 Q38 16 38 23 Q38 30 30 30" fill="none" stroke="#ec7e1c" stroke-width="2.2" stroke-linecap="round"/>' +
-    '<path d="M13.5 11 Q11 8 13 6" fill="none" stroke="#564130" stroke-width="1.2" stroke-linecap="round"/>' +
+    '<ellipse cx="19" cy="27" rx="12" ry="12" fill="#e6e0da" stroke="#6b3028" stroke-width="1.5"/>' +
+    '<path d="M10 20 Q7 24 7.5 30" fill="none" stroke="#d0c9c2" stroke-width="5" stroke-linecap="round" opacity="0.6"/>' +
+    '<path d="M7.1 29 Q7.5 39 19 39 Q30.5 39 30.9 29 Z" fill="#4a2818" stroke="none"/>' +
+    '<line x1="7.1" y1="29" x2="30.9" y2="29" stroke="#6b3028" stroke-width="1.2"/>' +
+    '<rect x="14" y="14" width="10" height="2.5" rx="1.2" fill="#ec7e1c" stroke="#6b3028" stroke-width="1.2"/>' +
+    '<path d="M15 14 Q12 12.5 13 10.5" fill="none" stroke="#6b3028" stroke-width="1.3" stroke-linecap="round"/>' +
+    '<path d="M31 19 Q38 19 38 27 Q38 35 31 35" fill="none" stroke="#ec7e1c" stroke-width="2.8" stroke-linecap="round"/>' +
   '</svg>',
 ];
 
-const LEVELS = [
+const LEVELS = [const LEVELS = [
   { level:1, name:'Descobridor', minPts:0,    maxPts:29,
     color:'#8c9aaa', bg:'#f0f3f6', fg:'#3d4f5c', barColor:'#8c9aaa',
     description:'Estás a dar os primeiros passos.', prize:null },
