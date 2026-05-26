@@ -1607,3 +1607,51 @@ body { background: var(--nuage); color: var(--text); }
 #mobile-search-input { color: var(--ink-new) !important; }
 #mobile-search-input::placeholder { color: var(--mut-lt) !important; }
 .mobile-search-cancel { color: var(--laranja) !important; }
+
+/* ════════════════════════════════════════
+   ADD MODAL — card centrado em mobile
+════════════════════════════════════════ */
+#add-modal {
+  align-items: center !important;
+  padding: 16px !important;
+}
+#add-modal .modal {
+  border-radius: var(--r-xl) !important;
+  width: min(480px, calc(100% - 32px)) !important;
+  max-height: 88dvh !important;
+  overflow-y: auto !important;
+}
+@media (max-width: 768px) {
+  #add-modal { align-items: center !important; padding: 16px !important; }
+  #add-modal .modal {
+    border-radius: var(--r-xl) !important;
+    width: calc(100% - 32px) !important;
+    margin: auto !important;
+  }
+}
+
+/* ── iOS font-size zoom fix ── */
+input, select, textarea { font-size: 16px !important; }
+@media (min-width: 769px) {
+  input, select, textarea { font-size: 13px !important; }
+}
+
+/* ── Sidebar search results sempre visíveis na sidebar ── */
+#search-results-box { display: none; }
+#search-results-box.active { display: block !important; }
+
+/* ── Cores fixas — não mudam com nível ── */
+.level-name-badge {
+  background: rgba(236,126,28,.12) !important;
+  color: var(--ink-new) !important;
+  border-color: rgba(236,126,28,.3) !important;
+}
+.level-next-label span { color: var(--laranja) !important; }
+.earn-dot { background: var(--laranja) !important; }
+.earn-pts { color: var(--laranja) !important; }
+.prize-dot { background: var(--laranja) !important; }
+.prize-level-label { color: var(--laranja) !important; }
+.levels-table-dot { background: var(--laranja) !important; }
+.levels-table-prize { color: var(--amarelo) !important; }
+.rank-level { color: var(--laranja) !important; }
+.profile-stat-lbl { color: rgba(255,255,255,.65) !important; }
