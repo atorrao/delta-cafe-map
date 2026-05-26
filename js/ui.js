@@ -50,15 +50,24 @@ const UI = {
     var el = document.getElementById('tb-right');
     if (App.currentUser) {
       var lv  = Gamification.getLevel(App.currentUser.points || 0);
-      var svg = Gamification.getAvatarSVG(App.currentUser.points||0, App.currentUser.selectedAvatar);
+      var photoKey = 'profile_photo_' + App.currentUser.email;
+      var photoData = '';
+      try { photoData = localStorage.getItem(photoKey) || ''; } catch(e){}
+
+      var avatarInner;
+      if (photoData) {
+        avatarInner = '<img src="' + photoData + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">';
+      } else {
+        avatarInner = Gamification.getAvatarSVG(App.currentUser.points||0, App.currentUser.selectedAvatar);
+      }
+
       var adminBtn = (App.currentUser.role === 'admin')
         ? '<button class="tbtn tbtn-ghost tbtn-admin" onclick="UI.openAdminPanel()" style="font-size:11px;padding:6px 12px;margin-right:6px;">Admin</button>'
         : '';
       el.innerHTML =
         adminBtn +
-        '<div class="avatar-btn" onclick="UI.openProfileOverlay()" title="' + App.currentUser.name + '">' +
-          '<div class="avatar-svg-wrap">' + svg + '</div>' +
-          '<div class="avatar-level-badge" style="background:var(--laranja);">' + lv.level + '</div>' +
+        '<div class="avatar-btn" onclick="UI.openProfileOverlay()" title="' + App.currentUser.name + '" style="overflow:hidden;padding:0;">' +
+          avatarInner +
         '</div>';
     } else {
       el.innerHTML =
@@ -420,6 +429,23 @@ const UI = {
     html += '          <svg class="eye-off" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:17px;height:17px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>';
     html += '          <svg class="eye-on" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:17px;height:17px;display:none;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>';
     html += '        </button></div></div>';
+    /* Foto de perfil na área de dados */
+    html += '    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--brd);">';
+    html += '      <div class="account-label" style="margin-bottom:10px;">Foto de perfil</div>';
+    html += '      <div style="display:flex;align-items:center;gap:14px;">';
+    if (photoData) {
+      html += '      <img src="' + photoData + '" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--brd);">';
+      html += '      <div style="display:flex;flex-direction:column;gap:8px;">';
+      html += '        <label class="spot-action-btn" for="ph-photo-file-dados" style="cursor:pointer;">Alterar foto</label>';
+      html += '        <button class="spot-action-btn" style="color:var(--terre-cuite);border-color:rgba(161,58,30,.3);" onclick="UI._removePhoto()">Remover foto</button>';
+      html += '      </div>';
+    } else {
+      html += '      <div style="width:56px;height:56px;border-radius:50%;background:var(--nuage-dk);border:2px solid var(--brd);display:flex;align-items:center;justify-content:center;overflow:hidden;">' + Gamification.getAvatarSVG(pts, u.selectedAvatar) + '</div>';
+      html += '      <label class="spot-action-btn" for="ph-photo-file-dados" style="cursor:pointer;">Adicionar foto</label>';
+    }
+    html += '      </div>';
+    html += '      <input type="file" id="ph-photo-file-dados" accept="image/*" style="display:none;">';
+    html += '    </div>';
     html += '    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--brd);">';
     html += '      <div class="account-label" style="margin-bottom:8px;">Avatar actual</div>';
     html += '      <div class="avatar-picker-grid" style="pointer-events:none;">' + avatarPickHtml + '</div>';
@@ -458,55 +484,52 @@ const UI = {
     document.getElementById('profile-body').innerHTML = html;
     UI.switchProfileTab(UI._activeProfileTab || 'pontos');
 
-    /* Attach photo upload event after DOM insert */
-    var fileInput = document.getElementById('ph-photo-file');
-    if (fileInput) {
-      fileInput.addEventListener('change', function() {
-        UI._uploadPhoto(this);
-      });
-    }
+    /* Delegação de eventos — apanha qualquer file input de foto */
+    var pb = document.getElementById('profile-body');
+    pb.addEventListener('change', function(e) {
+      if (e.target && e.target.type === 'file' && e.target.accept === 'image/*') {
+        UI._uploadPhoto(e.target);
+      }
+    });
   },
 
-  /* Upload de foto de perfil */
+  /* Remove foto */
+  _removePhoto: function() {
+    if (!App.currentUser) return;
+    try { localStorage.removeItem('profile_photo_' + App.currentUser.email); } catch(e){}
+    UI._activeProfileTab = 'dados';
+    UI.renderProfile(); UI.renderTopbar();
+    UI.toast('Foto removida.', 'success');
+  },
+
+  /* Upload — até 5MB, comprimido via canvas */
   _uploadPhoto: function(input) {
     var file = input.files[0];
     if (!file) return;
-    /* Limit to 2MB */
-    if (file.size > 2 * 1024 * 1024) {
-      UI.toast('Foto demasiado grande. Máximo 2MB.', 'error');
-      return;
-    }
+    if (file.size > 5 * 1024 * 1024) { UI.toast('Máximo 5MB.', 'error'); return; }
     var reader = new FileReader();
     reader.onload = function(e) {
-      var dataUrl = e.target.result;
-      /* Compress via canvas if image */
       var img = new Image();
       img.onload = function() {
         var canvas = document.createElement('canvas');
-        var MAX = 400;
+        var MAX = 500;
         var scale = Math.min(MAX/img.width, MAX/img.height, 1);
-        canvas.width  = Math.round(img.width  * scale);
-        canvas.height = Math.round(img.height * scale);
+        canvas.width = Math.round(img.width*scale);
+        canvas.height = Math.round(img.height*scale);
         canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-        var compressed = canvas.toDataURL('image/jpeg', 0.7);
-        var key = 'profile_photo_' + App.currentUser.email;
+        var compressed = canvas.toDataURL('image/jpeg', 0.75);
         try {
-          localStorage.setItem(key, compressed);
-          UI.renderProfile();
-          UI.renderTopbar();
+          localStorage.setItem('profile_photo_' + App.currentUser.email, compressed);
+          UI._activeProfileTab = 'dados';
+          UI.renderProfile(); UI.renderTopbar();
           UI.toast('Foto actualizada!', 'success');
-        } catch(err) {
-          UI.toast('Não foi possível guardar a foto. Tenta uma imagem mais pequena.', 'error');
-        }
+        } catch(err) { UI.toast('Erro ao guardar. Tenta menor.', 'error'); }
       };
-      img.src = dataUrl;
+      img.src = e.target.result;
     };
-    reader.onerror = function() {
-      UI.toast('Erro ao ler a imagem.', 'error');
-    };
+    reader.onerror = function(){ UI.toast('Erro ao ler.', 'error'); };
     reader.readAsDataURL(file);
   },
-
 
   /* ══════════════════════════════
      RANKING

@@ -34,10 +34,17 @@ const LEVEL_AVATARS = [
 
   // 4 — Takeaway orange cup (row 2, col 1)
   '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">' +
-    '<path d="M13.5 16.5 L11.5 34 Q11.5 36 20 36 Q28.5 36 28.5 34 L26.5 16.5 Z" fill="#ec7e1c" stroke="#564130" stroke-width="1.3" stroke-linejoin="round"/>' +
-    '<rect x="12.5" y="12" width="15" height="5.5" rx="2.8" fill="#f0ebe4" stroke="#564130" stroke-width="1.3"/>' +
-    '<rect x="14.5" y="12" width="11" height="2.5" rx="1.2" fill="#564130" opacity="0.18"/>' +
-    '<path d="M15 23 Q20 25 25 23" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.3" stroke-linecap="round"/>' +
+    /* body: trapezoid narrower at top, wider at bottom */
+    '<path d="M14 16 L12 35 Q12 37 20 37 Q28 37 28 35 L26 16 Z" fill="#ec7e1c" stroke="#564130" stroke-width="1.3" stroke-linejoin="round"/>' +
+    /* white bottom stripe */
+    '<path d="M12.6 31 L12 35 Q12 37 20 37 Q28 37 28 35 L27.4 31 Z" fill="#f0ebe4" stroke="none"/>' +
+    '<path d="M12.6 31 Q20 33 27.4 31" fill="none" stroke="#564130" stroke-width="1.1"/>' +
+    /* lid base */
+    '<rect x="12.5" y="12.5" width="15" height="4.5" rx="1" fill="#f0ebe4" stroke="#564130" stroke-width="1.3"/>' +
+    /* lid top/cap - slightly narrower */
+    '<rect x="14" y="10" width="12" height="3.5" rx="1.8" fill="#f0ebe4" stroke="#564130" stroke-width="1.2"/>' +
+    /* drinking hole indent on lid top */
+    '<path d="M18 11.8 Q20 11 22 11.8" fill="none" stroke="#564130" stroke-width="1" stroke-linecap="round"/>' +
   '</svg>',
 
   // 5 — Steaming angled mug (row 2, col 2)
@@ -66,13 +73,23 @@ const LEVEL_AVATARS = [
     '<path d="M33 22 Q38 19 37 26" fill="none" stroke="#ec7e1c" stroke-width="2" stroke-linecap="round"/>' +
   '</svg>',
 
-  // 8 — Moka pot (row 4, col 2)
+  // 8 — Moka pot (row 4, col 2) — waisted shape with vertical ribs
   '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">' +
-    '<path d="M14 22 L12.5 34 Q12.5 36 20 36 Q27.5 36 27.5 34 L26 22 Z" fill="#f0ebe4" stroke="#564130" stroke-width="1.3" stroke-linejoin="round"/>' +
-    '<path d="M13.5 22 Q10 17 12 11.5 Q14 8 20 8 Q26 8 28 11.5 Q30 17 26.5 22 Z" fill="#f0ebe4" stroke="#564130" stroke-width="1.3" stroke-linejoin="round"/>' +
-    '<rect x="17.5" y="5" width="5" height="4" rx="1.5" fill="#564130"/>' +
-    '<line x1="13.5" y1="22" x2="26.5" y2="22" stroke="#564130" stroke-width="1.3"/>' +
-    '<rect x="14" y="27" width="12" height="2" rx="1" fill="#ec7e1c" opacity="0.8"/>' +
+    /* top chamber — narrower trapezoid */
+    '<path d="M15 20 L16 11 Q16 8 20 8 Q24 8 24 11 L25 20 Z" fill="#f0ebe4" stroke="#564130" stroke-width="1.3" stroke-linejoin="round"/>' +
+    /* small nozzle/spout top */
+    '<rect x="18.5" y="5.5" width="3" height="3" rx="1" fill="#564130"/>' +
+    /* waist ring */
+    '<rect x="13.5" y="19.5" width="13" height="2.5" rx="1.2" fill="#ec7e1c" stroke="#564130" stroke-width="1.1"/>' +
+    /* bottom chamber — wider trapezoid with vertical ribs */
+    '<path d="M12.5 22 L11.5 35 Q11.5 37 20 37 Q28.5 37 28.5 35 L27.5 22 Z" fill="#f0ebe4" stroke="#564130" stroke-width="1.3" stroke-linejoin="round"/>' +
+    /* vertical ribs on bottom */
+    '<line x1="16" y1="22.5" x2="15.2" y2="35" stroke="#564130" stroke-width="0.9" opacity="0.4"/>' +
+    '<line x1="20" y1="22.5" x2="20" y2="35" stroke="#564130" stroke-width="0.9" opacity="0.4"/>' +
+    '<line x1="24" y1="22.5" x2="24.8" y2="35" stroke="#564130" stroke-width="0.9" opacity="0.4"/>' +
+    /* handles */
+    '<path d="M12.5 25 Q9 25 9 28 Q9 31 12.5 31" fill="none" stroke="#564130" stroke-width="1.2" stroke-linecap="round"/>' +
+    '<path d="M27.5 25 Q31 25 31 28 Q31 31 27.5 31" fill="none" stroke="#564130" stroke-width="1.2" stroke-linecap="round"/>' +
   '</svg>',
 
   // 9 — Glass coffee jug with dark coffee + orange handle (row 4, col 3)
