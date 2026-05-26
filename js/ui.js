@@ -101,15 +101,23 @@ const UI = {
 
   switchProfileTab: function(tab) {
     UI._activeProfileTab = tab;
+    /* Deactivate all first */
     document.querySelectorAll('.profile-tab').forEach(function(b) {
-      b.classList.toggle('active', b.dataset.tab === tab);
+      b.classList.remove('active');
     });
     document.querySelectorAll('.ph-hex').forEach(function(b) {
-      b.classList.toggle('ph-hex-active', b.dataset.tab === tab);
+      b.classList.remove('ph-hex-active');
     });
     document.querySelectorAll('.profile-tab-panel').forEach(function(p) {
-      p.classList.toggle('active', p.id === 'ptab-' + tab);
+      p.classList.remove('active');
     });
+    /* Activate the selected one */
+    var activeBtn = document.querySelector('.profile-tab[data-tab="' + tab + '"]');
+    if (activeBtn) activeBtn.classList.add('active');
+    var activeHex = document.querySelector('.ph-hex[data-tab="' + tab + '"]');
+    if (activeHex) activeHex.classList.add('ph-hex-active');
+    var activePanel = document.getElementById('ptab-' + tab);
+    if (activePanel) activePanel.classList.add('active');
   },
 
   toggleEditMode: function() {
