@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="description" content="Descobre onde beber e comprar Café Delta em Portugal e no Mundo.">
 <meta name="theme-color" content="#542916">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -216,7 +216,17 @@
             class="sidebar-search-input"
             placeholder="Pesquisar local, cidade..."
             autocomplete="off"
-          oninput="Map.search(this.value); document.getElementById('global-search').value=this.value; document.getElementById('sidebar-search-clear').style.display=this.value?'flex':'none';"
+          oninput="
+            var q=this.value;
+            document.getElementById('global-search').value=q;
+            document.getElementById('sidebar-search-clear').style.display=q?'flex':'none';
+            Map.search(q);
+            if(q&&q.length>=2){
+              document.getElementById('search-results-box').style.display='block';
+            } else {
+              document.getElementById('search-results-box').style.display='none';
+            }
+          "
           >
           <button class="sidebar-search-clear" id="sidebar-search-clear" onclick="Map.clearSearch();this.style.display='none';document.getElementById('sidebar-search-input').value='';document.getElementById('global-search').value='';" style="display:none;">×</button>
         </div>
@@ -381,8 +391,8 @@
 </div>
 
 <!-- ADD SPOT MODAL -->
-<div class="modal-bg" id="add-modal">
-  <div class="modal modal-add">
+<div class="modal-bg" id="add-modal" style="align-items:center;">
+  <div class="modal modal-add" style="border-radius:var(--r-xl);max-height:88vh;overflow-y:auto;">
     <button class="modal-close" onclick="Map.cancelAdd()">×</button>
     <h2>Adicionar Novo Local</h2>
     <p class="modal-sub" id="add-coords-lbl">A detectar a tua localização...</p>
