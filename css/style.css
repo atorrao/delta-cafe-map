@@ -1410,3 +1410,200 @@ a, button { -webkit-tap-highlight-color:transparent; }
   border-radius: var(--r-md);
 }
 .ph-content .profile-tab-panel { padding-bottom: 80px; }
+
+/* ════════════════════════════════════════════
+   ACTUALIZAÇÃO DE CORES + TIPOGRAFIA  v8
+════════════════════════════════════════════ */
+
+/* ── Novos tokens ── */
+:root {
+  /* Texto principal */
+  --ink-new     : #564130;
+  /* Fundo banners */
+  --banner-bg   : #f8f4f3;
+  /* Secundárias */
+  --verde       : #9bb166;
+  --amarelo     : #ffce5d;
+  --laranja     : #ec7e1c;
+
+  /* Override dos tokens existentes */
+  --text        : #564130;
+  --text-2      : #6b5040;
+  --mut         : #8a7060;
+  --mut-lt      : #b09888;
+  --espresso    : #564130;
+  --espresso-dk : #3d2d1e;
+  --nuage       : #f8f4f3;
+  --nuage-dk    : #f0eae6;
+  --surface-2   : #f0eae6;
+  --brd         : rgba(86,65,48,.13);
+
+  /* Aliases */
+  --d-espresso  : #564130;
+  --d-cream     : #f8f4f3;
+  --d-foam      : #f0eae6;
+}
+
+/* ── Corpo e superfícies ── */
+body { background: var(--nuage); color: var(--text); }
+
+/* ── Topbar: cor de fundo banner ── */
+#topbar {
+  background: var(--banner-bg) !important;
+  background-image: var(--grain) !important;
+  border-bottom: 1px solid var(--brd) !important;
+}
+.logo-app-name { color: var(--ink-new) !important; }
+.search-bar {
+  background: rgba(86,65,48,.07) !important;
+  border-color: rgba(86,65,48,.2) !important;
+}
+.search-bar:focus-within { border-color: var(--laranja) !important; }
+#global-search { color: var(--ink-new) !important; }
+#global-search::placeholder { color: rgba(86,65,48,.35) !important; }
+#hamburger-btn {
+  background: rgba(86,65,48,.08) !important;
+  border-color: rgba(86,65,48,.2) !important;
+  color: var(--ink-new) !important;
+}
+#hamburger-btn:hover { background: rgba(86,65,48,.15) !important; }
+.tbtn-ghost { color: var(--ink-new) !important; border-color: rgba(86,65,48,.25) !important; }
+.tbtn-ghost:hover { background: rgba(86,65,48,.08) !important; }
+.avatar-btn { background: var(--laranja) !important; border-color: rgba(236,126,28,.4) !important; }
+
+/* ── Sidebar banner ── */
+.sidebar-pill-header {
+  background: var(--banner-bg) !important;
+  color: var(--ink-new) !important;
+  border-bottom: 1px solid var(--brd) !important;
+}
+.sidebar-pill-title { color: var(--ink-new) !important; }
+.sidebar-close-btn { background: rgba(86,65,48,.1) !important; color: var(--ink-new) !important; }
+
+/* ── Nearest alert banner ── */
+.nearest-alert-inner {
+  background: var(--banner-bg) !important;
+  border-color: var(--brd) !important;
+}
+.nearest-label { color: var(--laranja) !important; }
+.nearest-name  { color: var(--ink-new) !important; font-style: normal !important; font-family: var(--font-display) !important; }
+.nearest-dist  { color: var(--mut) !important; }
+.nearest-close { background: rgba(86,65,48,.08) !important; color: var(--mut) !important; }
+.nearest-close:hover { background: rgba(86,65,48,.15) !important; color: var(--ink-new) !important; }
+.nearest-go    { background: var(--laranja) !important; color: #fff !important; }
+.nearest-go:hover { background: #d06a10 !important; }
+
+/* ── Overlay headers ── */
+.overlay-header { background: var(--banner-bg) !important; }
+.overlay-header h2 {
+  font-family: var(--font-display) !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  color: var(--ink-new) !important;
+}
+.back-btn { color: var(--laranja) !important; }
+.back-btn:hover { color: var(--ink-new) !important; }
+
+/* ── Add banner ── */
+#add-banner { background: var(--laranja) !important; }
+
+/* ── FAB ── */
+.fab-add { background: var(--laranja) !important; box-shadow: 0 4px 18px rgba(236,126,28,.4), 0 2px 6px rgba(0,0,0,.15) !important; }
+.fab-add:hover { background: #d06a10 !important; }
+
+/* ── Botões primários ── */
+.mbtn-red, .tbtn-red { background: var(--laranja) !important; }
+.mbtn-red:hover, .tbtn-red:hover { background: #d06a10 !important; }
+.btn-save { background: var(--laranja) !important; }
+.btn-save:hover { background: #d06a10 !important; }
+
+/* ── Tags / badges ── */
+.tag-verified { background: rgba(155,177,102,.2) !important; color: #4a6a1e !important; }
+.spot-badge-ok { background: rgba(155,177,102,.2) !important; color: #4a6a1e !important; }
+.admin-btn-approve { background: rgba(155,177,102,.2) !important; color: #4a6a1e !important; }
+.admin-btn-approve:hover { background: var(--verde) !important; color: #fff !important; }
+.admin-tab-badge, .admin-badge-num { background: var(--laranja) !important; }
+
+/* ── Layer switcher activo ── */
+.layer-btn.active { background: var(--ink-new) !important; color: var(--nuage) !important; }
+
+/* ── Profile hero hex nav ── */
+.ph-hex-active { background: var(--ink-new) !important; }
+.spot-saberMais { background: var(--ink-new) !important; }
+.spot-saberMais:hover { background: var(--laranja) !important; }
+
+/* ── Secção "Café / Restaurante" na sidebar ── */
+.sidebar-label-destaque { color: var(--laranja) !important; }
+.fitem.on { color: var(--laranja) !important; background: rgba(236,126,28,.08) !important; }
+.fitem:hover { background: rgba(236,126,28,.06) !important; }
+.fitem.on .fitem-count { background: rgba(236,126,28,.12) !important; color: var(--laranja) !important; }
+.sidebar-loc-dist { color: var(--laranja) !important; }
+
+/* ── Inputs focus ── */
+.finput:focus, .account-edit-input:focus { border-color: var(--laranja) !important; box-shadow: 0 0 0 3px rgba(236,126,28,.1) !important; }
+.sidebar-search-wrap:focus-within { border-color: var(--laranja) !important; }
+
+/* ── Modal h2 — uniformizar fonte ── */
+.modal h2 {
+  font-family: var(--font-display) !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  color: var(--ink-new) !important;
+}
+
+/* ── Profile greeting — mesma fonte que o resto ── */
+.profile-greeting,
+.ph-name {
+  font-family: var(--font-display) !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+}
+
+/* ── Ranking ── */
+.rtab.on { background: var(--ink-new) !important; color: var(--nuage) !important; }
+.ranking-row.me { border-color: var(--amarelo) !important; background: rgba(255,206,93,.06) !important; }
+.rank-you { color: var(--amarelo) !important; background: rgba(255,206,93,.15) !important; }
+.rank-av { background: var(--laranja) !important; }
+
+/* ── Profile card titles ── */
+.card-section-title { color: var(--laranja) !important; letter-spacing: 1.2px; }
+.account-label { color: var(--laranja) !important; }
+.flabel { color: var(--laranja) !important; }
+
+/* ── Progress bars ── */
+.level-fill { background: linear-gradient(90deg, var(--amarelo), var(--laranja)) !important; }
+.ph-progress-fill { background: rgba(255,255,255,.8) !important; }
+
+/* ── Prizes ── */
+.prize-code { background: rgba(255,206,93,.15) !important; color: var(--ink-new) !important; border-color: rgba(236,126,28,.2) !important; }
+
+/* ── Auth switch link ── */
+.auth-switch a { color: var(--laranja) !important; }
+
+/* ── Spot panel badge história ── */
+.sp-badge-historia { background: rgba(255,206,93,.2) !important; color: var(--ink-new) !important; border-color: rgba(255,206,93,.4) !important; }
+
+/* ── Mobile search button in topbar ── */
+#mobile-search-btn {
+  width: 38px; height: 38px; border-radius: var(--r-sm);
+  background: rgba(86,65,48,.08); border: 1px solid rgba(86,65,48,.2);
+  color: var(--ink-new); display: none;
+  align-items: center; justify-content: center; cursor: pointer;
+  flex-shrink: 0; transition: background .15s;
+}
+#mobile-search-btn:hover { background: rgba(86,65,48,.15); }
+@media (max-width: 768px) {
+  #mobile-search-btn { display: flex; }
+}
+
+/* ── Mobile search overlay — z-index acima de tudo ── */
+#mobile-search-overlay {
+  z-index: 3000 !important;
+  background: var(--nuage) !important;
+}
+.mobile-search-header { background: var(--banner-bg) !important; border-bottom: 1px solid var(--brd) !important; }
+.mobile-search-bar { background: var(--nuage-dk) !important; border-color: var(--brd) !important; }
+.mobile-search-bar:focus-within { border-color: var(--laranja) !important; }
+#mobile-search-input { color: var(--ink-new) !important; }
+#mobile-search-input::placeholder { color: var(--mut-lt) !important; }
+.mobile-search-cancel { color: var(--laranja) !important; }
