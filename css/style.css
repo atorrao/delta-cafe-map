@@ -1655,3 +1655,98 @@ input, select, textarea { font-size: 16px !important; }
 .levels-table-prize { color: var(--amarelo) !important; }
 .rank-level { color: var(--laranja) !important; }
 .profile-stat-lbl { color: rgba(255,255,255,.65) !important; }
+
+/* ════════════════════════════════════════
+   VERDE MAIS PRESENTE + CÍRCULOS PERFIL
+════════════════════════════════════════ */
+
+/* ── Verde como cor primária em vários pontos ── */
+.sidebar-label { color: var(--verde) !important; }
+.sidebar-acc-label { color: var(--verde) !important; }
+.card-section-title { color: var(--verde) !important; }
+.account-label { color: var(--verde) !important; }
+.flabel { color: var(--verde) !important; }
+.back-btn { color: var(--verde) !important; }
+.back-btn:hover { color: var(--ink-new) !important; }
+.edit-toggle-btn { border-color: var(--verde) !important; color: var(--verde) !important; }
+.edit-toggle-btn:hover { background: rgba(155,177,102,.1) !important; }
+.spot-action-link { color: var(--verde) !important; border-color: rgba(155,177,102,.4) !important; }
+.spot-action-link:hover { background: rgba(155,177,102,.12) !important; color: var(--ink-new) !important; }
+.sidebar-search-wrap:focus-within { border-color: var(--verde) !important; }
+.ph-level { background: rgba(155,177,102,.25) !important; border-color: rgba(155,177,102,.4) !important; color: #fff !important; }
+.profile-stat-lbl { color: rgba(155,177,102,.9) !important; }
+.nearest-label { color: var(--verde) !important; }
+.auth-switch a { color: var(--verde) !important; }
+.ptag.on { border-color: var(--verde) !important; background: rgba(155,177,102,.08) !important; color: var(--verde) !important; }
+.fitem-count { background: rgba(155,177,102,.15) !important; color: var(--verde) !important; }
+.historia-link-btn { background: rgba(155,177,102,.15) !important; color: var(--verde) !important; }
+.historia-link-btn:hover { background: var(--verde) !important; color: #fff !important; }
+.sp-badge-historia { background: rgba(155,177,102,.15) !important; color: #4a6a1e !important; border-color: rgba(155,177,102,.4) !important; }
+.level-fill { background: linear-gradient(90deg, var(--verde), var(--laranja)) !important; }
+.prize-locked-msg { color: var(--verde) !important; opacity: .6; }
+
+/* ── Hexágonos → círculos ── */
+.ph-hex {
+  width: 60px !important;
+  height: 60px !important;
+  border-radius: 50% !important;
+  clip-path: none !important;
+  background: var(--surface) !important;
+  box-shadow: 0 3px 12px rgba(86,65,48,.15) !important;
+  border: 2.5px solid var(--brd) !important;
+  transition: transform .18s, border-color .18s !important;
+}
+.ph-hex:hover { transform: translateY(-3px) !important; border-color: var(--verde) !important; }
+.ph-hex-active {
+  background: var(--verde) !important;
+  border-color: var(--verde) !important;
+  box-shadow: 0 4px 16px rgba(155,177,102,.4) !important;
+}
+.ph-hex-active svg { color: #fff !important; }
+.ph-hex-active span { color: rgba(255,255,255,.9) !important; }
+.ph-hex svg { color: var(--ink-new) !important; }
+.ph-hex span { color: var(--mut) !important; font-size: 9px !important; }
+.ph-hex-inner { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.ph-hex-nav { gap: 20px !important; }
+
+/* ── Avatar SVG — círculo limpo, uma só camada ── */
+.avatar-btn {
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  background: var(--verde) !important;
+  border: 2px solid rgba(155,177,102,.4) !important;
+  padding: 0 !important;
+}
+.avatar-svg-wrap { width: 100% !important; height: 100% !important; }
+.avatar-svg-wrap svg { width: 100% !important; height: 100% !important; display: block; }
+
+.profile-bigav {
+  background: rgba(255,255,255,.15) !important;
+  border: 3px solid rgba(255,255,255,.5) !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+}
+.profile-avatar-svg { width: 100% !important; height: 100% !important; }
+.profile-avatar-svg svg { width: 100% !important; height: 100% !important; }
+
+.ph-photo { border: 3px solid rgba(255,255,255,.5) !important; }
+.ph-photo-avatar { background: rgba(255,255,255,.15) !important; }
+
+/* Avatar picker — círculo único limpo */
+.avatar-pick-option {
+  background: var(--nuage-dk) !important;
+  border: 2px solid var(--brd) !important;
+  overflow: hidden !important;
+  padding: 4px !important;
+}
+.avatar-pick-option svg {
+  width: 36px !important; height: 36px !important;
+  display: block !important;
+}
+.avatar-pick-option.selected { border-color: var(--verde) !important; background: rgba(155,177,102,.1) !important; }
+
+/* Admin avatar */
+.admin-avatar-circle { overflow: hidden !important; background: var(--verde) !important; }
+.admin-avatar-circle svg { width: 40px !important; height: 40px !important; }
+.rank-av { background: rgba(155,177,102,.15) !important; border-color: rgba(155,177,102,.3) !important; overflow: hidden !important; }
+.rank-av svg { width: 34px !important; height: 34px !important; }
