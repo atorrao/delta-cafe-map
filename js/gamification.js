@@ -102,6 +102,7 @@ const LEVELS = [
 const POINT_RULES = {
   ADD_LOCATION:    5,
   FIRST_LOCATION: 20,
+  ADD_PHOTO:       3,
   UPVOTE_RECEIVED: 8,
   UPVOTE_GIVEN:    1,
   VERIFIED:       30,
