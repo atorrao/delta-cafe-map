@@ -99,7 +99,7 @@ const LEVEL_AVATARS = [
   '</svg>',
 ];
 
-const LEVELS = [const LEVELS = [
+const LEVELS = [
   { level:1, name:'Descobridor', minPts:0,    maxPts:29,
     color:'#8c9aaa', bg:'#f0f3f6', fg:'#3d4f5c', barColor:'#8c9aaa',
     description:'Estás a dar os primeiros passos.', prize:null },
