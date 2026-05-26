@@ -1750,3 +1750,68 @@ input, select, textarea { font-size: 16px !important; }
 .admin-avatar-circle svg { width: 40px !important; height: 40px !important; }
 .rank-av { background: rgba(155,177,102,.15) !important; border-color: rgba(155,177,102,.3) !important; overflow: hidden !important; }
 .rank-av svg { width: 34px !important; height: 34px !important; }
+
+/* ════════════════════════════════════════
+   AJUSTES FINAIS v9
+════════════════════════════════════════ */
+
+/* ── Títulos de secção — de volta ao espresso/laranja ── */
+.card-section-title { color: var(--ink-new) !important; letter-spacing: 1px; font-weight: 700; }
+.account-label      { color: var(--ink-new) !important; }
+.flabel             { color: var(--ink-new) !important; }
+.sidebar-label      { color: var(--mut) !important; }
+.sidebar-acc-label  { color: var(--ink-new) !important; }
+
+/* ── Círculo activo no perfil — laranja em vez de verde ── */
+.ph-hex-active {
+  background: var(--laranja) !important;
+  border-color: var(--laranja) !important;
+  box-shadow: 0 4px 16px rgba(236,126,28,.35) !important;
+}
+.ph-hex:hover { border-color: var(--laranja) !important; }
+
+/* ── Verde apenas onde faz sentido ── */
+.tag-verified, .spot-badge-ok { background: rgba(155,177,102,.18) !important; color: #3d5a1a !important; }
+.admin-btn-approve { background: rgba(155,177,102,.18) !important; color: #3d5a1a !important; }
+.admin-btn-approve:hover { background: var(--verde) !important; color: #fff !important; }
+.edit-toggle-btn { border-color: var(--brd) !important; color: var(--mut) !important; }
+.edit-toggle-btn:hover { border-color: var(--laranja) !important; color: var(--laranja) !important; background: rgba(236,126,28,.06) !important; }
+.ph-level { background: rgba(155,177,102,.25) !important; border-color: rgba(155,177,102,.4) !important; }
+.profile-stat-lbl { color: rgba(255,255,255,.65) !important; }
+.level-fill { background: linear-gradient(90deg, var(--amarelo), var(--laranja)) !important; }
+.ptag.on { border-color: var(--laranja) !important; background: rgba(236,126,28,.08) !important; color: var(--laranja) !important; }
+.historia-link-btn { background: rgba(155,177,102,.12) !important; color: var(--verde) !important; }
+.auth-switch a { color: var(--laranja) !important; }
+.back-btn { color: var(--laranja) !important; }
+.back-btn:hover { color: var(--ink-new) !important; }
+
+/* ── Barra lateral botão voltar ── */
+.sidebar-section .sidebar-label-destaque { color: var(--laranja) !important; }
+
+/* ── Título "O Meu Perfil" centrado ── */
+#profile-overlay .overlay-header {
+  justify-content: center !important;
+  position: relative;
+}
+#profile-overlay .overlay-header .back-btn {
+  position: absolute;
+  left: 16px;
+}
+#profile-overlay .overlay-header h2 {
+  text-align: center !important;
+  flex: none !important;
+}
+#profile-overlay .overlay-header > div:last-child { display: none; }
+
+/* ── Sidebar resultados de pesquisa sempre abaixo de Cafés com História ── */
+#search-results-box {
+  border-top: 1px solid var(--brd);
+  padding-top: 4px;
+}
+#search-results-box .sidebar-label {
+  color: var(--laranja) !important;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
