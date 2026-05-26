@@ -1815,3 +1815,93 @@ input, select, textarea { font-size: 16px !important; }
   letter-spacing: 1.2px;
   text-transform: uppercase;
 }
+
+/* ════════════════════════════════════════
+   CORRECÇÕES v10
+════════════════════════════════════════ */
+
+/* ── Círculo activo — só outline laranja, sem fill ── */
+.ph-hex {
+  background: var(--surface) !important;
+  border: 2px solid var(--brd) !important;
+  transition: transform .18s, border-color .18s, box-shadow .18s !important;
+}
+.ph-hex:hover {
+  transform: scale(1.08) !important;
+  border-color: var(--laranja) !important;
+  box-shadow: 0 0 0 3px rgba(236,126,28,.18) !important;
+  background: var(--surface) !important;
+}
+.ph-hex-active {
+  background: var(--surface) !important;
+  border: 2.5px solid var(--laranja) !important;
+  box-shadow: 0 0 0 3px rgba(236,126,28,.18) !important;
+  transform: scale(1.1) !important;
+}
+.ph-hex-active svg  { color: var(--laranja) !important; }
+.ph-hex-active span { color: var(--laranja) !important; }
+.ph-hex svg  { color: var(--ink-new) !important; }
+.ph-hex span { color: var(--mut) !important; }
+
+/* ── Avatar picker — lock icon FORA do círculo ── */
+.avatar-pick-option {
+  position: relative !important;
+  overflow: visible !important;  /* não clipar o cadeado */
+  background: var(--nuage-dk) !important;
+  border: 2px solid var(--brd) !important;
+  padding: 4px !important;
+}
+.avatar-pick-option.selected {
+  border-color: var(--laranja) !important;
+  background: rgba(236,126,28,.08) !important;
+  box-shadow: 0 0 0 3px rgba(236,126,28,.15) !important;
+}
+.avatar-pick-option.locked {
+  opacity: .55 !important;
+}
+.avatar-lock-icon {
+  position: absolute !important;
+  bottom: -6px !important;
+  right: -6px !important;
+  font-size: 12px !important;
+  background: var(--surface) !important;
+  border-radius: 50% !important;
+  width: 20px !important;
+  height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid var(--brd) !important;
+  line-height: 1 !important;
+  box-shadow: var(--sh-xs) !important;
+}
+
+/* ── Avatar SVG sem background de círculo extra ── */
+.avatar-pick-option svg {
+  width: 36px !important;
+  height: 36px !important;
+  display: block !important;
+}
+.profile-bigav, .ph-photo-avatar {
+  background: var(--nuage-dk) !important;
+}
+.profile-avatar-svg svg,
+.ph-photo-avatar svg {
+  width: 85% !important;
+  height: 85% !important;
+}
+
+/* ── Photo upload label cursor ── */
+.ph-photo-upload-btn {
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* search-results-box controlled by JS */
+
+
+
+/* ── Search results — default hidden, shown by JS ── */
+#search-results-box { display: none; }
