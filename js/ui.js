@@ -95,6 +95,9 @@ const UI = {
     document.querySelectorAll('.profile-tab').forEach(function(b) {
       b.classList.toggle('active', b.dataset.tab === tab);
     });
+    document.querySelectorAll('.ph-hex').forEach(function(b) {
+      b.classList.toggle('ph-hex-active', b.dataset.tab === tab);
+    });
     document.querySelectorAll('.profile-tab-panel').forEach(function(p) {
       p.classList.toggle('active', p.id === 'ptab-' + tab);
     });
@@ -205,7 +208,7 @@ const UI = {
   },
 
   /* ══════════════════════════════════════════════════
-     RENDER PROFILE
+     RENDER PROFILE — layout com hero grande + hexágonos
   ══════════════════════════════════════════════════ */
   renderProfile: function() {
     if (!App.currentUser) return;
@@ -217,7 +220,13 @@ const UI = {
     var mySpots  = App.locations.filter(function(l){ return l.ownerEmail === u.email; });
     var allPrize = Gamification.getAllPrizeLevels();
     var firstName = u.name.split(' ')[0];
-    var heroStyle = UI._heroStyle(lv);
+
+    /* Cor dominante do nível para o hero */
+    var c  = lv.color;
+    var r  = parseInt(c.slice(1,3),16);
+    var g  = parseInt(c.slice(3,5),16);
+    var b  = parseInt(c.slice(5,7),16);
+    var heroStyle = 'background:linear-gradient(160deg,rgba('+r+','+g+','+b+',.92) 0%,rgba('+Math.max(0,r-50)+','+Math.max(0,g-40)+','+Math.max(0,b-30)+',.98) 100%);';
 
     var spotsByType = {};
     mySpots.forEach(function(l){
@@ -225,38 +234,80 @@ const UI = {
       spotsByType[l.type].push(l);
     });
 
+    /* Foto guardada localmente */
+    var photoKey = 'profile_photo_' + u.email;
+    var photoData = '';
+    try { photoData = localStorage.getItem(photoKey) || ''; } catch(e){}
+
     var html = '';
 
-    /* ── HERO ── */
-    html += '<div class="profile-hero" style="' + heroStyle + '">';
-    html += '  <div class="profile-hero-inner">';
-    /* Avatar */
-    html += '    <div class="profile-bigav" style="border-color:rgba(255,255,255,.4);">';
-    html += '      <div class="profile-avatar-svg">' + Gamification.getAvatarSVG(pts, u.selectedAvatar) + '</div>';
-    html += '    </div>';
-    /* Name + level */
-    html += '    <div class="profile-hero-text">';
-    html += '      <div class="profile-greeting">Olá, ' + firstName + '</div>';
-    html += '      <div class="profile-level-pill" style="background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.3);">';
-    html += '        Nível ' + lv.level + ' &nbsp;·&nbsp; ' + lv.name;
-    html += '      </div>';
-    html += '    </div>';
+    /* ════════════════════════
+       HERO grande
+    ════════════════════════ */
+    html += '<div class="ph-hero" style="' + heroStyle + '">';
+
+    /* Foto / avatar com botão de upload */
+    html += '<div class="ph-photo-wrap">';
+    if (photoData) {
+      html += '<img src="' + photoData + '" class="ph-photo" alt="Foto de perfil">';
+    } else {
+      html += '<div class="ph-photo ph-photo-avatar">' + Gamification.getAvatarSVG(pts, u.selectedAvatar) + '</div>';
+    }
+    html += '<label class="ph-photo-upload-btn" title="Alterar foto">';
+    html += '  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" /></svg>';
+    html += '  <input type="file" accept="image/*" style="display:none;" onchange="UI._uploadPhoto(this)">';
+    html += '</label>';
+    html += '</div>';
+
+    /* Nome, nível, stats */
+    html += '<div class="ph-hero-info">';
+    html += '  <div class="ph-name">' + u.name + '</div>';
+    html += '  <div class="ph-level" style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);">Nível ' + lv.level + ' · ' + lv.name + '</div>';
+    html += '  <div class="ph-stats">';
+    html += '    <div class="ph-stat"><div class="ph-stat-num">' + pts + '</div><div class="ph-stat-lbl">Pontos</div></div>';
+    html += '    <div class="ph-stat-div"></div>';
+    html += '    <div class="ph-stat"><div class="ph-stat-num">' + mySpots.length + '</div><div class="ph-stat-lbl">Locais</div></div>';
+    html += '    <div class="ph-stat-div"></div>';
+    html += '    <div class="ph-stat"><div class="ph-stat-num">' + lv.level + '</div><div class="ph-stat-lbl">Nível</div></div>';
     html += '  </div>';
     html += '</div>';
 
-    /* ── 3 TABS ── */
-    html += '<div class="profile-tabs">';
-    html += '  <button class="profile-tab" data-tab="pontos" onclick="UI.switchProfileTab(\'pontos\')">Pontos</button>';
-    html += '  <button class="profile-tab" data-tab="locais" onclick="UI.switchProfileTab(\'locais\')">Locais</button>';
-    html += '  <button class="profile-tab" data-tab="dados"  onclick="UI.switchProfileTab(\'dados\')">Os meus dados</button>';
+    /* Barra de progresso */
+    if (nextLv) {
+      html += '<div class="ph-progress">';
+      html += '  <div class="ph-progress-bar"><div class="ph-progress-fill" style="width:' + progress + '%;background:rgba(255,255,255,.8);"></div></div>';
+      html += '  <div class="ph-progress-lbl"><span>' + pts + ' pts</span><span>faltam ' + (nextLv.minPts - pts) + ' pts para ' + nextLv.name + '</span></div>';
+      html += '</div>';
+    }
+
+    /* Navegação hexagonal */
+    html += '<div class="ph-hex-nav">';
+    var tabs = [
+      { id:'pontos', icon:'<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"/></svg>', label:'Pontos' },
+      { id:'locais', icon:'<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>', label:'Locais' },
+      { id:'dados',  icon:'<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>', label:'Dados' },
+    ];
+    tabs.forEach(function(t) {
+      var isActive = (UI._activeProfileTab === t.id);
+      html += '<button class="ph-hex' + (isActive?' ph-hex-active':'') + '" data-tab="' + t.id + '" onclick="UI.switchProfileTab(\'' + t.id + '\')">';
+      html += '  <div class="ph-hex-inner">';
+      html += '    ' + t.icon;
+      html += '    <span>' + t.label + '</span>';
+      html += '  </div>';
+      html += '</button>';
+    });
     html += '</div>';
 
-    /* ══════════════════════════════
-       TAB 1 — Pontos & Prémios
-    ══════════════════════════════ */
+    html += '</div>'; /* fim ph-hero */
+
+    /* ════════════════════════
+       CONTEÚDO DAS TABS
+    ════════════════════════ */
+    html += '<div class="ph-content">';
+
+    /* ── TAB 1: Pontos ── */
     html += '<div class="profile-tab-panel" id="ptab-pontos">';
 
-    /* Pontos actuais */
     html += '<div class="profile-card">';
     html += '  <div class="pts-big" style="color:' + lv.color + ';">' + pts + '<span class="pts-big-lbl">pts</span></div>';
     html += '  <div class="level-header-row" style="margin-top:12px;">';
@@ -275,7 +326,6 @@ const UI = {
     }
     html += '</div>';
 
-    /* Como ganhar pontos */
     html += '<div class="profile-card">';
     html += '  <div class="card-section-title">Como ganhar pontos</div>';
     html += '  <div class="earn-grid">';
@@ -285,17 +335,13 @@ const UI = {
     html += '  </div>';
     html += '</div>';
 
-    /* Prémios */
     html += '<div class="profile-card">';
     html += '  <div class="card-section-title">Prémios</div>';
     html += '  <div class="prizes-timeline">';
     allPrize.forEach(function(lev){
       var unlocked = pts >= lev.minPts;
       html += '<div class="prize-row">';
-      html += '  <div class="prize-indicator">';
-      html += '    <div class="prize-dot" style="background:' + (unlocked?lev.color:'#ddd') + ';' + (unlocked?'box-shadow:0 0 0 3px '+lev.color+'25;':'') + '"></div>';
-      html += '    <div class="prize-line"></div>';
-      html += '  </div>';
+      html += '  <div class="prize-indicator"><div class="prize-dot" style="background:' + (unlocked?lev.color:'#ddd') + ';' + (unlocked?'box-shadow:0 0 0 3px '+lev.color+'25;':'') + '"></div><div class="prize-line"></div></div>';
       html += '  <div class="prize-body">';
       html += '    <div class="prize-level-label" style="color:' + (unlocked?lev.color:'#bbb') + ';">Nível ' + lev.level + ' — ' + lev.name + '</div>';
       html += '    <div class="prize-title' + (unlocked?'':' prize-blurred') + '">' + lev.prize.name + '</div>';
@@ -310,31 +356,20 @@ const UI = {
     });
     html += '  </div>';
     html += '</div>';
-
     html += '</div>'; /* fim ptab-pontos */
 
-    /* ══════════════════════════════
-       TAB 2 — Locais
-    ══════════════════════════════ */
+    /* ── TAB 2: Locais ── */
     html += '<div class="profile-tab-panel" id="ptab-locais">';
     html += '<div class="profile-card">';
     html += '  <div class="card-section-title">Os Meus Locais (' + mySpots.length + ')</div>';
     if (mySpots.length === 0) {
-      html += '  <div class="empty-state-sm">';
-      html += '    <div style="font-size:2rem;margin-bottom:8px;">📍</div>';
-      html += '    <p>Ainda não adicionaste nenhum local.</p>';
-      html += '    <p style="margin-top:4px;font-size:11px;">Usa o botão + no mapa para começar.</p>';
-      html += '  </div>';
+      html += '  <div class="empty-state-sm"><div style="font-size:2rem;margin-bottom:8px;">📍</div><p>Ainda não adicionaste nenhum local.</p></div>';
     } else {
       Object.keys(spotsByType).forEach(function(type){
         var spots = spotsByType[type];
         var cfg   = TYPE_CONFIG[type] || { label: type, color: '#888' };
         html += '<div class="spots-type-group">';
-        html += '  <div class="spots-type-header">';
-        html += '    <span class="spots-type-dot" style="background:' + cfg.color + ';"></span>';
-        html += '    <span class="spots-type-name" style="color:' + cfg.color + ';">' + cfg.label + '</span>';
-        html += '    <span class="spots-type-count">' + spots.length + '</span>';
-        html += '  </div>';
+        html += '  <div class="spots-type-header"><span class="spots-type-dot" style="background:' + cfg.color + ';"></span><span class="spots-type-name" style="color:' + cfg.color + ';">' + cfg.label + '</span><span class="spots-type-count">' + spots.length + '</span></div>';
         spots.forEach(function(l){
           var dddUrl = l.dddeltaUrl || l.dddelta_url;
           html += '<div class="spot-list-item">';
@@ -344,14 +379,10 @@ const UI = {
           html += '    <div class="spot-list-loc">' + l.city + ', ' + l.country + '</div>';
           html += '    <div class="spot-list-actions">';
           html += '      <button class="spot-action-btn" onclick="UI.closeOverlay(\'profile-overlay\');setTimeout(function(){Map.flyTo(\''+l.id+'\');},200);">Ver no mapa</button>';
-          if (dddUrl) {
-            html += '      <a class="spot-action-btn spot-action-link" href="' + dddUrl + '" target="_blank" rel="noopener">Saber mais</a>';
-          }
+          if (dddUrl) html += '      <a class="spot-action-btn spot-action-link" href="' + dddUrl + '" target="_blank" rel="noopener">Saber mais</a>';
           html += '    </div>';
           html += '  </div>';
-          html += '  <div class="spot-list-right">';
-          html += '    <span class="spot-badge ' + (l.verified?'spot-badge-ok':'spot-badge-pend') + '">' + (l.verified?'Verificado':'Pendente') + '</span>';
-          html += '  </div>';
+          html += '  <div class="spot-list-right"><span class="spot-badge ' + (l.verified?'spot-badge-ok':'spot-badge-pend') + '">' + (l.verified?'Verificado':'Pendente') + '</span></div>';
           html += '</div>';
         });
         html += '</div>';
@@ -360,23 +391,10 @@ const UI = {
     html += '</div>';
     html += '</div>'; /* fim ptab-locais */
 
-    /* ══════════════════════════════
-       TAB 3 — Os Meus Dados
-    ══════════════════════════════ */
+    /* ── TAB 3: Dados ── */
     html += '<div class="profile-tab-panel" id="ptab-dados">';
 
-    /* ── Account fields ── */
-    var selIdx = (u.selectedAvatar !== undefined && u.selectedAvatar !== null)
-      ? u.selectedAvatar : lv.level - 1;
-
-    /* View mode */
-    html += '<div class="profile-card" id="account-card">';
-    html += '  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
-    html += '    <div class="card-section-title" style="margin-bottom:0;">Dados da conta</div>';
-    html += '    <button class="edit-toggle-btn" onclick="UI.toggleEditMode()">Editar</button>';
-    html += '  </div>';
-
-    /* Avatar picker html — usado em view e edit */
+    var selIdx = (u.selectedAvatar !== undefined && u.selectedAvatar !== null) ? u.selectedAvatar : lv.level - 1;
     var avatarPickHtml = '';
     LEVEL_AVATARS.forEach(function(svg, i) {
       var lvNum    = i + 1;
@@ -384,73 +402,79 @@ const UI = {
       var isSel    = selIdx === i;
       avatarPickHtml += '<div class="avatar-pick-option ' + (!unlocked?'locked':'') + ' ' + (isSel?'selected':'') + '"';
       if (unlocked) avatarPickHtml += ' onclick="UI.selectAvatar(' + i + ')"';
-      avatarPickHtml += ' title="Nível ' + lvNum + (unlocked?'':' — bloqueado') + '">';
-      avatarPickHtml += svg;
+      avatarPickHtml += ' title="Nível ' + lvNum + (unlocked?'':' — bloqueado') + '">' + svg;
       if (!unlocked) avatarPickHtml += '<div class="avatar-lock-icon">🔒</div>';
       avatarPickHtml += '</div>';
     });
 
+    html += '<div class="profile-card" id="account-card">';
+    html += '  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
+    html += '    <div class="card-section-title" style="margin-bottom:0;">Dados da conta</div>';
+    html += '    <button class="edit-toggle-btn" onclick="UI.toggleEditMode()">Editar</button>';
+    html += '  </div>';
+
     html += '  <div id="account-view">';
-    html += '    <div class="account-field"><span class="account-label">Username</span><span class="account-value">' + u.email.split('@')[0] + '</span></div>';
     html += '    <div class="account-field"><span class="account-label">Nome</span><span class="account-value">' + u.name + '</span></div>';
     html += '    <div class="account-field"><span class="account-label">E-mail</span><span class="account-value">' + u.email + '</span></div>';
     html += '    <div class="account-field" style="border-bottom:none;"><span class="account-label">Password</span>';
-    html += '      <div class="pass-view-wrap">';
-    html += '        <span class="account-value" id="pw-display">••••••••</span>';
+    html += '      <div class="pass-view-wrap"><span class="account-value" id="pw-display">••••••••</span>';
     html += '        <button type="button" class="pass-view-eye" onclick="UI.toggleViewPassword(this)" tabindex="-1">';
     html += '          <svg class="eye-off" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:17px;height:17px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>';
     html += '          <svg class="eye-on" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:17px;height:17px;display:none;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>';
-    html += '        </button>';
-    html += '      </div>';
-    html += '    </div>';
-    /* Avatares visíveis em modo leitura */
+    html += '        </button></div></div>';
     html += '    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--brd);">';
-    html += '      <div class="account-label" style="margin-bottom:8px;">Avatares</div>';
+    html += '      <div class="account-label" style="margin-bottom:8px;">Avatar actual</div>';
     html += '      <div class="avatar-picker-grid" style="pointer-events:none;">' + avatarPickHtml + '</div>';
     html += '      <p style="font-size:10px;color:var(--mut-lt);margin-top:6px;">Os avatares com 🔒 desbloqueiam com mais pontos</p>';
     html += '    </div>';
     html += '  </div>';
 
     html += '  <div id="account-edit" style="display:none;">';
-    html += '    <div class="account-field-edit"><label class="account-label">Nome</label><input class="account-edit-input" id="edit-name" value="' + u.name + '" placeholder="O teu nome"></div>';
+    html += '    <div class="account-field-edit"><label class="account-label">Nome</label><input class="account-edit-input" id="edit-name" value="' + u.name + '"></div>';
     html += '    <div class="account-field-edit"><label class="account-label">E-mail</label><input class="account-edit-input" id="edit-email" type="email" value="' + u.email + '"></div>';
     html += '    <div class="account-field-edit" style="border-bottom:none;">';
     html += '      <button id="toggle-pass-btn" class="btn-toggle-pass" type="button" onclick="UI.toggleNewPassField()">Alterar password</button>';
-    html += '      <div id="new-pass-wrap" style="display:none;margin-top:10px;">';
-    html += '        <label class="account-label">Nova Password</label>';
-    html += '        <div class="pass-wrap">';
-    html += '          <input class="account-edit-input" id="edit-pass" type="password" placeholder="Mínimo 6 caracteres" style="padding-right:44px;">';
+    html += '      <div id="new-pass-wrap" style="display:none;margin-top:10px;"><label class="account-label">Nova Password</label>';
+    html += '        <div class="pass-wrap"><input class="account-edit-input" id="edit-pass" type="password" placeholder="Mínimo 6 caracteres" style="padding-right:44px;">';
     html += '          <button type="button" class="pass-toggle" tabindex="-1" onclick="togglePassEye(this)">';
     html += '            <svg class="eye-off" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>';
     html += '            <svg class="eye-on" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:18px;height:18px;display:none;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>';
-    html += '          </button>';
-    html += '        </div>';
-    html += '      </div>';
-    html += '    </div>';
-    /* Avatar picker em edição */
-    html += '    <div class="account-field-edit" style="border-bottom:none;padding-top:14px;">';
-    html += '      <label class="account-label">Escolher avatar</label>';
-    html += '      <div class="avatar-picker-grid">' + avatarPickHtml + '</div>';
-    html += '      <p style="font-size:10px;color:var(--mut-lt);margin-top:6px;">Os avatares com 🔒 desbloqueiam com mais pontos</p>';
-    html += '    </div>';
+    html += '          </button></div></div></div>';
+    html += '    <div class="account-field-edit" style="border-bottom:none;padding-top:14px;"><label class="account-label">Escolher avatar</label>';
+    html += '      <div class="avatar-picker-grid">' + avatarPickHtml + '</div></div>';
     html += '    <div class="edit-actions">';
     html += '      <button class="btn-cancel-edit" onclick="UI.toggleEditMode()">Cancelar</button>';
     html += '      <button class="btn-save" onclick="UI.saveProfile()">Guardar</button>';
     html += '    </div>';
     html += '  </div>';
-    html += '</div>'; /* fim account-card */
+    html += '</div>';
 
-    /* Terminar sessão + Apagar conta — no fim, sem destaque */
     html += '<div class="profile-card profile-session-card">';
     html += '  <button class="btn-logout-sm btn-full-w" onclick="Auth.logout()">Terminar sessão</button>';
     html += '  <button class="btn-delete-sm btn-full-w" onclick="UI.deleteAccount()">Apagar conta</button>';
     html += '</div>';
-
     html += '</div>'; /* fim ptab-dados */
+
+    html += '</div>'; /* fim ph-content */
 
     document.getElementById('profile-body').innerHTML = html;
     UI.switchProfileTab(UI._activeProfileTab || 'pontos');
   },
+
+  /* Upload de foto de perfil */
+  _uploadPhoto: function(input) {
+    var file = input.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var key = 'profile_photo_' + App.currentUser.email;
+      try { localStorage.setItem(key, e.target.result); } catch(err) {}
+      UI.renderProfile();
+      UI.renderTopbar();
+    };
+    reader.readAsDataURL(file);
+  },
+
 
   /* ══════════════════════════════
      RANKING
