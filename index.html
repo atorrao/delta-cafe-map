@@ -219,6 +219,11 @@
           <button class="sidebar-search-clear" id="sidebar-search-clear" onclick="Map.clearSearch();this.style.display='none';document.getElementById('sidebar-search-input').value='';document.getElementById('global-search').value='';" style="display:none;">×</button>
         </div>
       </div>
+      <!-- Search results — immediately below search -->
+      <div class="sidebar-section" id="search-results-box">
+        <div class="sidebar-label">Resultados</div>
+        <div id="search-results-list"></div>
+      </div>
       <div class="sidebar-section" id="nearby-box">
         <div class="sidebar-label sidebar-label-destaque">
           <span class="sidebar-label-dot" style="background:#E8820C;"></span>
@@ -238,10 +243,6 @@
           </div>
           <div class="sidebar-accordion-body" id="historia-list" style="display:none;"></div>
         </div>
-      </div>
-      <div class="sidebar-section" id="search-results-box">
-        <div class="sidebar-label">Resultados</div>
-        <div id="search-results-list"></div>
       </div>
     </aside>
 
@@ -324,13 +325,13 @@
         <div class="onboarding-step active" data-step="1">
           <div class="onboarding-icon">🗺️</div>
           <h2 class="onboarding-title">Bem-vindo ao Where's my Delta?</h2>
-          <p class="onboarding-text">Descobre onde beber e comprar Café Delta em Portugal e por todo o Mundo. A app é feita pela comunidade — és tu que a construís.</p>
+          <p class="onboarding-text">Descobre onde beber e comprar Café Delta em Portugal e por todo o Mundo. A app é feita pela comunidade, é com o teu apoio que se constrói.</p>
         </div>
         <!-- Step 2 -->
         <div class="onboarding-step" data-step="2">
           <div class="onboarding-icon">📍</div>
           <h2 class="onboarding-title">Adiciona locais</h2>
-          <p class="onboarding-text">Conheces um café ou restaurante que serve Delta? Carrega no botão <strong>+</strong> no mapa e adiciona-o. Ganha <strong>5 pontos</strong> por cada local e <strong>20 pontos</strong> no primeiro!</p>
+          <p class="onboarding-text">Conheces um café ou restaurante que serve Delta? Carrega no botão <strong>+</strong> no mapa e adiciona-o. Ganha <strong>5 pontos</strong> por cada local e <strong>20 pontos</strong> de bónus no primeiro!</p>
         </div>
         <!-- Step 3 -->
         <div class="onboarding-step" data-step="3">
@@ -340,15 +341,15 @@
         </div>
         <!-- Step 4 -->
         <div class="onboarding-step" data-step="4">
-          <div class="onboarding-icon">⭐</div>
+          <div class="onboarding-icon">🏆</div>
           <h2 class="onboarding-title">Sobe de nível</h2>
-          <p class="onboarding-text">Acumula pontos e passa por 8 níveis: de <strong>Explorador</strong> a <strong>Mestre</strong>. Cada nível desbloqueia um novo avatar e prémios exclusivos Delta.</p>
+          <p class="onboarding-text">Acumula pontos e passa por níveis para desbloquear <strong>prémios exclusivos Delta</strong> — desde descontos a experiências únicas na fábrica de Campo Maior.</p>
         </div>
-        <!-- Step 5 -->
+        <!-- Step 5 — Ready -->
         <div class="onboarding-step" data-step="5">
           <div class="onboarding-icon">☕</div>
-          <h2 class="onboarding-title">Cafés com História</h2>
-          <p class="onboarding-text">Explora os <strong>Cafés com História</strong> na barra lateral — espaços icónicos que servem Delta em todo o Mundo, com a sua história contada pela D de Delta.</p>
+          <h2 class="onboarding-title">Estás pronto?</h2>
+          <p class="onboarding-text">Vamos a isso! Começa por explorar o mapa ou adiciona o teu primeiro local Delta.</p>
         </div>
       </div>
       <!-- Dots -->
