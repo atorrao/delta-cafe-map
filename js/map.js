@@ -197,7 +197,7 @@ var Map = (function() {
       '</div>';
       html += '<div class="sidebar-accordion-body" id="acc-' + k + '" style="display:none;">';
       locs.forEach(function(loc) {
-        html += '<div class="sidebar-loc-item" data-id="' + loc.id + '">' +
+        html += '<div class="sidebar-loc-item loc-official" data-id="' + loc.id + '">' +
           '<div class="sidebar-loc-info">' +
             '<div class="sidebar-loc-name">' + loc.name + '</div>' +
             '<div class="sidebar-loc-meta">' + (loc.city ? loc.city : '') + (loc.country ? ', ' + loc.country : '') + '</div>' +
@@ -250,7 +250,8 @@ var Map = (function() {
     withDist.forEach(function(x) {
       var loc = x.loc;
       var distStr = x.dist < 1 ? Math.round(x.dist*1000)+' m' : x.dist.toFixed(1)+' km';
-      html += '<div class="sidebar-loc-item" data-id="' + loc.id + '">' +
+      var isOfficial = loc.verified && (!loc.ownerEmail || loc.ownerEmail === 'admin@delta.pt');
+      html += '<div class="sidebar-loc-item ' + (isOfficial ? 'loc-official' : 'loc-user') + '" data-id="' + loc.id + '">' +
         '<span class="sidebar-loc-dot" style="background:' + TYPE_CONFIG['cafe'].color + ';"></span>' +
         '<div class="sidebar-loc-info">' +
           '<div class="sidebar-loc-name">' + loc.name + '</div>' +
