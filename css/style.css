@@ -2157,3 +2157,132 @@ html, body {
   transition: background .15s;
 }
 .ob-next:hover { background: #d06a10; }
+
+/* ════════════════════════════════════════
+   HERO TEXTURE + DADOS TAB REDESIGN
+════════════════════════════════════════ */
+
+/* ── Leaf texture as subtle pseudo-element overlay ── */
+.ph-hero {
+  position: relative;
+  overflow: hidden;
+}
+.ph-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('assets/leaf-texture.png') center/cover no-repeat;
+  opacity: 0.08;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 0;
+}
+.ph-hero > * { position: relative; z-index: 1; }
+
+/* ── Dados tab — professional rows inspired by reference ── */
+.account-field {
+  display: flex;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--brd);
+  gap: 14px;
+}
+.account-field-icon {
+  width: 36px; height: 36px;
+  border-radius: var(--r-sm);
+  background: var(--nuage-dk);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: var(--laranja);
+}
+.account-field-body { flex: 1; min-width: 0; }
+.account-label {
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+  color: var(--mut-lt) !important;
+  display: block; margin-bottom: 2px;
+}
+.account-value {
+  font-size: 14px; font-weight: 500;
+  color: var(--ink-new);
+  display: block;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* Edit inputs */
+.account-field-edit {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--brd);
+}
+.account-edit-input {
+  width: 100%;
+  border: 1.5px solid var(--brd);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: var(--font-body);
+  color: var(--ink-new);
+  background: var(--surface);
+  transition: border-color .18s;
+  margin-top: 6px;
+}
+.account-edit-input:focus { border-color: var(--laranja); outline: none; }
+
+/* Edit / Guardar buttons */
+.edit-toggle-btn {
+  font-size: 12px; font-weight: 600;
+  padding: 6px 14px; border-radius: 20px;
+  border: 1.5px solid var(--brd);
+  color: var(--mut); background: transparent;
+  cursor: pointer; font-family: var(--font-body);
+  transition: all .15s;
+}
+.edit-toggle-btn:hover { border-color: var(--laranja); color: var(--laranja); }
+
+.edit-actions {
+  display: flex; gap: 10px; padding-top: 16px;
+}
+.btn-cancel-edit {
+  flex: 1; padding: 12px; border: 1.5px solid var(--brd);
+  border-radius: var(--r-sm); background: transparent;
+  font-size: 13px; font-weight: 600; color: var(--mut);
+  cursor: pointer; font-family: var(--font-body);
+}
+.btn-save {
+  flex: 2; padding: 12px; border: none;
+  border-radius: var(--r-sm); background: var(--laranja);
+  font-size: 13px; font-weight: 700; color: #fff;
+  cursor: pointer; font-family: var(--font-body);
+  transition: background .15s;
+}
+.btn-save:hover { background: #d06a10; }
+
+/* Session card at bottom */
+.profile-session-card {
+  margin: 12px 12px 0;
+  border-radius: var(--r-md);
+  gap: 8px;
+}
+.btn-logout-sm {
+  width: 100%; padding: 13px;
+  border: 1.5px solid var(--brd);
+  border-radius: var(--r-sm);
+  background: transparent;
+  font-size: 13px; font-weight: 600;
+  color: var(--ink-new);
+  font-family: var(--font-body);
+  cursor: pointer; text-align: center;
+  transition: all .15s; display: flex;
+  align-items: center; justify-content: center; gap: 8px;
+}
+.btn-logout-sm:hover { border-color: var(--laranja); color: var(--laranja); }
+.btn-delete-sm {
+  width: 100%; padding: 11px;
+  border: none; border-radius: var(--r-sm);
+  background: transparent;
+  font-size: 12px; font-weight: 500;
+  color: var(--mut-lt);
+  font-family: var(--font-body);
+  cursor: pointer; text-align: center;
+  transition: color .15s;
+}
+.btn-delete-sm:hover { color: #a13a1e; }
