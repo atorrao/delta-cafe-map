@@ -2373,3 +2373,47 @@ html, body {
 #account-view .avatar-picker-grid {
   justify-content: flex-start !important;
 }
+
+/* ════════════════════════════════════════
+   FIX — centramento mobile
+════════════════════════════════════════ */
+
+/* ph-hero centra só o próprio conteúdo (foto, nome, stats) — não herda para os cards */
+.ph-content,
+.ph-content .profile-card,
+.ph-content .profile-tab-panel,
+#ptab-dados,
+#ptab-locais,
+#ptab-pontos,
+#account-view,
+#account-edit,
+.account-field,
+.account-field-body,
+.account-label,
+.account-value,
+.profile-session-card,
+.earn-grid,
+.earn-item,
+.prize-row,
+.prize-body,
+.spots-type-group,
+.spot-list-item,
+.spot-list-info,
+.level-header-row,
+.level-bar-wrap,
+.level-bar-labels {
+  text-align: left !important;
+}
+
+/* Override any inherited justify-content:center on flex containers in cards */
+.profile-card {
+  text-align: left !important;
+}
+#account-view .account-field {
+  justify-content: flex-start !important;
+  align-items: center !important;
+}
+#account-view .account-field[style*="flex-direction:column"],
+#account-view .account-field[style*="flex-direction: column"] {
+  align-items: flex-start !important;
+}
