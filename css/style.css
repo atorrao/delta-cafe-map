@@ -2329,3 +2329,183 @@ html, body { height: 100dvh !important; overflow: hidden !important; }
 .sidebar-accordion-body .historia-item .sidebar-loc-meta {
   color: var(--mut);
 }
+
+/* ════════════════════════════════════════
+   MODAL ADD — Bottom Sheet redesign
+════════════════════════════════════════ */
+
+#add-modal {
+  align-items: flex-end !important;
+  padding: 0 !important;
+}
+
+.modal-add-sheet {
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  max-height: 92dvh;
+  overflow-y: auto;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -8px 40px rgba(0,0,0,.18);
+  animation: sheetUp .3s cubic-bezier(.2,0,.2,1);
+}
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.modal-sheet-handle {
+  width: 36px; height: 4px;
+  background: var(--brd);
+  border-radius: 2px;
+  margin: 12px auto 0;
+}
+
+.modal-sheet-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--brd);
+}
+.modal-sheet-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ink-new);
+  line-height: 1.2;
+}
+.modal-sheet-sub {
+  font-size: 11px;
+  color: var(--mut);
+  margin-top: 3px;
+  font-family: var(--font-body);
+}
+.modal-sheet-close {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--nuage-dk);
+  color: var(--mut);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background .15s;
+}
+.modal-sheet-close:hover { background: var(--brd); }
+
+/* Photo zone */
+.modal-photo-zone {
+  display: block;
+  margin: 12px 20px;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  cursor: pointer;
+  height: 120px;
+  border: 2px dashed var(--brd);
+  background: var(--nuage-dk);
+  transition: border-color .18s, background .18s;
+}
+.modal-photo-zone:hover { border-color: var(--laranja); background: rgba(236,126,28,.04); }
+.modal-photo-inner {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 8px;
+  color: var(--mut);
+}
+.modal-photo-inner svg { color: var(--mut-lt); }
+.modal-photo-txt {
+  font-size: 12px; font-weight: 500;
+  font-family: var(--font-body);
+  color: var(--mut);
+}
+.modal-photo-txt em {
+  font-style: normal;
+  background: rgba(236,126,28,.12);
+  color: var(--laranja);
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-left: 4px;
+  font-size: 11px;
+}
+
+/* Fields */
+.modal-fields { padding: 4px 20px 0; }
+.mfield { margin-bottom: 14px; }
+.mfield-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--laranja);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  margin-bottom: 6px;
+  font-family: var(--font-body);
+}
+.mfield-opt {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--mut-lt);
+  font-size: 10px;
+  margin-left: 4px;
+}
+.mfield-input {
+  width: 100%;
+  background: var(--nuage-dk);
+  border: 1.5px solid var(--brd);
+  border-radius: var(--r-sm);
+  padding: 11px 14px;
+  font-size: 14px;
+  font-family: var(--font-body);
+  color: var(--ink-new);
+  transition: border-color .18s, background .18s;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+}
+.mfield-input:focus {
+  outline: none;
+  border-color: var(--laranja);
+  background: var(--surface);
+}
+.mfield-input::placeholder { color: var(--mut-lt); }
+.mfield-select { cursor: pointer; }
+.mfield-textarea { resize: none; min-height: 68px; }
+
+/* Actions */
+.modal-sheet-actions {
+  display: flex;
+  gap: 10px;
+  padding: 16px 20px 4px;
+  border-top: 1px solid var(--brd);
+}
+.msheet-btn {
+  flex: 1;
+  padding: 13px;
+  border-radius: var(--r-sm);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: none;
+  transition: all .15s;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+}
+.msheet-cancel {
+  background: var(--nuage-dk);
+  color: var(--mut);
+  border: 1.5px solid var(--brd);
+  flex: 0 0 auto;
+  padding: 13px 20px;
+}
+.msheet-cancel:hover { background: var(--brd); }
+.msheet-submit {
+  background: var(--laranja);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(236,126,28,.35);
+}
+.msheet-submit:hover { background: #d06a10; }
