@@ -301,7 +301,7 @@ input, select, textarea { font-family: var(--font-body); }
   gap:4px; padding:10px 12px; min-width:68px;
   background:var(--surface); border:1px solid var(--brd);
   border-radius:var(--r-md); box-shadow:var(--sh-sm);
-  color:var(--text-2); transition:all .18s; cursor:pointer;
+  color:var(--text-2); transition:all .18s; cursor:pointer; min-width:unset;
 }
 .map-ctrl-btn:hover { box-shadow:var(--sh-md); color:var(--terre-cuite); background:var(--nuage-dk); }
 .map-ctrl-label {
@@ -721,7 +721,7 @@ input, select, textarea { font-size:16px !important; }
   .layer-switcher { top:8px; right:8px; }
   .layer-btn { font-size:10px; padding:5px 10px; }
   .map-controls { bottom:calc(var(--bnav-h) + env(safe-area-inset-bottom,0px) + 80px); left:12px; right:auto; }
-  .map-ctrl-btn { min-width:60px; padding:8px 10px; }
+  .map-ctrl-btn { min-width:unset; padding:8px 10px; }
   .modal-bg { align-items:flex-end; padding:0; }
   .modal { width:100%; border-radius:var(--r-lg) var(--r-lg) 0 0; max-height:92vh; padding:1.5rem 1.2rem; padding-bottom:calc(1.5rem + env(safe-area-inset-bottom,0px)); }
   .modal-add { width:100%; }
@@ -1410,6 +1410,9 @@ a, button { -webkit-tap-highlight-color:transparent; }
   background: var(--nuage-dk);
   padding-top: 42px;
   min-height: 300px;
+  width: 100%;
+  align-self: stretch;
+  text-align: left;
 }
 .ph-content .profile-card {
   margin: 12px 12px 0;
@@ -1817,8 +1820,12 @@ input, select, textarea { font-size: 16px !important; }
    CORRECÇÕES v10
 ════════════════════════════════════════ */
 
-/* ── Círculo activo — só outline laranja, sem fill ── */
+/* ── Círculo — sem clip-path, com border-radius ── */
 .ph-hex {
+  clip-path: none !important;
+  border-radius: 50% !important;
+  width: 60px !important;
+  height: 60px !important;
   background: var(--surface) !important;
   border: 2px solid var(--brd) !important;
   transition: transform .18s, border-color .18s, box-shadow .18s !important;
