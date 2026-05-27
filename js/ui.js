@@ -492,24 +492,19 @@ const UI = {
     html += '  <div id="account-view" style="text-align:left;">';
 
     /* 1 — Foto de perfil */
-    html += '<div class="account-field">';
-    html += '  <div class="account-field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z"/></svg></div>';
-    html += '  <div class="account-field-body" style="text-align:left;">';
-    html += '    <span class="account-label">Foto de perfil</span>';
-    html += '    <div style="display:flex;align-items:center;gap:12px;margin-top:6px;">';
+    html += '<div style="padding:14px 0;border-bottom:1px solid var(--brd);">';
+    html += '  <span class="account-label" style="display:block;margin-bottom:12px;">Foto de perfil</span>';
     if (photoData) {
-      html += '<img src="' + photoData + '" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--brd);flex-shrink:0;">';
-      html += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
-      html += '  <label class="spot-action-btn" for="ph-photo-file-dados" style="cursor:pointer;font-size:12px;">Alterar</label>';
-      html += '  <button class="spot-action-btn" style="color:var(--terre-cuite);border-color:rgba(161,58,30,.3);font-size:12px;" onclick="UI._removePhoto()">Remover</button>';
-      html += '</div>';
+      html += '  <img src="' + photoData + '" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid var(--brd);display:block;margin-bottom:10px;">';
+      html += '  <div style="display:flex;gap:8px;">';
+      html += '    <label class="spot-action-btn" for="ph-photo-file-dados" style="cursor:pointer;font-size:12px;">Alterar</label>';
+      html += '    <button class="spot-action-btn" style="color:var(--terre-cuite);border-color:rgba(161,58,30,.3);font-size:12px;" onclick="UI._removePhoto()">Remover</button>';
+      html += '  </div>';
     } else {
-      html += '<div style="width:44px;height:44px;border-radius:50%;background:var(--nuage-dk);border:2px solid var(--brd);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">' + Gamification.getAvatarSVG(pts, u.selectedAvatar) + '</div>';
-      html += '<label class="spot-action-btn" for="ph-photo-file-dados" style="cursor:pointer;font-size:12px;">Adicionar foto</label>';
+      html += '  <div style="width:72px;height:72px;border-radius:50%;background:var(--nuage-dk);border:2px solid var(--brd);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:10px;">' + Gamification.getAvatarSVG(pts, u.selectedAvatar) + '</div>';
+      html += '  <label class="spot-action-btn" for="ph-photo-file-dados" style="cursor:pointer;font-size:12px;display:inline-block;">Adicionar foto</label>';
     }
-    html += '    </div>';
-    html += '    <input type="file" id="ph-photo-file-dados" accept="image/*" style="display:none;">';
-    html += '  </div>';
+    html += '  <input type="file" id="ph-photo-file-dados" accept="image/*" style="display:none;">';
     html += '</div>';
 
     /* 2 — Nome */
@@ -539,10 +534,10 @@ const UI = {
     html += '</div>';
 
     /* 5 — Avatar actual */
-    html += '<div class="account-field" style="border-bottom:none;flex-direction:column;align-items:flex-start;gap:10px;">';
-    html += '  <span class="account-label" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--mut-lt);">Avatar actual</span>';
-    html += '  <div class="avatar-picker-grid" style="pointer-events:none;">' + avatarPickHtml + '</div>';
-    html += '  <p style="font-size:10px;color:var(--mut-lt);">Os avatares com 🔒 desbloqueiam com mais pontos</p>';
+    html += '<div style="padding-top:14px;">';
+    html += '  <span class="account-label" style="display:block;margin-bottom:12px;">Avatar actual</span>';
+    html += '  <div class="avatar-picker-grid">' + avatarPickHtml + '</div>';
+    html += '  <p style="font-size:10px;color:var(--mut-lt);margin-top:8px;">Os avatares com 🔒 desbloqueiam com mais pontos</p>';
     html += '</div>';
 
     html += '  </div>'; /* fim account-view */
