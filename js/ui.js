@@ -65,9 +65,15 @@ const UI = {
   closeOverlay: function(id) {
     var el = document.getElementById(id);
     if (el) el.classList.add('hidden');
+    /* Show nearest alert again if it was visible */
+    var na = document.getElementById('nearest-alert');
+    if (na) na.style.removeProperty('display');
   },
 
   closeAllOverlays: function() {
+    /* Show nearest alert again */
+    var na = document.getElementById('nearest-alert');
+    if (na) na.style.removeProperty('display');
     ['profile-overlay','ranking-overlay','admin-overlay'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.classList.add('hidden');
@@ -78,18 +84,23 @@ const UI = {
     document.querySelectorAll('.bnav-btn').forEach(function(b) {
       b.classList.toggle('active', b.dataset.view===tab);
     });
+    var na = document.getElementById('nearest-alert');
     if (tab==='map') {
       UI.closeAllOverlays();
-    } else if (tab==='ranking') {
-      UI.closeAllOverlays();
-      UI.renderRanking();
-      document.getElementById('ranking-overlay').classList.remove('hidden');
-    } else if (tab==='profile') {
-      UI.closeAllOverlays();
-      if (App.currentUser) { UI.renderProfile(); document.getElementById('profile-overlay').classList.remove('hidden'); }
-      else Auth.showModal('login');
-    } else if (tab==='add') {
-      Auth.requireLogin(function(){ Map.startAdd(); });
+    } else {
+      /* Hide nearest alert when opening any overlay */
+      if (na) na.style.display = 'none';
+      if (tab==='ranking') {
+        UI.closeAllOverlays();
+        UI.renderRanking();
+        document.getElementById('ranking-overlay').classList.remove('hidden');
+      } else if (tab==='profile') {
+        UI.closeAllOverlays();
+        if (App.currentUser) { UI.renderProfile(); document.getElementById('profile-overlay').classList.remove('hidden'); }
+        else Auth.showModal('login');
+      } else if (tab==='add') {
+        Auth.requireLogin(function(){ Map.startAdd(); });
+      }
     }
   },
 
@@ -126,6 +137,9 @@ const UI = {
   openProfileOverlay: function() {
     if (!App.currentUser) { Auth.showModal('login'); return; }
     UI.closeAllOverlays();
+    /* Hide nearest-alert while profile is open */
+    var na = document.getElementById('nearest-alert');
+    if (na) na.style.display = 'none';
     UI._activeProfileTab = 'pontos';
     UI.renderProfile();
     document.getElementById('profile-overlay').classList.remove('hidden');
