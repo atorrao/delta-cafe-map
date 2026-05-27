@@ -134,8 +134,12 @@ const App = {
   },
 
   setUser(user) {
+    var wasLoggedIn = !!this.currentUser;
     this.currentUser = user;
     UI.renderTopbar();
+    if (user && !wasLoggedIn) {
+      UI.checkOnboarding();
+    }
   },
 
   closeAllOverlays() { UI.closeAllOverlays(); }

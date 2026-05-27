@@ -19,7 +19,49 @@ const UI = {
     this._toastTimer = setTimeout(function(){ el.style.display='none'; }, 3500);
   },
 
-  closeOverlay(id) { document.getElementById(id).classList.add('hidden'); },
+  _obStep: 1,
+
+  showOnboarding: function() {
+    var el = document.getElementById('onboarding-overlay');
+    if (el) { el.classList.remove('hidden'); el.style.display = 'flex'; }
+    UI._obStep = 1;
+    UI._obUpdate();
+  },
+
+  closeOnboarding: function() {
+    var el = document.getElementById('onboarding-overlay');
+    if (el) { el.classList.add('hidden'); el.style.display = 'none'; }
+    try { localStorage.setItem('wmd_onboarded', '1'); } catch(e){}
+  },
+
+  onboardingNext: function() {
+    if (UI._obStep < 5) {
+      UI._obStep++;
+      UI._obUpdate();
+    } else {
+      UI.closeOnboarding();
+    }
+  },
+
+  _obUpdate: function() {
+    var step = UI._obStep;
+    document.querySelectorAll('.onboarding-step').forEach(function(el) {
+      el.classList.toggle('active', parseInt(el.dataset.step) === step);
+    });
+    document.querySelectorAll('.ob-dot').forEach(function(el) {
+      el.classList.toggle('active', parseInt(el.dataset.dot) === step);
+    });
+    var btn = document.getElementById('ob-next-btn');
+    if (btn) btn.textContent = step < 5 ? 'Seguinte' : 'Começar!';
+  },
+
+  checkOnboarding: function() {
+    try {
+      if (!localStorage.getItem('wmd_onboarded')) {
+        setTimeout(function() { UI.showOnboarding(); }, 600);
+      }
+    } catch(e){}
+  },
   closeAllOverlays: function() {
     ['profile-overlay','ranking-overlay','admin-overlay'].forEach(function(id) {
       var el = document.getElementById(id);
@@ -238,8 +280,10 @@ const UI = {
     var allPrize = Gamification.getAllPrizeLevels();
     var firstName = u.name.split(' ')[0];
 
-    /* Cor fixa do hero — não muda com o nível */
-    var heroStyle = 'background:linear-gradient(160deg,#6b5040 0%,#564130 100%);';
+    /* Hero com textura de folha subtil */
+    var heroStyle = 'background:linear-gradient(160deg,#6b5040 0%,#564130 100%);' +
+      'background-image:url(assets/leaf-texture.png),linear-gradient(160deg,#6b5040 0%,#564130 100%);' +
+      'background-blend-mode:soft-light;background-size:cover;background-position:center;';
     var accentColor = '#ec7e1c';
     var accentLight = 'rgba(236,126,28,.15)';
 
