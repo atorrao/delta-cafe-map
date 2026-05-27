@@ -1313,8 +1313,11 @@ a, button { -webkit-tap-highlight-color:transparent; }
 /* Hero */
 .ph-hero {
   padding: 32px 20px 0;
-  text-align: center; /* hero content centred */
   position: relative;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 /* Cards below hero must NOT inherit text-align:center */
 .ph-content { text-align: left; }
@@ -2241,34 +2244,17 @@ html, body {
 
 
 
-/* ROOT FIX — profile cards left aligned */
-.ph-content .profile-card,
-.ph-content .profile-tab-panel,
-.ph-content #ptab-pontos,
-.ph-content #ptab-locais,
-.ph-content #ptab-dados,
-#account-card,
-#account-view,
-#account-edit {
-  text-align: left !important;
+/* ph-content children need full width since ph-hero is now flex */
+.ph-content {
+  width: 100%;
+  align-self: stretch;
+  text-align: left;
 }
-#profile-overlay .overlay-body {
-  padding: 0 !important;
-  margin: 0 !important;
-  max-width: 100% !important;
+.ph-content .profile-card { text-align: left; }
+.ph-content .profile-tab-panel { text-align: left; }
+.profile-session-card {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100%;
 }
-
-/* profile overlay — no margin:0 auto, left-aligned content */
-#profile-overlay .overlay-body { padding:0 !important; margin:0 !important; max-width:100% !important; }
-.ph-content { text-align:left !important; }
-.ph-content .profile-card { text-align:left !important; }
-.ph-content .profile-tab-panel { text-align:left !important; }
-#account-view, #account-view * { text-align:left !important; }
-#account-edit, #account-edit * { text-align:left !important; }
-.account-field { justify-content:flex-start !important; }
-.card-section-title { text-align:left !important; }
-.earn-item { text-align:left !important; }
-.prize-body { text-align:left !important; }
-.spot-list-info { text-align:left !important; }
-.level-header-row { text-align:left !important; }
-.level-bar-labels { text-align:left !important; }
+#account-view { text-align: left !important; }
