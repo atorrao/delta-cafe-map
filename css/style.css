@@ -2417,3 +2417,53 @@ html, body {
 #account-view .account-field[style*="flex-direction: column"] {
   align-items: flex-start !important;
 }
+
+/* ════════════════════════════════════════
+   FIX DEFINITIVO — alinhamento mobile
+════════════════════════════════════════ */
+
+/* Overlay body — sem margin auto no profile */
+#profile-overlay .overlay-body {
+  padding: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+/* ph-content — sem centramento */
+.ph-content { text-align: left !important; }
+.ph-content * { text-align: left !important; }
+
+/* Excepções que devem ficar centradas */
+.ph-hero,
+.ph-hero *:not(.ph-hex-nav):not(.ph-hex):not(.ph-progress) {
+  /* hero continua centrado */
+}
+.ph-hex-nav { text-align: center !important; }
+.pts-big { text-align: center !important; }
+
+/* Todos os campos de dados alinhados à esquerda */
+.account-field,
+.account-field-body,
+.account-label,
+.account-value,
+.account-field-edit,
+.profile-card,
+.card-section-title,
+.earn-item,
+.earn-label,
+.prize-body,
+.prize-title,
+.spot-list-info,
+.spot-list-name,
+.spot-list-loc,
+.level-bar-labels,
+.level-name-badge,
+.level-next-label {
+  text-align: left !important;
+}
+
+/* Nearest alert — esconde quando overlay está aberto */
+.overlay:not(.hidden) ~ #app .nearest-alert,
+#profile-overlay:not(.hidden) ~ .nearest-alert {
+  display: none !important;
+}
