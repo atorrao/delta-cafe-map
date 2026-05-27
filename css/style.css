@@ -2311,3 +2311,65 @@ html, body {
   cursor: pointer;
 }
 .historia-item .sidebar-loc-dot { display: none !important; }
+
+/* ════════════════════════════════════════
+   FIXES — nearest alert + dados tab
+════════════════════════════════════════ */
+
+/* ── Nearest alert — truly centred on any screen ── */
+.nearest-alert {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(400px, calc(100vw - 32px)) !important;
+  z-index: 2500 !important;
+}
+
+/* ── Dados tab — left-aligned, clear order ── */
+#account-view {
+  text-align: left !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+#account-view .account-field {
+  text-align: left !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+#account-view .account-field-body {
+  text-align: left !important;
+}
+#account-view .account-label {
+  text-align: left !important;
+  display: block !important;
+}
+#account-view .account-value {
+  text-align: left !important;
+  display: block !important;
+}
+/* Photo section in dados */
+#account-view .photo-dados-section {
+  text-align: left !important;
+  border-bottom: 1px solid var(--brd);
+  padding: 14px 0;
+}
+#account-view .photo-dados-section .account-label {
+  margin-bottom: 10px !important;
+}
+#account-view .photo-dados-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  justify-content: flex-start !important;
+}
+/* Avatar section at bottom */
+#account-view .avatar-section {
+  text-align: left !important;
+  padding-top: 14px;
+  border-top: 1px solid var(--brd);
+  margin-top: 4px;
+}
+#account-view .avatar-picker-grid {
+  justify-content: flex-start !important;
+}
