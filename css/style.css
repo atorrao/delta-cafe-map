@@ -464,7 +464,7 @@ select.finput { cursor:pointer; }
 .overlay-header h2 { font-family:var(--font-serif); font-size:1.1rem; color:var(--espresso); font-style:italic; }
 .back-btn { background:none; border:none; font-size:13px; color:var(--miel); font-weight:600; padding:4px 8px; font-family:var(--font-body); }
 .back-btn:hover { color:var(--terre-cuite); }
-.overlay-body { padding:20px; max-width:680px; margin:0 auto; }
+.overlay-body { padding:20px; }
 #profile-overlay .overlay-body { padding:0; max-width:100%; margin:0; }
 
 /* ════════════════════════════
@@ -479,7 +479,7 @@ select.finput { cursor:pointer; }
   flex:1; padding:9px 14px; border:none; border-radius:9px;
   font-size:12px; font-weight:600; font-family:var(--font-body);
   color:var(--mut); background:transparent; cursor:pointer; transition:all .18s;
-  text-align:center;
+  text-align:center; /* tab label only */
 }
 .profile-tab:hover { background:rgba(0,0,0,.04); color:var(--text); }
 .profile-tab.active { background:var(--surface); color:var(--espresso); box-shadow:var(--sh-xs); }
@@ -547,7 +547,7 @@ select.finput { cursor:pointer; }
 .prize-locked-msg { font-size:11px; color:var(--mut-lt); font-style:italic; }
 
 /* Account */
-.account-field { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--brd); }
+.account-field { display:flex; align-items:center; justify-content:flex-start; padding:10px 0; border-bottom:1px solid var(--brd); gap:14px; }
 .account-label { font-size:10px; font-weight:700; color:var(--eau-trouble); text-transform:uppercase; letter-spacing:.6px; }
 .account-value { font-size:13px; color:var(--text); }
 .edit-toggle-btn { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; margin-left:auto; background:var(--surface-2); border:1.5px solid var(--brd); border-radius:20px; font-size:11px; font-weight:600; color:var(--mut); cursor:pointer; transition:all .15s; font-family:var(--font-body); }
@@ -1629,8 +1629,7 @@ body { background: var(--nuage); color: var(--text); }
   #add-modal .modal {
     border-radius: var(--r-xl) !important;
     width: calc(100% - 32px) !important;
-    margin: auto !important;
-  }
+    }
 }
 
 /* ── iOS font-size zoom fix ── */
@@ -2014,57 +2013,6 @@ input, select, textarea { font-size: 16px !important; }
 }
 
 /* ════════════════════════════════════════
-   FIXES — nearest alert, map controls,
-   white bar, profile tabs
-════════════════════════════════════════ */
-
-/* ── Nearest alert — more centred vertically ── */
-.nearest-alert {
-  top: 50% !important;
-  transform: translate(-50%, -60%) !important;
-}
-@media (max-width: 768px) {
-  .nearest-alert {
-    top: 40% !important;
-    transform: translate(-50%, -50%) !important;
-  }
-}
-
-/* ── Map controls — align bottom with FAB ── */
-.map-controls {
-  bottom: 24px !important;
-  left: 12px !important;
-}
-@media (max-width: 768px) {
-  .map-controls {
-    bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
-    left: 20px !important;
-  }
-  .map-ctrl-btn {
-    width: 46px !important;
-    height: 46px !important;
-  }
-}
-
-/* ── Remove white bar below map — fill full height ── */
-#app { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
-#main { flex: 1; min-height: 0; overflow: hidden; }
-#map-container { height: 100%; }
-#map { height: 100% !important; }
-
-/* ── Profile tabs — only one active at a time ── */
-.profile-tab { cursor: pointer; }
-.profile-tab-panel { display: none !important; }
-.profile-tab-panel.active { display: block !important; }
-
-/* ── Historia accordion — clean header ── */
-.sidebar-accordion-header {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-}
-
-/* ════════════════════════════════════════
    ONBOARDING + HERO TEXTURE + MAP FIX
 ════════════════════════════════════════ */
 
@@ -2290,219 +2238,21 @@ html, body {
 }
 .btn-delete-sm:hover { color: #a13a1e; }
 
-/* ════════════════════════════════════════
-   FIXES — hero icons, texture removed
-════════════════════════════════════════ */
 
-/* Remove texture pseudo-element */
-.ph-hero::before { display: none !important; }
 
-/* Fix hero overflow — icons were getting cut */
-.ph-hero {
-  overflow: visible !important;
-  padding-bottom: 50px !important; /* space for hex nav overlap */
-}
-.ph-hex-nav {
-  position: relative;
-  z-index: 2;
-  transform: translateY(28px);
-}
-
-/* Historia items — no dot, clean */
-.historia-item {
-  padding: 8px 12px !important;
-  cursor: pointer;
-}
-.historia-item .sidebar-loc-dot { display: none !important; }
-
-/* ════════════════════════════════════════
-   FIXES — nearest alert + dados tab
-════════════════════════════════════════ */
-
-/* ── Nearest alert — truly centred on any screen ── */
-.nearest-alert {
-  position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  width: min(400px, calc(100vw - 32px)) !important;
-  z-index: 2500 !important;
-}
-
-/* ── Dados tab — left-aligned, clear order ── */
-#account-view {
-  text-align: left !important;
-  display: flex !important;
-  flex-direction: column !important;
-}
-#account-view .account-field {
-  text-align: left !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-}
-#account-view .account-field-body {
-  text-align: left !important;
-}
-#account-view .account-label {
-  text-align: left !important;
-  display: block !important;
-}
-#account-view .account-value {
-  text-align: left !important;
-  display: block !important;
-}
-/* Photo section in dados */
-#account-view .photo-dados-section {
-  text-align: left !important;
-  border-bottom: 1px solid var(--brd);
-  padding: 14px 0;
-}
-#account-view .photo-dados-section .account-label {
-  margin-bottom: 10px !important;
-}
-#account-view .photo-dados-row {
-  display: flex !important;
-  align-items: center !important;
-  gap: 14px !important;
-  justify-content: flex-start !important;
-}
-/* Avatar section at bottom */
-#account-view .avatar-section {
-  text-align: left !important;
-  padding-top: 14px;
-  border-top: 1px solid var(--brd);
-  margin-top: 4px;
-}
-#account-view .avatar-picker-grid {
-  justify-content: flex-start !important;
-}
-
-/* ════════════════════════════════════════
-   FIX — centramento mobile
-════════════════════════════════════════ */
-
-/* ph-hero centra só o próprio conteúdo (foto, nome, stats) — não herda para os cards */
-.ph-content,
+/* ROOT FIX — profile cards left aligned */
 .ph-content .profile-card,
 .ph-content .profile-tab-panel,
-#ptab-dados,
-#ptab-locais,
-#ptab-pontos,
+.ph-content #ptab-pontos,
+.ph-content #ptab-locais,
+.ph-content #ptab-dados,
+#account-card,
 #account-view,
-#account-edit,
-.account-field,
-.account-field-body,
-.account-label,
-.account-value,
-.profile-session-card,
-.earn-grid,
-.earn-item,
-.prize-row,
-.prize-body,
-.spots-type-group,
-.spot-list-item,
-.spot-list-info,
-.level-header-row,
-.level-bar-wrap,
-.level-bar-labels {
+#account-edit {
   text-align: left !important;
 }
-
-/* Override any inherited justify-content:center on flex containers in cards */
-.profile-card {
-  text-align: left !important;
-}
-#account-view .account-field {
-  justify-content: flex-start !important;
-  align-items: center !important;
-}
-#account-view .account-field[style*="flex-direction:column"],
-#account-view .account-field[style*="flex-direction: column"] {
-  align-items: flex-start !important;
-}
-
-/* ════════════════════════════════════════
-   FIX DEFINITIVO — alinhamento mobile
-════════════════════════════════════════ */
-
-/* Overlay body — sem margin auto no profile */
 #profile-overlay .overlay-body {
   padding: 0 !important;
-  max-width: 100% !important;
   margin: 0 !important;
+  max-width: 100% !important;
 }
-
-/* ph-content — sem centramento */
-.ph-content { text-align: left !important; }
-.ph-content * { text-align: left !important; }
-
-/* Excepções que devem ficar centradas */
-.ph-hero,
-.ph-hero *:not(.ph-hex-nav):not(.ph-hex):not(.ph-progress) {
-  /* hero continua centrado */
-}
-.ph-hex-nav { text-align: center !important; }
-.pts-big { text-align: center !important; }
-
-/* Todos os campos de dados alinhados à esquerda */
-.account-field,
-.account-field-body,
-.account-label,
-.account-value,
-.account-field-edit,
-.profile-card,
-.card-section-title,
-.earn-item,
-.earn-label,
-.prize-body,
-.prize-title,
-.spot-list-info,
-.spot-list-name,
-.spot-list-loc,
-.level-bar-labels,
-.level-name-badge,
-.level-next-label {
-  text-align: left !important;
-}
-
-/* Nearest alert — esconde quando overlay está aberto */
-.overlay:not(.hidden) ~ #app .nearest-alert,
-#profile-overlay:not(.hidden) ~ .nearest-alert {
-  display: none !important;
-}
-
-/* ══════════════════════════════════════════════
-   FINAL OVERRIDE — left-align all profile content
-   Must be LAST in file to win specificity
-══════════════════════════════════════════════ */
-#profile-overlay .overlay-body { padding:0 !important; max-width:100% !important; margin:0 !important; }
-.ph-content { text-align:left !important; }
-.ph-content .profile-card { text-align:left !important; }
-.ph-content .profile-tab-panel { text-align:left !important; }
-#account-view { text-align:left !important; }
-#account-view * { text-align:left !important; }
-#account-edit { text-align:left !important; }
-#account-edit * { text-align:left !important; }
-#ptab-pontos .profile-card { text-align:left !important; }
-#ptab-locais .profile-card { text-align:left !important; }
-.card-section-title { text-align:left !important; }
-.account-field { justify-content:flex-start !important; }
-.account-field-body { text-align:left !important; }
-.account-label { text-align:left !important; }
-.account-value { text-align:left !important; }
-.earn-grid { text-align:left !important; }
-.earn-item { text-align:left !important; }
-.level-header-row { text-align:left !important; }
-.level-bar-labels { text-align:left !important; }
-.prize-body { text-align:left !important; }
-.prize-title { text-align:left !important; }
-.prize-desc-text { text-align:left !important; }
-.prize-locked-msg { text-align:left !important; }
-.spot-list-info { text-align:left !important; }
-.spot-list-name { text-align:left !important; }
-.spot-list-loc { text-align:left !important; }
-.levels-table-info { text-align:left !important; }
-/* Keep hero centred */
-.ph-hero { text-align:center !important; }
-.ph-hex-nav { text-align:center !important; }
-.pts-big { text-align:center !important; }
