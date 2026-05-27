@@ -2158,13 +2158,16 @@ html, body {
 }
 .ph-hero > * { position: relative; z-index: 1; }
 
-/* ── Dados tab — professional rows inspired by reference ── */
+/* ── Dados tab — professional rows ── */
 .account-field {
-  display: flex;
-  align-items: center;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
   padding: 14px 0;
   border-bottom: 1px solid var(--brd);
   gap: 14px;
+  text-align: left !important;
 }
 .account-field-icon {
   width: 36px; height: 36px;
@@ -2174,17 +2177,19 @@ html, body {
   flex-shrink: 0;
   color: var(--laranja);
 }
-.account-field-body { flex: 1; min-width: 0; }
+.account-field-body { flex: 1; min-width: 0; text-align: left !important; }
 .account-label {
   font-size: 10px; font-weight: 700;
   text-transform: uppercase; letter-spacing: .08em;
   color: var(--mut-lt) !important;
   display: block; margin-bottom: 2px;
+  text-align: left !important;
 }
 .account-value {
   font-size: 14px; font-weight: 500;
   color: var(--ink-new);
   display: block;
+  text-align: left !important;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 /* Edit inputs */
