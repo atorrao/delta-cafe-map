@@ -2509,3 +2509,29 @@ html, body { height: 100dvh !important; overflow: hidden !important; }
   box-shadow: 0 4px 16px rgba(236,126,28,.35);
 }
 .msheet-submit:hover { background: #d06a10; }
+
+/* ════════════════════════════════════════
+   Sidebar card colours — official vs user
+════════════════════════════════════════ */
+
+/* Official / verified — soft warm tint */
+.sidebar-loc-item.loc-official {
+  background: rgba(236,126,28,.06);
+  border-left: 2.5px solid rgba(236,126,28,.35);
+  border-radius: 0 6px 6px 0;
+  padding-left: 10px !important;
+}
+.sidebar-loc-item.loc-official:hover {
+  background: rgba(236,126,28,.12) !important;
+}
+
+/* User-added — neutral, no tint */
+.sidebar-loc-item.loc-user {
+  background: transparent;
+  border-left: 2.5px solid transparent;
+}
+
+/* Profile hero — ensure photo/name/level centred */
+.ph-hero-info { text-align: center !important; width: 100%; }
+.ph-photo-wrap { margin-left: auto !important; margin-right: auto !important; }
+.ph-stats { width: 100%; }
