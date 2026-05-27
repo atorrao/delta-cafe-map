@@ -62,6 +62,11 @@ const UI = {
       }
     } catch(e){}
   },
+  closeOverlay: function(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+  },
+
   closeAllOverlays: function() {
     ['profile-overlay','ranking-overlay','admin-overlay'].forEach(function(id) {
       var el = document.getElementById(id);
@@ -280,8 +285,8 @@ const UI = {
     var allPrize = Gamification.getAllPrizeLevels();
     var firstName = u.name.split(' ')[0];
 
-    /* Hero — gradiente espresso com textura subtil por cima */
-    var heroStyle = 'background: linear-gradient(160deg,#6b5040 0%,#564130 100%);';
+    /* Hero — gradiente espresso simples */
+    var heroStyle = 'background:linear-gradient(160deg,#6b5040 0%,#564130 100%);';
     var accentColor = '#ec7e1c';
     var accentLight = 'rgba(236,126,28,.15)';
 
