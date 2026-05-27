@@ -291,7 +291,7 @@
   <!-- OVERLAYS -->
   <div id="admin-overlay" class="overlay hidden">
     <div class="overlay-header">
-      <button class="back-btn" onclick="UI.closeOverlay('admin-overlay')">← Voltar</button>
+      <button class="back-btn" onclick="UI.closeOverlay('admin-overlay')">Voltar</button>
       <h2>Painel de Administração</h2>
       <div></div>
     </div>
@@ -300,7 +300,7 @@
 
   <div id="profile-overlay" class="overlay hidden">
     <div class="overlay-header">
-      <button class="back-btn" onclick="UI.closeOverlay('profile-overlay')">← Voltar</button>
+      <button class="back-btn" onclick="UI.closeOverlay('profile-overlay')">Voltar</button>
       <h2>O Meu Perfil</h2>
       <div></div>
     </div>
@@ -309,11 +309,62 @@
 
   <div id="ranking-overlay" class="overlay hidden">
     <div class="overlay-header">
-      <button class="back-btn" onclick="UI.closeOverlay('ranking-overlay')">← Voltar</button>
+      <button class="back-btn" onclick="UI.closeOverlay('ranking-overlay')">Voltar</button>
       <h2>Ranking</h2>
       <div></div>
     </div>
     <div id="ranking-body" class="overlay-body"></div>
+  </div>
+
+  <!-- ONBOARDING OVERLAY -->
+  <div id="onboarding-overlay" class="hidden" style="position:fixed;inset:0;z-index:9000;background:rgba(84,41,22,.7);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px;">
+    <div class="onboarding-card" id="onboarding-card">
+      <div class="onboarding-steps">
+        <!-- Step 1 -->
+        <div class="onboarding-step active" data-step="1">
+          <div class="onboarding-icon">🗺️</div>
+          <h2 class="onboarding-title">Bem-vindo ao Where's my Delta?</h2>
+          <p class="onboarding-text">Descobre onde beber e comprar Café Delta em Portugal e por todo o Mundo. A app é feita pela comunidade — és tu que a construís.</p>
+        </div>
+        <!-- Step 2 -->
+        <div class="onboarding-step" data-step="2">
+          <div class="onboarding-icon">📍</div>
+          <h2 class="onboarding-title">Adiciona locais</h2>
+          <p class="onboarding-text">Conheces um café ou restaurante que serve Delta? Carrega no botão <strong>+</strong> no mapa e adiciona-o. Ganha <strong>5 pontos</strong> por cada local e <strong>20 pontos</strong> no primeiro!</p>
+        </div>
+        <!-- Step 3 -->
+        <div class="onboarding-step" data-step="3">
+          <div class="onboarding-icon">📷</div>
+          <h2 class="onboarding-title">Adiciona fotografias</h2>
+          <p class="onboarding-text">Quando adicionas um local, podes incluir uma fotografia. Isso vale <strong>+3 pontos</strong> extra e ajuda a comunidade a reconhecer o espaço.</p>
+        </div>
+        <!-- Step 4 -->
+        <div class="onboarding-step" data-step="4">
+          <div class="onboarding-icon">⭐</div>
+          <h2 class="onboarding-title">Sobe de nível</h2>
+          <p class="onboarding-text">Acumula pontos e passa por 8 níveis: de <strong>Explorador</strong> a <strong>Mestre</strong>. Cada nível desbloqueia um novo avatar e prémios exclusivos Delta.</p>
+        </div>
+        <!-- Step 5 -->
+        <div class="onboarding-step" data-step="5">
+          <div class="onboarding-icon">☕</div>
+          <h2 class="onboarding-title">Cafés com História</h2>
+          <p class="onboarding-text">Explora os <strong>Cafés com História</strong> na barra lateral — espaços icónicos que servem Delta em todo o Mundo, com a sua história contada pela D de Delta.</p>
+        </div>
+      </div>
+      <!-- Dots -->
+      <div class="onboarding-dots">
+        <span class="ob-dot active" data-dot="1"></span>
+        <span class="ob-dot" data-dot="2"></span>
+        <span class="ob-dot" data-dot="3"></span>
+        <span class="ob-dot" data-dot="4"></span>
+        <span class="ob-dot" data-dot="5"></span>
+      </div>
+      <!-- Buttons -->
+      <div class="onboarding-actions">
+        <button class="ob-skip" onclick="UI.closeOnboarding()">Saltar</button>
+        <button class="ob-next" id="ob-next-btn" onclick="UI.onboardingNext()">Seguinte</button>
+      </div>
+    </div>
   </div>
 
   <div id="mobile-search-overlay" class="overlay hidden">
