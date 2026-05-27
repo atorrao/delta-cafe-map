@@ -2286,3 +2286,28 @@ html, body {
   transition: color .15s;
 }
 .btn-delete-sm:hover { color: #a13a1e; }
+
+/* ════════════════════════════════════════
+   FIXES — hero icons, texture removed
+════════════════════════════════════════ */
+
+/* Remove texture pseudo-element */
+.ph-hero::before { display: none !important; }
+
+/* Fix hero overflow — icons were getting cut */
+.ph-hero {
+  overflow: visible !important;
+  padding-bottom: 50px !important; /* space for hex nav overlap */
+}
+.ph-hex-nav {
+  position: relative;
+  z-index: 2;
+  transform: translateY(28px);
+}
+
+/* Historia items — no dot, clean */
+.historia-item {
+  padding: 8px 12px !important;
+  cursor: pointer;
+}
+.historia-item .sidebar-loc-dot { display: none !important; }
