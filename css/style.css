@@ -2311,3 +2311,21 @@ html, body { height: 100dvh !important; overflow: hidden !important; }
 .map-ctrl-btn { width: 46px !important; height: 46px !important; border-radius: 50% !important; min-width: unset !important; min-height: unset !important; padding: 0 !important; }
 .map-ctrl-label { display: none !important; }
 .nearest-alert { position: fixed !important; top: 50% !important; left: 50% !important; right: auto !important; transform: translate(-50%, -50%) !important; width: min(400px, calc(100vw - 32px)) !important; z-index: 2500 !important; }
+
+/* Cafés com História — sidebar highlight */
+.sidebar-accordion-body .historia-item {
+  background: rgba(183,152,88,.07);
+  border-left: 2.5px solid rgba(183,152,88,.4);
+  border-radius: 0 6px 6px 0;
+  padding-left: 10px !important;
+}
+.sidebar-accordion-body .historia-item:hover {
+  background: rgba(183,152,88,.14) !important;
+}
+.sidebar-accordion-body .historia-item .sidebar-loc-name {
+  color: var(--ink-new);
+  font-weight: 600;
+}
+.sidebar-accordion-body .historia-item .sidebar-loc-meta {
+  color: var(--mut);
+}
