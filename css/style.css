@@ -465,6 +465,7 @@ select.finput { cursor:pointer; }
 .back-btn { background:none; border:none; font-size:13px; color:var(--miel); font-weight:600; padding:4px 8px; font-family:var(--font-body); }
 .back-btn:hover { color:var(--terre-cuite); }
 .overlay-body { padding:20px; max-width:680px; margin:0 auto; }
+#profile-overlay .overlay-body { padding:0; max-width:100%; margin:0; }
 
 /* ════════════════════════════
    PROFILE TABS
@@ -1312,9 +1313,11 @@ a, button { -webkit-tap-highlight-color:transparent; }
 /* Hero */
 .ph-hero {
   padding: 32px 20px 0;
-  text-align: center;
+  text-align: center; /* hero content centred */
   position: relative;
 }
+/* Cards below hero must NOT inherit text-align:center */
+.ph-content { text-align: left; }
 
 /* Foto / avatar */
 .ph-photo-wrap {
@@ -2467,3 +2470,39 @@ html, body {
 #profile-overlay:not(.hidden) ~ .nearest-alert {
   display: none !important;
 }
+
+/* ══════════════════════════════════════════════
+   FINAL OVERRIDE — left-align all profile content
+   Must be LAST in file to win specificity
+══════════════════════════════════════════════ */
+#profile-overlay .overlay-body { padding:0 !important; max-width:100% !important; margin:0 !important; }
+.ph-content { text-align:left !important; }
+.ph-content .profile-card { text-align:left !important; }
+.ph-content .profile-tab-panel { text-align:left !important; }
+#account-view { text-align:left !important; }
+#account-view * { text-align:left !important; }
+#account-edit { text-align:left !important; }
+#account-edit * { text-align:left !important; }
+#ptab-pontos .profile-card { text-align:left !important; }
+#ptab-locais .profile-card { text-align:left !important; }
+.card-section-title { text-align:left !important; }
+.account-field { justify-content:flex-start !important; }
+.account-field-body { text-align:left !important; }
+.account-label { text-align:left !important; }
+.account-value { text-align:left !important; }
+.earn-grid { text-align:left !important; }
+.earn-item { text-align:left !important; }
+.level-header-row { text-align:left !important; }
+.level-bar-labels { text-align:left !important; }
+.prize-body { text-align:left !important; }
+.prize-title { text-align:left !important; }
+.prize-desc-text { text-align:left !important; }
+.prize-locked-msg { text-align:left !important; }
+.spot-list-info { text-align:left !important; }
+.spot-list-name { text-align:left !important; }
+.spot-list-loc { text-align:left !important; }
+.levels-table-info { text-align:left !important; }
+/* Keep hero centred */
+.ph-hero { text-align:center !important; }
+.ph-hex-nav { text-align:center !important; }
+.pts-big { text-align:center !important; }
