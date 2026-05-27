@@ -203,7 +203,7 @@ input, select, textarea { font-family: var(--font-body); }
 }
 .sidebar-section { padding:14px 16px; border-bottom:1px solid var(--brd); }
 .sidebar-label {
-  font-size:10px; font-weight:700; color:var(--mut);
+  font-size:10px; font-weight:700; color:var(--laranja);
   letter-spacing:1.4px; text-transform:uppercase; margin-bottom:9px;
 }
 /* Destaque para Café / Restaurante */
@@ -409,7 +409,7 @@ input, select, textarea { font-family: var(--font-body); }
 .err-box { display:none; background:#fde8eb; color:#7a1524; font-size:12px; padding:9px 12px; border-radius:var(--r-sm); margin-bottom:12px; border-left:3px solid var(--terre-cuite); }
 .err-box.show { display:block; }
 
-.flabel { display:block; font-size:10px; font-weight:700; color:var(--eau-trouble); margin-bottom:4px; margin-top:12px; text-transform:uppercase; letter-spacing:.7px; }
+.flabel { display:block; font-size:10px; font-weight:700; color:var(--laranja); margin-bottom:4px; margin-top:12px; text-transform:uppercase; letter-spacing:.7px; }
 .flabel:first-child { margin-top:0; }
 .finput {
   width:100%; padding:9px 12px; border:1.5px solid var(--brd); border-radius:var(--r-sm);
@@ -462,7 +462,7 @@ select.finput { cursor:pointer; }
   position:sticky; top:0; z-index:10;
 }
 .overlay-header h2 { font-family:var(--font-serif); font-size:1.1rem; color:var(--espresso); font-style:italic; }
-.back-btn { background:none; border:none; font-size:13px; color:var(--miel); font-weight:600; padding:4px 8px; font-family:var(--font-body); }
+.back-btn { background:none; border:none; font-size:13px; color:var(--laranja); font-weight:600; padding:4px 8px; font-family:var(--font-body); }
 .back-btn:hover { color:var(--terre-cuite); }
 .overlay-body { padding:20px; }
 #profile-overlay .overlay-body { padding:0; max-width:100%; margin:0; }
@@ -513,7 +513,7 @@ select.finput { cursor:pointer; }
 .profile-stat-lbl { font-size:9px; color:rgba(241,193,102,.8); margin-top:3px; text-transform:uppercase; letter-spacing:.7px; }
 
 .profile-card { background:var(--surface); background-image:var(--grain); border-radius:var(--r-md); border:1px solid var(--brd); padding:18px; margin-bottom:12px; box-shadow:var(--sh-xs); }
-.card-section-title { font-size:10px; font-weight:700; color:var(--eau-trouble); text-transform:uppercase; letter-spacing:1.4px; margin-bottom:14px; }
+.card-section-title { font-size:10px; font-weight:700; color:var(--laranja); text-transform:uppercase; letter-spacing:1.4px; margin-bottom:14px; }
 .level-header-row { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:8px; gap:10px; flex-wrap:wrap; }
 .level-name-badge { display:inline-block; padding:5px 14px; border-radius:20px; font-size:12px; font-weight:700; font-family:var(--font-body); }
 .level-next-label { font-size:11px; color:var(--mut); }
@@ -548,7 +548,7 @@ select.finput { cursor:pointer; }
 
 /* Account */
 .account-field { display:flex; align-items:center; justify-content:flex-start; padding:10px 0; border-bottom:1px solid var(--brd); gap:14px; }
-.account-label { font-size:10px; font-weight:700; color:var(--eau-trouble); text-transform:uppercase; letter-spacing:.6px; }
+.account-label { font-size:10px; font-weight:700; color:var(--laranja); text-transform:uppercase; letter-spacing:.6px; }
 .account-value { font-size:13px; color:var(--text); }
 .edit-toggle-btn { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; margin-left:auto; background:var(--surface-2); border:1.5px solid var(--brd); border-radius:20px; font-size:11px; font-weight:600; color:var(--mut); cursor:pointer; transition:all .15s; font-family:var(--font-body); }
 .edit-toggle-btn:hover { border-color:var(--miel); color:var(--espresso); }
@@ -727,7 +727,7 @@ input, select, textarea { font-size:16px !important; }
   .modal-add { width:100%; }
   .form-grid { grid-template-columns:1fr; }
   .form-col-full { grid-column:1; }
-  .overlay-body { padding:14px 14px 24px; text-align:left; }
+  .overlay-body { padding:14px 14px 24px; }
   .profile-hero { padding:18px 16px; border-radius:var(--r-md); }
   .profile-greeting { font-size:1.1rem; }
   .account-field { flex-direction:column; align-items:flex-start; gap:3px; }
@@ -1142,12 +1142,12 @@ a, button { -webkit-tap-highlight-color:transparent; }
     width: 56px !important; height: 56px !important;
   }
 
-  /* Map controls — circular, à direita acima do FAB */
+  /* Map controls — left side, same bottom as FAB */
   .map-controls {
     position: fixed !important;
-    bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
-    right: 20px !important;
-    left: auto !important;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 20px !important;
+    right: auto !important;
     flex-direction: column;
     gap: 8px;
   }
@@ -1162,11 +1162,11 @@ a, button { -webkit-tap-highlight-color:transparent; }
 
   /* Nearest alert — abaixo da topbar, acima do layer switcher */
   .nearest-alert {
-    top: calc(var(--topbar-h) + env(safe-area-inset-top, 0px) + 56px) !important;
-    left: 16px !important;
-    right: 16px !important;
-    transform: none !important;
-    width: auto !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translate(-50%, -50%) !important;
+    width: min(400px, calc(100vw - 32px)) !important;
   }
 
   /* Layer switcher — mais pequeno, não sobrepõe zoom */
@@ -1313,20 +1313,8 @@ a, button { -webkit-tap-highlight-color:transparent; }
 /* Hero */
 .ph-hero {
   padding: 32px 20px 0;
-  text-align: center;
+  text-align: center; /* hero content centred */
   position: relative;
-  overflow: visible;
-}
-.ph-content,
-.ph-content .profile-card,
-.ph-content .profile-tab-panel,
-#ptab-pontos, #ptab-locais, #ptab-dados,
-#account-view, #account-edit,
-.account-field, .account-field-body,
-.account-label, .account-value,
-.card-section-title, .earn-item, .earn-label,
-.prize-body, .spot-list-info, .level-header-row {
-  text-align: left;
 }
 /* Cards below hero must NOT inherit text-align:center */
 .ph-content { text-align: left; }
@@ -1392,7 +1380,7 @@ a, button { -webkit-tap-highlight-color:transparent; }
 .ph-hex {
   width: 64px; height: 72px;
   background: var(--surface);
-  border-radius: 50%;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   border: none; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: transform .18s, filter .18s;
@@ -1710,14 +1698,15 @@ input, select, textarea { font-size: 16px !important; }
   border: 2.5px solid var(--brd) !important;
   transition: transform .18s, border-color .18s !important;
 }
-.ph-hex:hover { transform: translateY(-3px) !important; border-color: var(--verde) !important; }
+.ph-hex:hover { transform: scale(1.08) !important; border-color: var(--laranja) !important; }
 .ph-hex-active {
-  background: var(--verde) !important;
-  border-color: var(--verde) !important;
-  box-shadow: 0 4px 16px rgba(155,177,102,.4) !important;
+  background: var(--surface) !important;
+  border: 2.5px solid var(--laranja) !important;
+  box-shadow: 0 0 0 3px rgba(236,126,28,.15) !important;
+  transform: scale(1.1) !important;
 }
-.ph-hex-active svg { color: #fff !important; }
-.ph-hex-active span { color: rgba(255,255,255,.9) !important; }
+.ph-hex-active svg { color: var(--laranja) !important; }
+.ph-hex-active span { color: var(--laranja) !important; }
 .ph-hex svg { color: var(--ink-new) !important; }
 .ph-hex span { color: var(--mut) !important; font-size: 9px !important; }
 .ph-hex-inner { display: flex; flex-direction: column; align-items: center; gap: 4px; }
@@ -1765,7 +1754,187 @@ input, select, textarea { font-size: 16px !important; }
 .rank-av { background: rgba(155,177,102,.15) !important; border-color: rgba(155,177,102,.3) !important; overflow: hidden !important; }
 .rank-av svg { width: 34px !important; height: 34px !important; }
 
+/* ════════════════════════════════════════
+   AJUSTES FINAIS v9
+════════════════════════════════════════ */
 
+/* ── Títulos de secção — de volta ao espresso/laranja ── */
+.card-section-title { color: var(--ink-new) !important; letter-spacing: 1px; font-weight: 700; }
+.account-label      { color: var(--ink-new) !important; }
+.flabel             { color: var(--ink-new) !important; }
+.sidebar-label      { color: var(--mut) !important; }
+.sidebar-acc-label  { color: var(--ink-new) !important; }
+
+/* ── Círculo activo no perfil — laranja em vez de verde ── */
+.ph-hex-active {
+  background: var(--laranja) !important;
+  border-color: var(--laranja) !important;
+  box-shadow: 0 4px 16px rgba(236,126,28,.35) !important;
+}
+.ph-hex:hover { border-color: var(--laranja) !important; }
+
+/* ── Verde apenas onde faz sentido ── */
+.tag-verified, .spot-badge-ok { background: rgba(155,177,102,.18) !important; color: #3d5a1a !important; }
+.admin-btn-approve { background: rgba(155,177,102,.18) !important; color: #3d5a1a !important; }
+.admin-btn-approve:hover { background: var(--verde) !important; color: #fff !important; }
+.edit-toggle-btn { border-color: var(--brd) !important; color: var(--mut) !important; }
+.edit-toggle-btn:hover { border-color: var(--laranja) !important; color: var(--laranja) !important; background: rgba(236,126,28,.06) !important; }
+.ph-level { background: rgba(155,177,102,.25) !important; border-color: rgba(155,177,102,.4) !important; }
+.profile-stat-lbl { color: rgba(255,255,255,.65) !important; }
+.level-fill { background: linear-gradient(90deg, var(--amarelo), var(--laranja)) !important; }
+.ptag.on { border-color: var(--laranja) !important; background: rgba(236,126,28,.08) !important; color: var(--laranja) !important; }
+.historia-link-btn { background: rgba(155,177,102,.12) !important; color: var(--verde) !important; }
+.auth-switch a { color: var(--laranja) !important; }
+.back-btn { color: var(--laranja) !important; }
+.back-btn:hover { color: var(--ink-new) !important; }
+
+/* ── Barra lateral botão voltar ── */
+.sidebar-section .sidebar-label-destaque { color: var(--laranja) !important; }
+
+/* ── Título "O Meu Perfil" centrado ── */
+#profile-overlay .overlay-header {
+  justify-content: center !important;
+  position: relative;
+}
+#profile-overlay .overlay-header .back-btn {
+  position: absolute;
+  left: 16px;
+}
+#profile-overlay .overlay-header h2 {
+  text-align: center !important;
+  flex: none !important;
+}
+#profile-overlay .overlay-header > div:last-child { display: none; }
+
+/* ── Sidebar resultados de pesquisa sempre abaixo de Cafés com História ── */
+
+
+
+/* ════════════════════════════════════════
+   CORRECÇÕES v10
+════════════════════════════════════════ */
+
+/* ── Círculo activo — só outline laranja, sem fill ── */
+.ph-hex {
+  background: var(--surface) !important;
+  border: 2px solid var(--brd) !important;
+  transition: transform .18s, border-color .18s, box-shadow .18s !important;
+}
+.ph-hex:hover {
+  transform: scale(1.08) !important;
+  border-color: var(--laranja) !important;
+  box-shadow: 0 0 0 3px rgba(236,126,28,.18) !important;
+  background: var(--surface) !important;
+}
+.ph-hex-active {
+  background: var(--surface) !important;
+  border: 2.5px solid var(--laranja) !important;
+  box-shadow: 0 0 0 3px rgba(236,126,28,.18) !important;
+  transform: scale(1.1) !important;
+}
+.ph-hex-active svg  { color: var(--laranja) !important; }
+.ph-hex-active span { color: var(--laranja) !important; }
+.ph-hex svg  { color: var(--ink-new) !important; }
+.ph-hex span { color: var(--mut) !important; }
+
+/* ── Avatar picker — lock icon FORA do círculo ── */
+.avatar-pick-option {
+  position: relative !important;
+  overflow: visible !important;  /* não clipar o cadeado */
+  background: var(--nuage-dk) !important;
+  border: 2px solid var(--brd) !important;
+  padding: 4px !important;
+}
+.avatar-pick-option.selected {
+  border-color: var(--laranja) !important;
+  background: rgba(236,126,28,.08) !important;
+  box-shadow: 0 0 0 3px rgba(236,126,28,.15) !important;
+}
+.avatar-pick-option.locked {
+  opacity: .55 !important;
+}
+.avatar-lock-icon {
+  position: absolute !important;
+  bottom: -6px !important;
+  right: -6px !important;
+  font-size: 12px !important;
+  background: var(--surface) !important;
+  border-radius: 50% !important;
+  width: 20px !important;
+  height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid var(--brd) !important;
+  line-height: 1 !important;
+  box-shadow: var(--sh-xs) !important;
+}
+
+/* ── Avatar SVG sem background de círculo extra ── */
+.avatar-pick-option svg {
+  width: 36px !important;
+  height: 36px !important;
+  display: block !important;
+}
+.profile-bigav, .ph-photo-avatar {
+  background: var(--nuage-dk) !important;
+}
+.profile-avatar-svg svg,
+.ph-photo-avatar svg {
+  width: 85% !important;
+  height: 85% !important;
+}
+
+/* ── Photo upload label cursor ── */
+.ph-photo-upload-btn {
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+
+
+
+
+/* ── Search results — default hidden, shown by JS ── */
+
+
+
+
+/* ── Avatar button — limpo, sem círculo cortado ── */
+.avatar-btn {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  border: 2px solid rgba(236,126,28,.35) !important;
+  background: var(--nuage-dk) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  position: relative !important;
+  flex-shrink: 0 !important;
+}
+.avatar-btn img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+  border-radius: 50% !important;
+}
+.avatar-btn svg {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
+.avatar-svg-wrap { display: none !important; } /* hide old wrapper */
+.avatar-level-badge { display: none !important; } /* hide level number */
+
+/* Search results — hidden by default, JS sets display via style attribute */
+#search-results-box { display: none; }
 
 /* ═══════════════════════════════
    TOPBAR AVATAR — círculo limpo
@@ -2089,23 +2258,17 @@ html, body {
   max-width: 100% !important;
 }
 
-/* ph-hex circles — not cut */
-.ph-hex {
-  border-radius: 50% !important;
-  clip-path: none !important;
-  overflow: visible !important;
-}
-.ph-hex-nav { overflow: visible !important; }
-.ph-hero { overflow: visible !important; }
-
-/* profile content — left aligned */
-.ph-content,
-.ph-content *:not(.ph-stat):not(.ph-stat-num):not(.ph-stat-lbl):not(.ph-name):not(.ph-level):not(.pts-big):not(.pts-big-lbl) {
-  text-align: left !important;
-}
-#profile-overlay .overlay-body {
-  padding: 0 !important;
-  margin: 0 !important;
-  max-width: 100% !important;
-  text-align: left !important;
-}
+/* profile overlay — no margin:0 auto, left-aligned content */
+#profile-overlay .overlay-body { padding:0 !important; margin:0 !important; max-width:100% !important; }
+.ph-content { text-align:left !important; }
+.ph-content .profile-card { text-align:left !important; }
+.ph-content .profile-tab-panel { text-align:left !important; }
+#account-view, #account-view * { text-align:left !important; }
+#account-edit, #account-edit * { text-align:left !important; }
+.account-field { justify-content:flex-start !important; }
+.card-section-title { text-align:left !important; }
+.earn-item { text-align:left !important; }
+.prize-body { text-align:left !important; }
+.spot-list-info { text-align:left !important; }
+.level-header-row { text-align:left !important; }
+.level-bar-labels { text-align:left !important; }
