@@ -507,12 +507,10 @@ function renderHistoriaSidebar() {
   historiaLocs.forEach(function(loc) {
     var dddUrl = loc.dddeltaUrl || loc.dddelta_url;
     html += '<div class="sidebar-loc-item historia-item" data-id="' + loc.id + '">' +
-      '<span class="sidebar-loc-dot" style="background:var(--eau-trouble);"></span>' +
       '<div class="sidebar-loc-info">' +
         '<div class="sidebar-loc-name">' + loc.name + '</div>' +
         '<div class="sidebar-loc-meta">' + (loc.city||'') + (loc.country?', '+loc.country:'') + '</div>' +
       '</div>' +
-      '<a href="' + dddUrl + '" target="_blank" rel="noopener" class="historia-link-btn" onclick="event.stopPropagation();"></a>' +
     '</div>';
   });
   listEl.innerHTML = html;
