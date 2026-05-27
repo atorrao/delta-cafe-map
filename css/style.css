@@ -100,7 +100,7 @@ input, select, textarea { font-family: var(--font-body); }
 
 .serif { font-family: var(--font-serif); font-style: italic; }
 
-#app { display:flex; flex-direction:column; height:100vh; }
+#app { display:flex; flex-direction:column; height:100dvh; position:fixed; inset:0; }
 
 /* ════════════════════════════
    TOPBAR
@@ -189,7 +189,7 @@ input, select, textarea { font-family: var(--font-body); }
 }
 
 /* ── LAYOUT ── */
-#main { flex:1; display:flex; overflow:hidden; }
+#main { flex:1; display:flex; overflow:hidden; min-height:0; }
 
 /* ════════════════════════════
    SIDEBAR
@@ -265,8 +265,8 @@ input, select, textarea { font-family: var(--font-body); }
 .no-results { font-size:12px; color:var(--mut); font-style:italic; padding:4px 0; }
 
 /* ── MAP ── */
-#map-container { flex:1; position:relative; overflow:hidden; }
-#map { width:100%; height:100%; }
+#map-container { flex:1; position:relative; overflow:hidden; min-height:0; }
+#map { width:100%; height:100%; position:absolute; inset:0; }
 #map.crosshair { cursor:crosshair !important; }
 .leaflet-control-attribution { display:none !important; }
 .leaflet-control-zoom { border:none !important; box-shadow:var(--sh-md) !important; }
@@ -1160,13 +1160,13 @@ a, button { -webkit-tap-highlight-color:transparent; }
     width: 56px !important; height: 56px !important;
   }
 
-  /* Map controls — circular, à direita acima do FAB */
+  /* Map controls — left side, same bottom as FAB */
   .map-controls {
     position: fixed !important;
-    bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
-    right: 20px !important;
-    left: auto !important;
-    flex-direction: column;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 20px !important;
+    right: auto !important;
+    flex-direction: column-reverse;
     gap: 8px;
   }
   .map-ctrl-btn {
@@ -1178,13 +1178,13 @@ a, button { -webkit-tap-highlight-color:transparent; }
   }
   .map-ctrl-label { display: none !important; }
 
-  /* Nearest alert — abaixo da topbar, acima do layer switcher */
+  /* Nearest alert — centred on screen */
   .nearest-alert {
-    top: calc(var(--topbar-h) + env(safe-area-inset-top, 0px) + 56px) !important;
-    left: 16px !important;
-    right: 16px !important;
-    transform: none !important;
-    width: auto !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translate(-50%, -50%) !important;
+    width: min(400px, calc(100vw - 32px)) !important;
   }
 
   /* Layer switcher — mais pequeno, não sobrepõe zoom */
