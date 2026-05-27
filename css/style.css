@@ -2060,3 +2060,100 @@ input, select, textarea { font-size: 16px !important; }
   align-items: center !important;
   justify-content: space-between !important;
 }
+
+/* ════════════════════════════════════════
+   ONBOARDING + HERO TEXTURE + MAP FIX
+════════════════════════════════════════ */
+
+/* ── White bar fix — aggressive approach ── */
+html, body {
+  height: 100%; height: 100dvh;
+  overflow: hidden;
+  margin: 0; padding: 0;
+}
+#app {
+  display: flex; flex-direction: column;
+  height: 100dvh; height: 100%;
+  overflow: hidden;
+  position: fixed; inset: 0;
+}
+#main {
+  flex: 1; min-height: 0;
+  display: flex; overflow: hidden;
+  position: relative;
+}
+#map-container {
+  flex: 1; position: relative;
+  height: 100%; min-height: 0;
+}
+#map {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ── Leaf texture on profile hero ── */
+.ph-hero {
+  background-blend-mode: soft-light !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+
+/* ── Back btn — no arrow ── */
+.back-btn {
+  font-size: 13px; font-weight: 600;
+  background: none; border: none;
+  color: var(--laranja); cursor: pointer;
+  padding: 8px 12px; font-family: var(--font-body);
+}
+
+/* ── Onboarding card ── */
+.onboarding-card {
+  background: var(--nuage);
+  border-radius: var(--r-xl);
+  padding: 32px 24px 24px;
+  width: min(360px, 100%);
+  box-shadow: 0 24px 64px rgba(0,0,0,.35);
+  display: flex; flex-direction: column;
+  gap: 20px;
+}
+.onboarding-step { display: none; text-align: center; }
+.onboarding-step.active { display: block; }
+.onboarding-icon { font-size: 48px; margin-bottom: 12px; line-height: 1; }
+.onboarding-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem; font-weight: 700;
+  color: var(--ink-new); margin-bottom: 10px;
+  line-height: 1.3;
+}
+.onboarding-text {
+  font-size: 14px; color: var(--mut);
+  line-height: 1.7;
+}
+.onboarding-text strong { color: var(--ink-new); }
+.onboarding-dots {
+  display: flex; justify-content: center; gap: 7px;
+}
+.ob-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--brd); transition: background .2s, transform .2s;
+}
+.ob-dot.active { background: var(--laranja); transform: scale(1.25); }
+.onboarding-actions {
+  display: flex; gap: 10px; align-items: center;
+}
+.ob-skip {
+  flex: 1; padding: 12px; border: 1.5px solid var(--brd);
+  border-radius: var(--r-sm); background: transparent;
+  font-size: 13px; font-weight: 600; color: var(--mut);
+  cursor: pointer; font-family: var(--font-body);
+}
+.ob-next {
+  flex: 2; padding: 12px; border: none;
+  border-radius: var(--r-sm); background: var(--laranja);
+  font-size: 13px; font-weight: 700; color: #fff;
+  cursor: pointer; font-family: var(--font-body);
+  transition: background .15s;
+}
+.ob-next:hover { background: #d06a10; }
