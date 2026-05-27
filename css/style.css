@@ -727,7 +727,7 @@ input, select, textarea { font-size:16px !important; }
   .modal-add { width:100%; }
   .form-grid { grid-template-columns:1fr; }
   .form-col-full { grid-column:1; }
-  .overlay-body { padding:14px 14px 24px; }
+  .overlay-body { padding:14px 14px 24px; text-align:left; }
   .profile-hero { padding:18px 16px; border-radius:var(--r-md); }
   .profile-greeting { font-size:1.1rem; }
   .account-field { flex-direction:column; align-items:flex-start; gap:3px; }
@@ -1313,8 +1313,20 @@ a, button { -webkit-tap-highlight-color:transparent; }
 /* Hero */
 .ph-hero {
   padding: 32px 20px 0;
-  text-align: center; /* hero content centred */
+  text-align: center;
   position: relative;
+  overflow: visible;
+}
+.ph-content,
+.ph-content .profile-card,
+.ph-content .profile-tab-panel,
+#ptab-pontos, #ptab-locais, #ptab-dados,
+#account-view, #account-edit,
+.account-field, .account-field-body,
+.account-label, .account-value,
+.card-section-title, .earn-item, .earn-label,
+.prize-body, .spot-list-info, .level-header-row {
+  text-align: left;
 }
 /* Cards below hero must NOT inherit text-align:center */
 .ph-content { text-align: left; }
@@ -1380,7 +1392,7 @@ a, button { -webkit-tap-highlight-color:transparent; }
 .ph-hex {
   width: 64px; height: 72px;
   background: var(--surface);
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  border-radius: 50%;
   border: none; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: transform .18s, filter .18s;
@@ -1753,187 +1765,7 @@ input, select, textarea { font-size: 16px !important; }
 .rank-av { background: rgba(155,177,102,.15) !important; border-color: rgba(155,177,102,.3) !important; overflow: hidden !important; }
 .rank-av svg { width: 34px !important; height: 34px !important; }
 
-/* ════════════════════════════════════════
-   AJUSTES FINAIS v9
-════════════════════════════════════════ */
 
-/* ── Títulos de secção — de volta ao espresso/laranja ── */
-.card-section-title { color: var(--ink-new) !important; letter-spacing: 1px; font-weight: 700; }
-.account-label      { color: var(--ink-new) !important; }
-.flabel             { color: var(--ink-new) !important; }
-.sidebar-label      { color: var(--mut) !important; }
-.sidebar-acc-label  { color: var(--ink-new) !important; }
-
-/* ── Círculo activo no perfil — laranja em vez de verde ── */
-.ph-hex-active {
-  background: var(--laranja) !important;
-  border-color: var(--laranja) !important;
-  box-shadow: 0 4px 16px rgba(236,126,28,.35) !important;
-}
-.ph-hex:hover { border-color: var(--laranja) !important; }
-
-/* ── Verde apenas onde faz sentido ── */
-.tag-verified, .spot-badge-ok { background: rgba(155,177,102,.18) !important; color: #3d5a1a !important; }
-.admin-btn-approve { background: rgba(155,177,102,.18) !important; color: #3d5a1a !important; }
-.admin-btn-approve:hover { background: var(--verde) !important; color: #fff !important; }
-.edit-toggle-btn { border-color: var(--brd) !important; color: var(--mut) !important; }
-.edit-toggle-btn:hover { border-color: var(--laranja) !important; color: var(--laranja) !important; background: rgba(236,126,28,.06) !important; }
-.ph-level { background: rgba(155,177,102,.25) !important; border-color: rgba(155,177,102,.4) !important; }
-.profile-stat-lbl { color: rgba(255,255,255,.65) !important; }
-.level-fill { background: linear-gradient(90deg, var(--amarelo), var(--laranja)) !important; }
-.ptag.on { border-color: var(--laranja) !important; background: rgba(236,126,28,.08) !important; color: var(--laranja) !important; }
-.historia-link-btn { background: rgba(155,177,102,.12) !important; color: var(--verde) !important; }
-.auth-switch a { color: var(--laranja) !important; }
-.back-btn { color: var(--laranja) !important; }
-.back-btn:hover { color: var(--ink-new) !important; }
-
-/* ── Barra lateral botão voltar ── */
-.sidebar-section .sidebar-label-destaque { color: var(--laranja) !important; }
-
-/* ── Título "O Meu Perfil" centrado ── */
-#profile-overlay .overlay-header {
-  justify-content: center !important;
-  position: relative;
-}
-#profile-overlay .overlay-header .back-btn {
-  position: absolute;
-  left: 16px;
-}
-#profile-overlay .overlay-header h2 {
-  text-align: center !important;
-  flex: none !important;
-}
-#profile-overlay .overlay-header > div:last-child { display: none; }
-
-/* ── Sidebar resultados de pesquisa sempre abaixo de Cafés com História ── */
-
-
-
-/* ════════════════════════════════════════
-   CORRECÇÕES v10
-════════════════════════════════════════ */
-
-/* ── Círculo activo — só outline laranja, sem fill ── */
-.ph-hex {
-  background: var(--surface) !important;
-  border: 2px solid var(--brd) !important;
-  transition: transform .18s, border-color .18s, box-shadow .18s !important;
-}
-.ph-hex:hover {
-  transform: scale(1.08) !important;
-  border-color: var(--laranja) !important;
-  box-shadow: 0 0 0 3px rgba(236,126,28,.18) !important;
-  background: var(--surface) !important;
-}
-.ph-hex-active {
-  background: var(--surface) !important;
-  border: 2.5px solid var(--laranja) !important;
-  box-shadow: 0 0 0 3px rgba(236,126,28,.18) !important;
-  transform: scale(1.1) !important;
-}
-.ph-hex-active svg  { color: var(--laranja) !important; }
-.ph-hex-active span { color: var(--laranja) !important; }
-.ph-hex svg  { color: var(--ink-new) !important; }
-.ph-hex span { color: var(--mut) !important; }
-
-/* ── Avatar picker — lock icon FORA do círculo ── */
-.avatar-pick-option {
-  position: relative !important;
-  overflow: visible !important;  /* não clipar o cadeado */
-  background: var(--nuage-dk) !important;
-  border: 2px solid var(--brd) !important;
-  padding: 4px !important;
-}
-.avatar-pick-option.selected {
-  border-color: var(--laranja) !important;
-  background: rgba(236,126,28,.08) !important;
-  box-shadow: 0 0 0 3px rgba(236,126,28,.15) !important;
-}
-.avatar-pick-option.locked {
-  opacity: .55 !important;
-}
-.avatar-lock-icon {
-  position: absolute !important;
-  bottom: -6px !important;
-  right: -6px !important;
-  font-size: 12px !important;
-  background: var(--surface) !important;
-  border-radius: 50% !important;
-  width: 20px !important;
-  height: 20px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  border: 1px solid var(--brd) !important;
-  line-height: 1 !important;
-  box-shadow: var(--sh-xs) !important;
-}
-
-/* ── Avatar SVG sem background de círculo extra ── */
-.avatar-pick-option svg {
-  width: 36px !important;
-  height: 36px !important;
-  display: block !important;
-}
-.profile-bigav, .ph-photo-avatar {
-  background: var(--nuage-dk) !important;
-}
-.profile-avatar-svg svg,
-.ph-photo-avatar svg {
-  width: 85% !important;
-  height: 85% !important;
-}
-
-/* ── Photo upload label cursor ── */
-.ph-photo-upload-btn {
-  cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-
-
-
-
-/* ── Search results — default hidden, shown by JS ── */
-
-
-
-
-/* ── Avatar button — limpo, sem círculo cortado ── */
-.avatar-btn {
-  width: 36px !important;
-  height: 36px !important;
-  border-radius: 50% !important;
-  overflow: hidden !important;
-  padding: 0 !important;
-  border: 2px solid rgba(236,126,28,.35) !important;
-  background: var(--nuage-dk) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  cursor: pointer !important;
-  position: relative !important;
-  flex-shrink: 0 !important;
-}
-.avatar-btn img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  display: block !important;
-  border-radius: 50% !important;
-}
-.avatar-btn svg {
-  width: 100% !important;
-  height: 100% !important;
-  display: block !important;
-}
-.avatar-svg-wrap { display: none !important; } /* hide old wrapper */
-.avatar-level-badge { display: none !important; } /* hide level number */
-
-/* Search results — hidden by default, JS sets display via style attribute */
-#search-results-box { display: none; }
 
 /* ═══════════════════════════════
    TOPBAR AVATAR — círculo limpo
@@ -2255,4 +2087,25 @@ html, body {
   padding: 0 !important;
   margin: 0 !important;
   max-width: 100% !important;
+}
+
+/* ph-hex circles — not cut */
+.ph-hex {
+  border-radius: 50% !important;
+  clip-path: none !important;
+  overflow: visible !important;
+}
+.ph-hex-nav { overflow: visible !important; }
+.ph-hero { overflow: visible !important; }
+
+/* profile content — left aligned */
+.ph-content,
+.ph-content *:not(.ph-stat):not(.ph-stat-num):not(.ph-stat-lbl):not(.ph-name):not(.ph-level):not(.pts-big):not(.pts-big-lbl) {
+  text-align: left !important;
+}
+#profile-overlay .overlay-body {
+  padding: 0 !important;
+  margin: 0 !important;
+  max-width: 100% !important;
+  text-align: left !important;
 }
