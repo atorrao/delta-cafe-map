@@ -291,7 +291,7 @@
   <!-- OVERLAYS -->
   <div id="admin-overlay" class="overlay hidden">
     <div class="overlay-header">
-      <button class="back-btn" onclick="UI.closeOverlay('admin-overlay')">Voltar</button>
+      <button class="back-btn" onclick="UI.closeOverlay('admin-overlay')">← Voltar</button>
       <h2>Painel de Administração</h2>
       <div></div>
     </div>
@@ -300,7 +300,7 @@
 
   <div id="profile-overlay" class="overlay hidden">
     <div class="overlay-header">
-      <button class="back-btn" onclick="UI.closeOverlay('profile-overlay')">Voltar</button>
+      <button class="back-btn" onclick="UI.closeOverlay('profile-overlay')">← Voltar</button>
       <h2>O Meu Perfil</h2>
       <div></div>
     </div>
@@ -309,7 +309,7 @@
 
   <div id="ranking-overlay" class="overlay hidden">
     <div class="overlay-header">
-      <button class="back-btn" onclick="UI.closeOverlay('ranking-overlay')">Voltar</button>
+      <button class="back-btn" onclick="UI.closeOverlay('ranking-overlay')">← Voltar</button>
       <h2>Ranking</h2>
       <div></div>
     </div>
@@ -512,7 +512,7 @@ function renderHistoriaSidebar() {
         '<div class="sidebar-loc-name">' + loc.name + '</div>' +
         '<div class="sidebar-loc-meta">' + (loc.city||'') + (loc.country?', '+loc.country:'') + '</div>' +
       '</div>' +
-      '<a href="' + dddUrl + '" target="_blank" rel="noopener" class="historia-link-btn" onclick="event.stopPropagation();">↗</a>' +
+      '<a href="' + dddUrl + '" target="_blank" rel="noopener" class="historia-link-btn" onclick="event.stopPropagation();"></a>' +
     '</div>';
   });
   listEl.innerHTML = html;
