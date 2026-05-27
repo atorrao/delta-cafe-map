@@ -475,47 +475,63 @@ const UI = {
     html += '    <button class="edit-toggle-btn" onclick="UI.toggleEditMode()">Editar</button>';
     html += '  </div>';
 
-    html += '  <div id="account-view">';
-    /* Helper for icon-prefixed row */
-    function _row(iconPath, label, value, noBorder) {
-      return '<div class="account-field" style="' + (noBorder ? 'border-bottom:none;' : '') + '">' +
-        '<div class="account-field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">' + iconPath + '</svg></div>' +
-        '<div class="account-field-body"><span class="account-label">' + label + '</span><span class="account-value">' + value + '</span></div>' +
-        '</div>';
-    }
-    html += _row('<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>', 'Nome', u.name);
-    html += _row('<path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/>', 'E-mail', u.email);
-    html += '<div class="account-field" style="border-bottom:none;">' +
-      '<div class="account-field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg></div>' +
-      '<div class="account-field-body"><span class="account-label">Password</span>' +
-      '<div class="pass-view-wrap" style="margin-top:2px;"><span class="account-value" id="pw-display">••••••••</span>' +
-      '<button type="button" class="pass-view-eye" onclick="UI.toggleViewPassword(this)" tabindex="-1">' +
-      '<svg class="eye-off" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:17px;height:17px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>' +
-      '<svg class="eye-on" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:17px;height:17px;display:none;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>' +
-      '</button></div></div></div>';
-    /* Foto de perfil na área de dados */
-    html += '    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--brd);">';
-    html += '      <div class="account-label" style="margin-bottom:10px;">Foto de perfil</div>';
-    html += '      <div style="display:flex;align-items:center;gap:14px;">';
+    html += '  <div id="account-view" style="text-align:left;">';
+
+    /* 1 — Foto de perfil */
+    html += '<div class="account-field">';
+    html += '  <div class="account-field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z"/></svg></div>';
+    html += '  <div class="account-field-body" style="text-align:left;">';
+    html += '    <span class="account-label">Foto de perfil</span>';
+    html += '    <div style="display:flex;align-items:center;gap:12px;margin-top:6px;">';
     if (photoData) {
-      html += '      <img src="' + photoData + '" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--brd);">';
-      html += '      <div style="display:flex;flex-direction:column;gap:8px;">';
-      html += '        <label class="spot-action-btn" for="ph-photo-file-dados" style="cursor:pointer;">Alterar foto</label>';
-      html += '        <button class="spot-action-btn" style="color:var(--terre-cuite);border-color:rgba(161,58,30,.3);" onclick="UI._removePhoto()">Remover foto</button>';
-      html += '      </div>';
+      html += '<img src="' + photoData + '" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--brd);flex-shrink:0;">';
+      html += '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
+      html += '  <label class="spot-action-btn" for="ph-photo-file-dados" style="cursor:pointer;font-size:12px;">Alterar</label>';
+      html += '  <button class="spot-action-btn" style="color:var(--terre-cuite);border-color:rgba(161,58,30,.3);font-size:12px;" onclick="UI._removePhoto()">Remover</button>';
+      html += '</div>';
     } else {
-      html += '      <div style="width:56px;height:56px;border-radius:50%;background:var(--nuage-dk);border:2px solid var(--brd);display:flex;align-items:center;justify-content:center;overflow:hidden;">' + Gamification.getAvatarSVG(pts, u.selectedAvatar) + '</div>';
-      html += '      <label class="spot-action-btn" for="ph-photo-file-dados" style="cursor:pointer;">Adicionar foto</label>';
+      html += '<div style="width:44px;height:44px;border-radius:50%;background:var(--nuage-dk);border:2px solid var(--brd);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">' + Gamification.getAvatarSVG(pts, u.selectedAvatar) + '</div>';
+      html += '<label class="spot-action-btn" for="ph-photo-file-dados" style="cursor:pointer;font-size:12px;">Adicionar foto</label>';
     }
-    html += '      </div>';
-    html += '      <input type="file" id="ph-photo-file-dados" accept="image/*" style="display:none;">';
     html += '    </div>';
-    html += '    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--brd);">';
-    html += '      <div class="account-label" style="margin-bottom:8px;">Avatar actual</div>';
-    html += '      <div class="avatar-picker-grid" style="pointer-events:none;">' + avatarPickHtml + '</div>';
-    html += '      <p style="font-size:10px;color:var(--mut-lt);margin-top:6px;">Os avatares com 🔒 desbloqueiam com mais pontos</p>';
+    html += '    <input type="file" id="ph-photo-file-dados" accept="image/*" style="display:none;">';
+    html += '  </div>';
+    html += '</div>';
+
+    /* 2 — Nome */
+    html += '<div class="account-field">';
+    html += '  <div class="account-field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg></div>';
+    html += '  <div class="account-field-body" style="text-align:left;"><span class="account-label">Nome</span><span class="account-value">' + u.name + '</span></div>';
+    html += '</div>';
+
+    /* 3 — E-mail */
+    html += '<div class="account-field">';
+    html += '  <div class="account-field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg></div>';
+    html += '  <div class="account-field-body" style="text-align:left;"><span class="account-label">E-mail</span><span class="account-value">' + u.email + '</span></div>';
+    html += '</div>';
+
+    /* 4 — Password */
+    html += '<div class="account-field">';
+    html += '  <div class="account-field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg></div>';
+    html += '  <div class="account-field-body" style="text-align:left;"><span class="account-label">Password</span>';
+    html += '    <div class="pass-view-wrap" style="margin-top:2px;justify-content:flex-start;">';
+    html += '      <span class="account-value" id="pw-display">••••••••</span>';
+    html += '      <button type="button" class="pass-view-eye" onclick="UI.toggleViewPassword(this)" tabindex="-1">';
+    html += '        <svg class="eye-off" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:17px;height:17px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>';
+    html += '        <svg class="eye-on" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width:17px;height:17px;display:none;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>';
+    html += '      </button>';
     html += '    </div>';
     html += '  </div>';
+    html += '</div>';
+
+    /* 5 — Avatar actual */
+    html += '<div class="account-field" style="border-bottom:none;flex-direction:column;align-items:flex-start;gap:10px;">';
+    html += '  <span class="account-label" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--mut-lt);">Avatar actual</span>';
+    html += '  <div class="avatar-picker-grid" style="pointer-events:none;">' + avatarPickHtml + '</div>';
+    html += '  <p style="font-size:10px;color:var(--mut-lt);">Os avatares com 🔒 desbloqueiam com mais pontos</p>';
+    html += '</div>';
+
+    html += '  </div>'; /* fim account-view */
 
     html += '  <div id="account-edit" style="display:none;">';
     html += '    <div class="account-field-edit"><label class="account-label">Nome</label><input class="account-edit-input" id="edit-name" value="' + u.name + '"></div>';
