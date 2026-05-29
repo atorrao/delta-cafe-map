@@ -163,7 +163,7 @@ var Map = (function() {
     var officialEl = document.getElementById('official-list');
     if (!officialEl) return;
     var official = App.locations.filter(function(l) {
-      return l.type !== 'cafe' && (l.verified || !l.ownerEmail);
+      return l.type !== 'cafe';
     });
     if (!official.length) {
       officialEl.innerHTML = '<p class="sidebar-empty">Sem locais disponíveis.</p>';
@@ -236,7 +236,7 @@ var Map = (function() {
     var nearbyEl = document.getElementById('nearby-list');
     if (!nearbyEl) return;
     var cafes = App.locations.filter(function(l) {
-      return l.type === 'cafe' && (l.verified || !l.ownerEmail);
+      return l.type === 'cafe';
     });
     var withDist = cafes.map(function(l) {
       return { loc: l, dist: _haversine(userLat, userLng, l.lat, l.lng) };
@@ -279,8 +279,6 @@ var Map = (function() {
     var filtered = App.locations.filter(function(l) {
       if (_activeType !== 'all' && l.type !== _activeType) return false;
       if (q && !_matchSearch(l, q)) return false;
-      // Hide user-submitted pending locations from public map
-      if (l.ownerEmail && !l.verified && (l.status === 'pending' || !l.status)) return false;
       return true;
     });
 
@@ -524,8 +522,8 @@ var Map = (function() {
       hours: hours || null, note: note || null,
       type: type, products: products,
       lat: _pendingCoords.lat, lng: _pendingCoords.lng,
-      verified: false,
-      status: 'pending',
+      verified: true,
+      status: 'approved',
       addedBy: App.currentUser.name,
       ownerEmail: App.currentUser.email, upvotes: 0,
       photo: photoData || null,
