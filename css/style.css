@@ -2603,3 +2603,96 @@ html, body { height: 100dvh !important; overflow: hidden !important; }
   border: 1.5px solid var(--brd) !important;
 }
 .admin-btn-edit:hover { border-color: var(--laranja) !important; color: var(--laranja) !important; }
+
+/* ════════════════════════════════════════
+   SIDEBAR close btn + historia cards
+════════════════════════════════════════ */
+
+/* Close button — no circle, just icon */
+.sidebar-close-btn {
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 4px !important;
+  color: var(--ink-new) !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: .7;
+  transition: opacity .15s;
+}
+.sidebar-close-btn:hover { opacity: 1 !important; }
+
+/* Sidebar header — close btn centred vertically */
+.sidebar-pill-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+/* Historia cards */
+.sidebar-accordion-body {
+  padding: 8px 4px 10px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.historia-card {
+  background: var(--surface);
+  border: 1px solid var(--brd);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow .18s, transform .18s;
+  box-shadow: var(--sh-xs);
+}
+.historia-card:hover {
+  box-shadow: var(--sh-md);
+  transform: translateY(-1px);
+}
+.historia-card-photo {
+  width: 100%;
+  height: 90px;
+  overflow: hidden;
+  background: var(--nuage-dk);
+}
+.historia-card-photo img {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  transition: transform .3s;
+}
+.historia-card:hover .historia-card-photo img { transform: scale(1.04); }
+.historia-card-no-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: var(--mut-lt);
+}
+.historia-card-body {
+  padding: 10px 12px 10px;
+}
+.historia-card-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-new);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.historia-card-meta {
+  font-size: 11px;
+  color: var(--mut);
+  margin-bottom: 6px;
+}
+.historia-card-link {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--laranja);
+  text-decoration: none;
+}
+.historia-card-link:hover { text-decoration: underline; }
