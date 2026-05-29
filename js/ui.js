@@ -137,12 +137,34 @@ const UI = {
   openProfileOverlay: function() {
     if (!App.currentUser) { Auth.showModal('login'); return; }
     UI.closeAllOverlays();
-    /* Hide nearest-alert while profile is open */
     var na = document.getElementById('nearest-alert');
     if (na) na.style.display = 'none';
     UI._activeProfileTab = 'pontos';
     UI.renderProfile();
-    document.getElementById('profile-overlay').classList.remove('hidden');
+    var el = document.getElementById('profile-overlay');
+    el.classList.remove('hidden');
+    /* Swipe right to close */
+    UI._addSwipeClose(el);
+  },
+
+  _addSwipeClose: function(el) {
+    var startX = 0, startY = 0;
+    function onStart(e) {
+      var t = e.touches ? e.touches[0] : e;
+      startX = t.clientX; startY = t.clientY;
+    }
+    function onEnd(e) {
+      var t = e.changedTouches ? e.changedTouches[0] : e;
+      var dx = t.clientX - startX;
+      var dy = Math.abs(t.clientY - startY);
+      if (dx > 80 && dy < 60) { UI.closeOverlay(el.id); }
+    }
+    el.removeEventListener('touchstart', el._swipeStart);
+    el.removeEventListener('touchend',   el._swipeEnd);
+    el._swipeStart = onStart;
+    el._swipeEnd   = onEnd;
+    el.addEventListener('touchstart', onStart, { passive: true });
+    el.addEventListener('touchend',   onEnd,   { passive: true });
   },
 
   _editMode: false,
