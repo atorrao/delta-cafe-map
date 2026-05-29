@@ -489,6 +489,78 @@ var Map = (function() {
     UI.closeModal('add-modal');
   }
 
+  /* ── Duplicate detection ── */
+  function _levenshtein(a, b) {
+    a = a.toLowerCase(); b = b.toLowerCase();
+    var m = a.length, n = b.length;
+    var dp = [];
+    for (var i = 0; i <= m; i++) { dp[i] = [i]; }
+    for (var j = 0; j <= n; j++) { dp[0][j] = j; }
+    for (var i = 1; i <= m; i++) {
+      for (var j = 1; j <= n; j++) {
+        dp[i][j] = a[i-1] === b[j-1]
+          ? dp[i-1][j-1]
+          : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+      }
+    }
+    return dp[m][n];
+  }
+
+  function _findNearbyDuplicates(name, lat, lng, radiusMeters) {
+    return App.locations.filter(function(l) {
+      if (!l.lat || !l.lng) return false;
+      var dist = _haversine(lat, lng, l.lat, l.lng) * 1000; // metres
+      if (dist > radiusMeters) return false;
+      // Name similarity: exact match or levenshtein within 40% of longer name
+      var maxLen = Math.max(name.length, l.name.length);
+      var lev = _levenshtein(name, l.name);
+      return lev / maxLen < 0.4;
+    }).map(function(l) {
+      return {
+        loc: l,
+        dist: Math.round(_haversine(lat, lng, l.lat, l.lng) * 1000)
+      };
+    }).sort(function(a, b) { return a.dist - b.dist; });
+  }
+
+  function _showDuplicateAlert(duplicates, onConfirmNew) {
+    // Remove any existing duplicate alert
+    var existing = document.getElementById('duplicate-alert');
+    if (existing) existing.remove();
+
+    var best = duplicates[0];
+    var distStr = best.dist < 1000 ? best.dist + 'm' : (best.dist/1000).toFixed(1) + 'km';
+
+    var el = document.createElement('div');
+    el.id = 'duplicate-alert';
+    el.innerHTML =
+      '<div class="dup-alert-overlay">' +
+        '<div class="dup-alert-card">' +
+          '<div class="dup-alert-icon">📍</div>' +
+          '<div class="dup-alert-title">Local já existe?</div>' +
+          '<div class="dup-alert-msg">Encontrámos um local próximo com um nome parecido:<br>' +
+            '<strong>' + best.loc.name + '</strong> <span class="dup-alert-dist">(' + distStr + ')</span>' +
+          '</div>' +
+          '<div class="dup-alert-actions">' +
+            '<button class="dup-btn dup-btn-yes" id="dup-yes">Sim, é o mesmo</button>' +
+            '<button class="dup-btn dup-btn-no"  id="dup-no">Não, é diferente</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(el);
+
+    document.getElementById('dup-yes').addEventListener('click', function() {
+      el.remove();
+      // Fly to the existing location
+      Map.flyTo(best.loc.id);
+      UI.toast('Local já existe no mapa. A mostrar o local existente.');
+    });
+    document.getElementById('dup-no').addEventListener('click', function() {
+      el.remove();
+      onConfirmNew();
+    });
+  }
+
   function submitSpot() {
     UI.hideErr('add-err');
     var name     = (document.getElementById('add-name')  || {value:''}).value.trim();
@@ -501,6 +573,16 @@ var Map = (function() {
     if (!name)          { UI.showErr('add-err', 'O nome do local é obrigatório.'); return; }
     if (!_pendingCoords){ UI.showErr('add-err', 'Localização não detectada. Fecha e clica no mapa para marcar o local.'); return; }
 
+    // Check for nearby duplicates before saving
+    var duplicates = _findNearbyDuplicates(name, _pendingCoords.lat, _pendingCoords.lng, 50);
+    if (duplicates.length) {
+      _showDuplicateAlert(duplicates, function() { _doSaveSpot(name, hours, note, type, products); });
+      return;
+    }
+    _doSaveSpot(name, hours, note, type, products);
+  }
+
+  function _doSaveSpot(name, hours, note, type, products) {
     var isFirst = App.locations.filter(function(l) { return l.ownerEmail === App.currentUser.email; }).length === 0;
     var oldPts  = App.currentUser.points || 0;
     var oldLv   = Gamification.getLevel(oldPts);
