@@ -2595,3 +2595,11 @@ html, body { height: 100dvh !important; overflow: hidden !important; }
   box-shadow: 0 4px 14px rgba(236,126,28,.3);
 }
 .dup-btn-no:hover { background: #d06a10; }
+
+/* Admin edit button */
+.admin-btn-edit {
+  background: var(--nuage-dk) !important;
+  color: var(--ink-new) !important;
+  border: 1.5px solid var(--brd) !important;
+}
+.admin-btn-edit:hover { border-color: var(--laranja) !important; color: var(--laranja) !important; }
