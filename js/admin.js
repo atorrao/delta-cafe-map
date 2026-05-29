@@ -106,6 +106,8 @@ var Admin = {
     } else {
       actions += '<button class="admin-btn admin-btn-approve" data-act="approve" data-em="'+u.email+'">Reativar</button>';
     }
+    // Edit button always visible
+    actions += '<button class="admin-btn admin-btn-edit" data-act="edit-user" data-em="'+u.email+'">Editar</button>';
 
     return '<div class="admin-profile-row">' +
       Admin._avatarHtml(u, 46) +
@@ -272,8 +274,6 @@ var Admin = {
   /* ── LOCATION ROW ── */
   _locRow: function(loc, isPending) {
     var cfg  = TYPE_CONFIG[loc.type] || { label: loc.type, color: '#888' };
-    var date = '';
-    try { date = new Date(loc.createdAt||Date.now()).toLocaleDateString('pt-PT',{day:'numeric',month:'short',year:'numeric'}); } catch(e){}
 
     return '<div class="admin-loc-card' + (isPending ? ' admin-card-pending' : '') + '">' +
       '<div class="admin-loc-header">' +
@@ -293,8 +293,10 @@ var Admin = {
         '</span>' +
       '</div>' +
       '<div class="admin-loc-footer">' +
-        '<span class="admin-loc-submitter">Submetido por <strong>' + loc.addedBy + '</strong>' + (date ? ' &middot; ' + date : '') + '</span>' +
+        '<span class="admin-loc-submitter">Submetido por <strong>' + (loc.addedBy||'—') + '</strong></span>' +
         '<div class="admin-actions">' +
+          '<button class="admin-btn admin-btn-edit" data-act="view-loc"  data-em="'+loc.id+'">Ver</button>' +
+          '<button class="admin-btn admin-btn-edit" data-act="edit-loc"  data-em="'+loc.id+'">Editar</button>' +
           (isPending  ? '<button class="admin-btn admin-btn-approve" data-act="approve-loc" data-em="'+loc.id+'">✓ Aprovar</button>' : '') +
           (isPending  ? '<button class="admin-btn admin-btn-reject"  data-act="reject-loc"  data-em="'+loc.id+'">✕ Recusar</button>' : '') +
           (!isPending ? '<button class="admin-btn admin-btn-inactive" data-act="remove-loc" data-em="'+loc.id+'">Remover</button>'   : '') +
@@ -354,6 +356,115 @@ var Admin = {
       }
       return;
     }
+    if (act === 'edit-user') {
+      var u = Admin._sbUsers.find(function(u){ return u.email===id; });
+      if (!u) return;
+      var ov = document.createElement('div');
+      ov.id = 'admin-edit-overlay';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:9600;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:24px;';
+      ov.innerHTML =
+        '<div style="background:var(--surface);border-radius:var(--r-xl);padding:28px 24px 24px;width:min(380px,100%);box-shadow:0 20px 60px rgba(0,0,0,.3);">' +
+          '<div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--ink-new);margin-bottom:20px;">Editar utilizador</div>' +
+          '<div class="mfield"><label class="mfield-label">Nome</label><input class="mfield-input" id="eu-name" value="'+u.name+'"></div>' +
+          '<div class="mfield"><label class="mfield-label">E-mail</label><input class="mfield-input" id="eu-email" value="'+u.email+'" disabled style="opacity:.5;"></div>' +
+          '<div class="mfield"><label class="mfield-label">Pontos</label><input class="mfield-input" id="eu-pts" type="number" value="'+(u.points||0)+'"></div>' +
+          '<div class="mfield"><label class="mfield-label">Estado</label>' +
+            '<select class="mfield-input mfield-select" id="eu-status">' +
+              '<option value="approved"'+(u.status==='approved'?' selected':'')+'>Aprovado</option>' +
+              '<option value="pending"'+(u.status==='pending'?' selected':'')+'>Pendente</option>' +
+              '<option value="inactive"'+(u.status==='inactive'?' selected':'')+'>Inativo</option>' +
+            '</select>' +
+          '</div>' +
+          '<div style="display:flex;gap:10px;margin-top:20px;">' +
+            '<button class="msheet-btn msheet-cancel" onclick="document.getElementById(\'admin-edit-overlay\').remove()">Cancelar</button>' +
+            '<button class="msheet-btn msheet-submit" id="eu-save">Guardar</button>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(ov);
+      document.getElementById('eu-save').addEventListener('click', async function() {
+        var newName   = document.getElementById('eu-name').value.trim();
+        var newPts    = parseInt(document.getElementById('eu-pts').value) || 0;
+        var newStatus = document.getElementById('eu-status').value;
+        if (!newName) { UI.toast('Nome obrigatório.','error'); return; }
+        try {
+          await DB.updateUser(u.email, { name:newName, points:newPts, status:newStatus });
+          u.name=newName; u.points=newPts; u.status=newStatus;
+          ov.remove();
+          UI.toast('Utilizador actualizado.','success');
+          Admin._loadAndRender();
+        } catch(e) { UI.toast('Erro ao guardar.','error'); }
+      });
+      return;
+    }
+
+    if (act === 'view-loc') {
+      var loc = App.locations.find(function(l){ return l.id===id; });
+      if (!loc) return;
+      var cfg = TYPE_CONFIG[loc.type] || { label:loc.type, color:'#888' };
+      var photoData = loc.photo || '';
+      if (!photoData) { try { photoData = localStorage.getItem('spot_photo_'+id)||''; } catch(e){} }
+      var ov = document.createElement('div');
+      ov.id = 'admin-view-overlay';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:9600;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:24px;';
+      ov.innerHTML =
+        '<div style="background:var(--surface);border-radius:var(--r-xl);width:min(400px,100%);box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;">' +
+          (photoData ? '<img src="'+photoData+'" style="width:100%;height:160px;object-fit:cover;display:block;">' : '') +
+          '<div style="padding:24px 24px 20px;">' +
+            '<div style="font-family:var(--font-display);font-size:1.15rem;font-weight:700;color:var(--ink-new);margin-bottom:6px;">'+loc.name+'</div>' +
+            '<div style="font-size:12px;color:var(--mut);margin-bottom:14px;">'+cfg.label+(loc.city?(' · '+loc.city):'')+(loc.country?(', '+loc.country):'')+'</div>' +
+            (loc.address ? '<div style="font-size:12px;color:var(--mut);margin-bottom:8px;">📍 '+loc.address+'</div>' : '') +
+            (loc.hours   ? '<div style="font-size:12px;color:var(--mut);margin-bottom:8px;">🕐 '+loc.hours+'</div>' : '') +
+            (loc.note    ? '<div style="font-size:12px;color:var(--mut);margin-bottom:8px;font-style:italic;">"'+loc.note+'"</div>' : '') +
+            '<div style="font-size:11px;color:var(--mut-lt);margin-top:10px;">Adicionado por <strong>'+loc.addedBy+'</strong></div>' +
+            '<button class="msheet-btn msheet-cancel" style="margin-top:16px;width:100%;" onclick="document.getElementById(\'admin-view-overlay\').remove()">Fechar</button>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(ov);
+      return;
+    }
+
+    if (act === 'edit-loc') {
+      var loc = App.locations.find(function(l){ return l.id===id; });
+      if (!loc) return;
+      var ov = document.createElement('div');
+      ov.id = 'admin-editloc-overlay';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:9600;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:24px;';
+      ov.innerHTML =
+        '<div style="background:var(--surface);border-radius:var(--r-xl);padding:28px 24px 24px;width:min(400px,100%);max-height:88dvh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);">' +
+          '<div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--ink-new);margin-bottom:20px;">Editar local</div>' +
+          '<div class="mfield"><label class="mfield-label">Nome</label><input class="mfield-input" id="el-name" value="'+loc.name+'"></div>' +
+          '<div class="mfield"><label class="mfield-label">Morada</label><input class="mfield-input" id="el-addr" value="'+(loc.address||'')+'"></div>' +
+          '<div class="mfield"><label class="mfield-label">Cidade</label><input class="mfield-input" id="el-city" value="'+(loc.city||'')+'"></div>' +
+          '<div class="mfield"><label class="mfield-label">País</label><input class="mfield-input" id="el-country" value="'+(loc.country||'')+'"></div>' +
+          '<div class="mfield"><label class="mfield-label">Horário</label><input class="mfield-input" id="el-hours" value="'+(loc.hours||'')+'" placeholder="Ex: Seg–Sex 08h–20h"></div>' +
+          '<div class="mfield"><label class="mfield-label">Nota</label><textarea class="mfield-input mfield-textarea" id="el-note" rows="2">'+(loc.note||'')+'</textarea></div>' +
+          '<div style="display:flex;gap:10px;margin-top:20px;">' +
+            '<button class="msheet-btn msheet-cancel" onclick="document.getElementById(\'admin-editloc-overlay\').remove()">Cancelar</button>' +
+            '<button class="msheet-btn msheet-submit" id="el-save">Guardar</button>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(ov);
+      document.getElementById('el-save').addEventListener('click', async function() {
+        var updates = {
+          name:    document.getElementById('el-name').value.trim() || loc.name,
+          address: document.getElementById('el-addr').value.trim(),
+          city:    document.getElementById('el-city').value.trim(),
+          country: document.getElementById('el-country').value.trim(),
+          hours:   document.getElementById('el-hours').value.trim() || null,
+          note:    document.getElementById('el-note').value.trim() || null,
+        };
+        try {
+          await App.updateLocation(id, updates);
+          Object.assign(loc, updates);
+          Map.renderMarkers();
+          ov.remove();
+          UI.toast('Local actualizado.','success');
+          Admin._loadAndRender();
+        } catch(e) { UI.toast('Erro ao guardar.','error'); }
+      });
+      return;
+    }
+
     var updateData={}, toastMsg='';
     if      (act==='approve')  { updateData={status:'approved'};  toastMsg='Utilizador aprovado.'; }
     else if (act==='reject')   { updateData={status:'rejected'};  toastMsg='Registo recusado.'; }
