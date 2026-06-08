@@ -64,10 +64,11 @@ const App = {
             note:       l.note    || null,
             products:   l.products || [],
             verified:   l.verified || false,
-            status:     l.status  || 'pending',
+            status:     l.status  || 'approved',
             addedBy:    l.added_by || '',
             ownerEmail: l.owner_email || null,
             upvotes:    l.upvotes || 0,
+            photo:      l.photo   || null,
             createdAt:  l.created_at
           };
           this.locations.push(loc);
@@ -97,10 +98,11 @@ const App = {
       note:        loc.note    || null,
       products:    loc.products || [],
       verified:    loc.verified || false,
-      status:      loc.status  || 'pending',
+      status:      loc.status  || 'approved',
       added_by:    loc.addedBy || '',
       owner_email: loc.ownerEmail || null,
       upvotes:     loc.upvotes || 0,
+      photo:       loc.photo   || null,
       created_at:  loc.createdAt || new Date().toISOString()
     };
     try {
