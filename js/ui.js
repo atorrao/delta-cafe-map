@@ -62,34 +62,44 @@ const UI = {
       }
     } catch(e){}
   },
-  closeOverlay: function(id) {
-    var el = document.getElementById(id);
-    if (el) el.classList.add('hidden');
-    /* Show nearest alert again if it was visible */
+  _hideNearestAlert: function() {
+    var na = document.getElementById('nearest-alert');
+    if (na) na.style.display = 'none';
+  },
+
+  _showNearestAlert: function() {
     var na = document.getElementById('nearest-alert');
     if (na) na.style.removeProperty('display');
   },
 
+  closeOverlay: function(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+    /* Only show nearest alert if all overlays are closed */
+    var anyOpen = ['profile-overlay','admin-overlay','ranking-overlay'].some(function(oid) {
+      var o = document.getElementById(oid);
+      return o && !o.classList.contains('hidden');
+    });
+    if (!anyOpen) UI._showNearestAlert();
+  },
+
   closeAllOverlays: function() {
-    /* Show nearest alert again */
-    var na = document.getElementById('nearest-alert');
-    if (na) na.style.removeProperty('display');
     ['profile-overlay','ranking-overlay','admin-overlay'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.classList.add('hidden');
     });
+    /* Do NOT show nearest alert here — caller decides */
   },
 
   showTab: function(tab) {
     document.querySelectorAll('.bnav-btn').forEach(function(b) {
       b.classList.toggle('active', b.dataset.view===tab);
     });
-    var na = document.getElementById('nearest-alert');
-    if (tab==='map') {
+    if (tab === 'map') {
       UI.closeAllOverlays();
+      UI._showNearestAlert(); /* back to map — show alert */
     } else {
-      /* Hide nearest alert when opening any overlay */
-      if (na) na.style.display = 'none';
+      UI._hideNearestAlert(); /* opening any overlay — hide alert */
       if (tab==='ranking') {
         UI.closeAllOverlays();
         UI.renderRanking();
@@ -137,13 +147,11 @@ const UI = {
   openProfileOverlay: function() {
     if (!App.currentUser) { Auth.showModal('login'); return; }
     UI.closeAllOverlays();
-    var na = document.getElementById('nearest-alert');
-    if (na) na.style.display = 'none';
+    UI._hideNearestAlert();
     UI._activeProfileTab = 'pontos';
     UI.renderProfile();
     var el = document.getElementById('profile-overlay');
     el.classList.remove('hidden');
-    /* Swipe right to close */
     UI._addSwipeClose(el);
   },
 
@@ -748,7 +756,10 @@ UI.showRegistrationPending = function() {
 };
 
 /* ── Admin Panel ── */
-UI.openAdminPanel = function() { Admin.open().catch(function(e){ console.error('Admin panel error:', e); UI.toast('Erro ao carregar painel admin.', 'error'); }); };
+UI.openAdminPanel = function() {
+  UI._hideNearestAlert();
+  Admin.open().catch(function(e){ console.error('Admin panel error:', e); UI.toast('Erro ao carregar painel admin.', 'error'); });
+};
 
 /* ── Mobile search ── */
 UI.showMobileSearch = function() {

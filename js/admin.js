@@ -11,6 +11,7 @@ var Admin = {
       return;
     }
     UI.closeAllOverlays();
+    UI._hideNearestAlert();
     Admin._tab = 'users';
     document.getElementById('admin-overlay').classList.remove('hidden');
     document.getElementById('admin-body').innerHTML =
