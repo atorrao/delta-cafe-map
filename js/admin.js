@@ -456,11 +456,12 @@ var Admin = {
         try {
           await App.updateLocation(id, updates);
           Object.assign(loc, updates);
+          App.saveUserLocations();
           Map.renderMarkers();
           ov.remove();
           UI.toast('Local actualizado.','success');
           Admin._loadAndRender();
-        } catch(e) { UI.toast('Erro ao guardar.','error'); }
+        } catch(e) { UI.toast('Erro ao guardar. Verifica a ligação.','error'); }
       });
       return;
     }
