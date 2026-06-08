@@ -92,8 +92,21 @@ const Auth = {
         if (!name)           { btn.textContent=orig; btn.disabled=false; UI.showErr('auth-err', 'Insere o teu nome.'); return; }
         if (pass !== conf)   { btn.textContent=orig; btn.disabled=false; UI.showErr('auth-err', 'As palavras-passe não coincidem.'); return; }
         if (pass.length < 6) { btn.textContent=orig; btn.disabled=false; UI.showErr('auth-err', 'Palavra-passe precisa de 6+ caracteres.'); return; }
-        const existing = await DB.getUser(email);
-        if (existing)        { btn.textContent=orig; btn.disabled=false; UI.showErr('auth-err', 'Este email já está registado.'); return; }
+
+        /* Always check for existing email — block registration if check fails */
+        let existing = null;
+        try {
+          existing = await DB.getUser(email);
+        } catch(checkErr) {
+          btn.textContent=orig; btn.disabled=false;
+          UI.showErr('auth-err', 'Não foi possível verificar o e-mail. Verifica a ligação e tenta novamente.');
+          return;
+        }
+        if (existing) {
+          btn.textContent=orig; btn.disabled=false;
+          UI.showErr('auth-err', 'Já existe uma conta associada a este e-mail. Usa a opção de login.');
+          return;
+        }
 
         await DB.createUser({
           email, name, avatar: name[0].toUpperCase(), password: pass,
