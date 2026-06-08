@@ -112,14 +112,25 @@ const App = {
   },
 
   async updateLocation(id, data) {
-    // Map camelCase to snake_case
     const row = {};
-    if (data.verified  !== undefined) row.verified = data.verified;
-    if (data.status    !== undefined) row.status   = data.status;
-    if (data.upvotes   !== undefined) row.upvotes  = data.upvotes;
+    if (data.verified !== undefined) row.verified = data.verified;
+    if (data.status   !== undefined) row.status   = data.status;
+    if (data.upvotes  !== undefined) row.upvotes  = data.upvotes;
+    if (data.name     !== undefined) row.name     = data.name;
+    if (data.address  !== undefined) row.address  = data.address;
+    if (data.city     !== undefined) row.city     = data.city;
+    if (data.country  !== undefined) row.country  = data.country;
+    if (data.hours    !== undefined) row.hours    = data.hours;
+    if (data.note     !== undefined) row.note     = data.note;
+    if (data.photo    !== undefined) row.photo    = data.photo;
+    if (data.type     !== undefined) row.type     = data.type;
+    if (!Object.keys(row).length) return;
     try {
       await DB.updateLocation(id, row);
-    } catch(e) { console.warn('updateLocation failed:', e); }
+    } catch(e) {
+      console.warn('updateLocation failed:', e);
+      throw e; /* re-throw so caller can show error */
+    }
   },
 
   async removeLocation(id) {
