@@ -55,6 +55,9 @@ var Map = (function() {
         L.circleMarker([lat, lng], {
           radius: 8, color: '#2C1810', fillColor: '#C8A84B', fillOpacity: 0.85, weight: 2.5
         }).addTo(_map).bindPopup('<strong>A tua localização</strong>');
+        /* Store for sidebar refresh */
+        Map._userLat = lat;
+        Map._userLng = lng;
         // Show nearest Delta alert
         _showNearestAlert(lat, lng);
         // Populate nearby cafés in sidebar
@@ -235,34 +238,40 @@ var Map = (function() {
   function renderSidebarNearby(userLat, userLng) {
     var nearbyEl = document.getElementById('nearby-list');
     if (!nearbyEl) return;
-    var cafes = App.locations.filter(function(l) {
-      return l.type === 'cafe';
-    });
-    var withDist = cafes.map(function(l) {
-      return { loc: l, dist: _haversine(userLat, userLng, l.lat, l.lng) };
-    }).filter(function(x) { return x.dist <= 5; });
-    withDist.sort(function(a, b) { return a.dist - b.dist; });
+
+    var RADIUS_KM = 1.5;
+    var withDist = App.locations
+      .filter(function(l) { return l.lat && l.lng; })
+      .map(function(l) {
+        return { loc: l, dist: _haversine(userLat, userLng, l.lat, l.lng) };
+      })
+      .filter(function(x) { return x.dist <= RADIUS_KM; })
+      .sort(function(a, b) { return a.dist - b.dist; })
+      .slice(0, 15); /* max 15 results */
+
     if (!withDist.length) {
-      nearbyEl.innerHTML = '<p class="sidebar-empty">Nenhum Local Encontrado</p>';
+      nearbyEl.innerHTML = '<p class="sidebar-empty">Nenhum local num raio de 1.5 km</p>';
       return;
     }
+
     var html = '';
     withDist.forEach(function(x) {
-      var loc = x.loc;
+      var loc    = x.loc;
+      var cfg    = TYPE_CONFIG[loc.type] || TYPE_CONFIG['cafe'];
       var distStr = x.dist < 1 ? Math.round(x.dist*1000)+' m' : x.dist.toFixed(1)+' km';
       var isOfficial = loc.verified && (!loc.ownerEmail || loc.ownerEmail === 'admin@delta.pt');
       html += '<div class="sidebar-loc-item ' + (isOfficial ? 'loc-official' : 'loc-user') + '" data-id="' + loc.id + '">' +
-        '<span class="sidebar-loc-dot" style="background:' + TYPE_CONFIG['cafe'].color + ';"></span>' +
+        '<span class="sidebar-loc-dot" style="background:' + cfg.color + ';flex-shrink:0;"></span>' +
         '<div class="sidebar-loc-info">' +
           '<div class="sidebar-loc-name">' + loc.name + '</div>' +
-          '<div class="sidebar-loc-meta">' + distStr + (loc.city ? ' · ' + loc.city : '') + '</div>' +
+          '<div class="sidebar-loc-meta">' + cfg.label + ' · ' + distStr + '</div>' +
         '</div>' +
         '<span class="sidebar-loc-dist">' + distStr + '</span>' +
       '</div>';
     });
     nearbyEl.innerHTML = html;
     nearbyEl.querySelectorAll('.sidebar-loc-item').forEach(function(el) {
-      el.addEventListener('click', function(){ Map.flyTo(el.dataset.id); });
+      el.addEventListener('click', function(){ Map.flyTo(el.dataset.id); closeSidebar(); });
     });
   }
 
