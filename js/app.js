@@ -10,13 +10,15 @@ const App = {
     // Load seed locations immediately (always available)
     this.locations = [...SEED_LOCATIONS];
 
-    // Init type select — 3 opções separadas
+    // Init type select — tipos correctos correspondentes ao TYPE_CONFIG
     const sel = document.getElementById('add-type');
     if (sel) {
       sel.innerHTML = [
-        '<option value="cafe">Café</option>',
-        '<option value="espresso">Restaurante</option>',
-        '<option value="loja-oficial">Outro Estabelecimento</option>',
+        '<option value="cafe">Café / Restaurante</option>',
+        '<option value="espresso">Delta Espresso</option>',
+        '<option value="delta-q">Delta Q</option>',
+        '<option value="loja-oficial">Loja Delta</option>',
+        '<option value="fabrica">Fábrica / Museu</option>',
       ].join('');
     }
     // Produtos — 2 opções
