@@ -421,6 +421,28 @@ var Map = (function() {
       html += '</a>';
     }
 
+    /* Photo action — owner or admin can add/change photo */
+    var isOwner = App.currentUser && (
+      App.currentUser.email === loc.ownerEmail ||
+      App.currentUser.role === 'admin'
+    );
+    if (isOwner) {
+      html += '<div class="sp-photo-action">';
+      if (photoData) {
+        html += '<label class="spot-action-btn sp-photo-btn" for="sp-photo-input" style="cursor:pointer;">';
+        html += '  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z"/></svg>';
+        html += '  Alterar foto';
+        html += '</label>';
+      } else {
+        html += '<label class="spot-action-btn sp-photo-btn" for="sp-photo-input" style="cursor:pointer;">';
+        html += '  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z"/></svg>';
+        html += '  Adicionar foto';
+        html += '</label>';
+      }
+      html += '<input type="file" id="sp-photo-input" accept="image/*" style="display:none;" data-locid="' + id + '">';
+      html += '</div>';
+    }
+
     /* Added by */
     if (App.currentUser) {
       html += '<div class="sp-added" id="sp-by">Adicionado por <strong>' + loc.addedBy + '</strong></div>';
@@ -428,6 +450,53 @@ var Map = (function() {
 
     panel.innerHTML = html;
     panel.classList.remove('hidden');
+
+    /* Attach photo upload listener */
+    var spPhotoInput = document.getElementById('sp-photo-input');
+    if (spPhotoInput) {
+      spPhotoInput.addEventListener('change', function() {
+        var file = this.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) { UI.toast('Máximo 5MB.', 'error'); return; }
+        var locId = this.dataset.locid;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var img = new Image();
+          img.onload = function() {
+            var canvas = document.createElement('canvas');
+            var MAX = 800;
+            var scale = Math.min(MAX / img.width, MAX / img.height, 1);
+            canvas.width  = Math.round(img.width  * scale);
+            canvas.height = Math.round(img.height * scale);
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            var compressed = canvas.toDataURL('image/jpeg', 0.75);
+            /* Save to localStorage + Supabase */
+            try { localStorage.setItem('spot_photo_' + locId, compressed); } catch(err) {}
+            var loc = App.locations.find(function(l){ return l.id === locId; });
+            if (loc) {
+              loc.photo = compressed;
+              App.updateLocation(locId, { photo: compressed })
+                .then(function() { UI.toast('Foto guardada!', 'success'); })
+                .catch(function() { UI.toast('Foto guardada localmente.', 'info'); });
+              /* Award photo points if first time */
+              if (!loc._hadPhoto) {
+                loc._hadPhoto = true;
+                var earned = Gamification.addPoints(App.currentUser.email, 'ADD_PHOTO');
+                App.currentUser.points = (App.currentUser.points || 0) + earned;
+                DB.saveSession(App.currentUser);
+                DB.updateUser(App.currentUser.email, { points: App.currentUser.points });
+                UI.renderTopbar();
+                setTimeout(function(){ UI.toast('+' + earned + ' pontos pela foto! 📷', 'success'); }, 800);
+              }
+            }
+            /* Refresh panel with new photo */
+            openPanel(locId);
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
   }
 
   function closePanel() {
