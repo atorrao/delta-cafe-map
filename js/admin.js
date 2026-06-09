@@ -109,6 +109,10 @@ var Admin = {
     }
     // Edit button always visible
     actions += '<button class="admin-btn admin-btn-edit" data-act="edit-user" data-em="'+u.email+'">Editar</button>';
+    // Delete button — not for admins
+    if (u.role !== 'admin') {
+      actions += '<button class="admin-btn admin-btn-delete" data-act="delete-user" data-em="'+u.email+'">Eliminar</button>';
+    }
 
     return '<div class="admin-profile-row">' +
       Admin._avatarHtml(u, 46) +
@@ -301,6 +305,7 @@ var Admin = {
           (isPending  ? '<button class="admin-btn admin-btn-approve" data-act="approve-loc" data-em="'+loc.id+'">✓ Aprovar</button>' : '') +
           (isPending  ? '<button class="admin-btn admin-btn-reject"  data-act="reject-loc"  data-em="'+loc.id+'">✕ Recusar</button>' : '') +
           (!isPending ? '<button class="admin-btn admin-btn-inactive" data-act="remove-loc" data-em="'+loc.id+'">Remover</button>'   : '') +
+          '<button class="admin-btn admin-btn-delete" data-act="delete-loc" data-em="'+loc.id+'">Eliminar</button>' +
         '</div>' +
       '</div>' +
     '</div>';
@@ -334,6 +339,26 @@ var Admin = {
   },
 
   /* ── ACTIONS ── */
+  _confirmDialog: function(title, msg, confirmLabel, onConfirm) {
+    var existing = document.getElementById('admin-confirm-overlay');
+    if (existing) existing.remove();
+    var ov = document.createElement('div');
+    ov.id = 'admin-confirm-overlay';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:9700;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:24px;';
+    ov.innerHTML =
+      '<div style="background:var(--surface);border-radius:var(--r-xl);padding:28px 24px 24px;width:min(340px,100%);box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;">' +
+        '<div style="font-size:36px;margin-bottom:12px;">⚠️</div>' +
+        '<div style="font-family:var(--font-display);font-size:1.05rem;font-weight:700;color:var(--ink-new);margin-bottom:10px;">'+title+'</div>' +
+        '<div style="font-size:13px;color:var(--mut);line-height:1.6;margin-bottom:22px;">'+msg+'</div>' +
+        '<div style="display:flex;gap:10px;">' +
+          '<button class="msheet-btn msheet-cancel" id="adm-conf-cancel" style="flex:1;">Cancelar</button>' +
+          '<button class="msheet-btn" id="adm-conf-ok" style="flex:1;background:#a13a1e;color:#fff;">'+confirmLabel+'</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(ov);
+    document.getElementById('adm-conf-cancel').addEventListener('click', function(){ ov.remove(); });
+    document.getElementById('adm-conf-ok').addEventListener('click', function(){ ov.remove(); onConfirm(); });
+  },
   handleAction: async function(act, id) {
     if (act === 'approve-loc') {
       var loc = App.locations.find(function(l){ return l.id===id; });
@@ -464,6 +489,46 @@ var Admin = {
           Admin._loadAndRender();
         } catch(e) { UI.toast('Erro ao guardar. Verifica a ligação.','error'); }
       });
+      return;
+    }
+
+    if (act === 'delete-user') {
+      var u = Admin._sbUsers.find(function(u){ return u.email===id; });
+      if (!u) return;
+      Admin._confirmDialog(
+        'Eliminar utilizador',
+        'Tens a certeza que queres eliminar <strong>' + u.name + '</strong> (' + u.email + ')? Esta acção é irreversível.',
+        'Eliminar',
+        async function() {
+          try {
+            await DB.deleteUser(id);
+            Admin._sbUsers = Admin._sbUsers.filter(function(x){ return x.email!==id; });
+            UI.toast('Utilizador eliminado.', 'success');
+            Admin._loadAndRender();
+          } catch(e) { UI.toast('Erro ao eliminar.', 'error'); }
+        }
+      );
+      return;
+    }
+
+    if (act === 'delete-loc') {
+      var loc = App.locations.find(function(l){ return l.id===id; });
+      if (!loc) return;
+      Admin._confirmDialog(
+        'Eliminar local',
+        'Tens a certeza que queres eliminar <strong>' + loc.name + '</strong>? Esta acção é irreversível.',
+        'Eliminar',
+        async function() {
+          try {
+            var idx = App.locations.findIndex(function(l){ return l.id===id; });
+            if (idx > -1) App.locations.splice(idx, 1);
+            await App.removeLocation(id);
+            Map.renderMarkers();
+            UI.toast('Local eliminado.', 'success');
+            Admin._loadAndRender();
+          } catch(e) { UI.toast('Erro ao eliminar.', 'error'); }
+        }
+      );
       return;
     }
 
