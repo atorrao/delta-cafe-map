@@ -2696,3 +2696,12 @@ html, body { height: 100dvh !important; overflow: hidden !important; }
   text-decoration: none;
 }
 .historia-card-link:hover { text-decoration: underline; }
+
+/* Nearby section label */
+.sidebar-nearby-radius {
+  font-weight: 400;
+  color: var(--mut-lt);
+  font-size: 9px;
+  letter-spacing: 0;
+  text-transform: none;
+}
