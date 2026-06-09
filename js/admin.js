@@ -458,6 +458,18 @@ var Admin = {
       ov.innerHTML =
         '<div style="background:var(--surface);border-radius:var(--r-xl);padding:28px 24px 24px;width:min(400px,100%);max-height:88dvh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);">' +
           '<div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--ink-new);margin-bottom:20px;">Editar local</div>' +
+          '<div class="mfield"><label class="mfield-label">Tipo</label>' +
+            '<select class="mfield-input mfield-select" id="el-type">' +
+              '<option value="cafe"'+(loc.type==='cafe'?' selected':'')+'>Café</option>' +
+              '<option value="restaurante"'+(loc.type==='restaurante'?' selected':'')+'>Restaurante</option>' +
+              '<option value="outro"'+(loc.type==='outro'?' selected':'')+'>Outro Estabelecimento</option>' +
+              '<option value="loja-oficial"'+(loc.type==='loja-oficial'?' selected':'')+'>Loja Delta</option>' +
+              '<option value="delta-q"'+(loc.type==='delta-q'?' selected':'')+'>Delta Q</option>' +
+              '<option value="espresso"'+(loc.type==='espresso'?' selected':'')+'>Delta Espresso</option>' +
+              '<option value="fabrica"'+(loc.type==='fabrica'?' selected':'')+'>Fábrica / Museu</option>' +
+              '<option value="historia"'+(loc.type==='historia'?' selected':'')+'>Café com História</option>' +
+            '</select>' +
+          '</div>' +
           '<div class="mfield"><label class="mfield-label">Nome</label><input class="mfield-input" id="el-name" value="'+loc.name+'"></div>' +
           '<div class="mfield"><label class="mfield-label">Morada</label><input class="mfield-input" id="el-addr" value="'+(loc.address||'')+'"></div>' +
           '<div class="mfield"><label class="mfield-label">Cidade</label><input class="mfield-input" id="el-city" value="'+(loc.city||'')+'"></div>' +
@@ -472,6 +484,7 @@ var Admin = {
       document.body.appendChild(ov);
       document.getElementById('el-save').addEventListener('click', async function() {
         var updates = {
+          type:    document.getElementById('el-type').value,
           name:    document.getElementById('el-name').value.trim() || loc.name,
           address: document.getElementById('el-addr').value.trim(),
           city:    document.getElementById('el-city').value.trim(),

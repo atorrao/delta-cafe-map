@@ -165,9 +165,13 @@ var Map = (function() {
   function renderSidebarStatic() {
     var officialEl = document.getElementById('official-list');
     if (!officialEl) return;
+
+    /* Official = non-café types */
+    var officialTypes = ['loja-oficial','delta-q','espresso','fabrica'];
     var official = App.locations.filter(function(l) {
-      return l.type !== 'cafe';
+      return officialTypes.indexOf(l.type) !== -1;
     });
+
     if (!official.length) {
       officialEl.innerHTML = '<p class="sidebar-empty">Sem locais disponíveis.</p>';
       return;
@@ -175,9 +179,7 @@ var Map = (function() {
 
     // Group by type
     var groups = {};
-    Object.keys(TYPE_CONFIG).forEach(function(k) {
-      if (k !== 'cafe') groups[k] = [];
-    });
+    officialTypes.forEach(function(k) { groups[k] = []; });
     official.forEach(function(l) {
       if (groups[l.type]) groups[l.type].push(l);
     });

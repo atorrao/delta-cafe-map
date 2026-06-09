@@ -14,19 +14,25 @@ const DELTA = {
 };
 
 const TYPE_CONFIG = {
-  'espresso':     { label: 'Delta Espresso',    color: '#a13a1e'  },
-  'loja-oficial': { label: 'Loja Delta',         color: '#542916'  },
-  'delta-q':      { label: 'Delta Q',            color: '#b79858'  },
-  'cafe':         { label: 'Café / Restaurante', color: '#E8820C'  },
-  'fabrica':      { label: 'Fábrica / Museu',    color: '#f1c166'  },
+  'cafe':         { label: 'Café',                color: '#E8820C'  },
+  'restaurante':  { label: 'Restaurante',          color: '#c0571e'  },
+  'outro':        { label: 'Outro Estabelecimento',color: '#7a6a5a'  },
+  'loja-oficial': { label: 'Loja Delta',           color: '#542916'  },
+  'delta-q':      { label: 'Delta Q',              color: '#b79858'  },
+  'espresso':     { label: 'Delta Espresso',       color: '#a13a1e'  },
+  'fabrica':      { label: 'Fábrica / Museu',      color: '#f1c166'  },
+  'historia':     { label: 'Café com História',    color: '#6b8c5a'  },
 };
 
 const MARKER_TYPE = {
-  'espresso':     'capsule',
+  'cafe':         'cup',
+  'restaurante':  'cup',
+  'outro':        'cup',
   'loja-oficial': 'capsule',
   'delta-q':      'capsule',
-  'cafe':         'cup',
+  'espresso':     'capsule',
   'fabrica':      'capsule',
+  'historia':     'cup',
 };
 
 function getMarkerSVG(type, iconColor) {
